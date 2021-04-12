@@ -13,5 +13,2164 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Libraries">
+      <UniqueIdentifier>{2771f0db-66d3-4cd9-b914-a64333b2ffca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ogre">
+      <UniqueIdentifier>{f39902e0-a5db-468e-b4e8-52547c3c1010}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\mygui">
+      <UniqueIdentifier>{ed4e3d2a-4f8e-46fa-945d-f38cb55cc1d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\core">
+      <UniqueIdentifier>{cde8048d-7cf1-467e-9094-764f65fd46ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\kenshi">
+      <UniqueIdentifier>{f2ec4452-97a9-413a-b20d-f3bd59cd5fe5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\core\RVA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\core\Scanner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\kenshi\Kenshi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\kenshi\Root.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\kenshi\UI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\ogre\math\array\neon\single\neon_mathfun.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\Ogre.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\simple\OgreAabb.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\simple\c\OgreAabb.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreAlignedAllocator.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\android\OgreAndroidLogListener.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreAnimable.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreAnimation.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreAnimationState.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreAnimationTrack.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreAny.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\android\OgreAPKFileSystemArchive.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\android\OgreAPKZipArchive.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreArchive.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreArchiveFactory.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreArchiveManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\c\OgreArrayAabb.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreArrayAabb.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreArrayAabb.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreArrayAabb.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreArrayConfig.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreArrayMatrix4.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\c\OgreArrayMatrix4.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreArrayMatrix4.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreArrayMatrix4.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\c\OgreArrayMatrixAf4x3.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreArrayMatrixAf4x3.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreArrayMatrixAf4x3.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreArrayMatrixAf4x3.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreArrayMemoryManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreArrayQuaternion.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\c\OgreArrayQuaternion.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreArrayQuaternion.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreArrayQuaternion.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreArrayRay.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\c\OgreArraySphere.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreArraySphere.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreArraySphere.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreArraySphere.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreArrayVector3.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\c\OgreArrayVector3.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreArrayVector3.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreArrayVector3.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreAssert.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreASTCCodec.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreAsyncTextureTicket.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreAsyncTicket.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreAtomicObject.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreAtomicScalar.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreAutoParamDataSource.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreAxisAlignedBox.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreBarrier.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreBillboard.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreBillboardChain.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreBillboardParticleRenderer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreBillboardSet.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreBitset.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreBitwise.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreBlendMode.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\animation\OgreBone.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreBoneArrayMemoryManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreBoneMemoryManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreBoneTransform.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreBooleanMask.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\c\OgreBooleanMask.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreBooleanMask.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreBooleanMask.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreBufferInterface.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreBufferPacked.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreBuildSettings.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreCamera.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\commandbuffer\OgreCbCommon.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\commandbuffer\OgreCbDrawCall.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\commandbuffer\OgreCbLowLevelMaterial.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\commandbuffer\OgreCbPipelineStateObject.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\commandbuffer\OgreCbShaderBuffer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\commandbuffer\OgreCbTexture.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreCodec.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreColourValue.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\commandbuffer\OgreCommandBuffer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreCommon.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorChannel.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorCommon.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorManager2.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorNamedBuffer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorNode.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorNodeDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\OgreCompositorPass.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passclear\OgreCompositorPassClear.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passclear\OgreCompositorPassClearDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passcompute\OgreCompositorPassCompute.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passcompute\OgreCompositorPassComputeDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\OgreCompositorPassDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passdepthcopy\OgreCompositorPassDepthCopy.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passdepthcopy\OgreCompositorPassDepthCopyDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passiblspecular\OgreCompositorPassIblSpecular.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passiblspecular\OgreCompositorPassIblSpecularDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passmipmap\OgreCompositorPassMipmap.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passmipmap\OgreCompositorPassMipmapDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\OgreCompositorPassProvider.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passquad\OgreCompositorPassQuad.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passquad\OgreCompositorPassQuadDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passscene\OgreCompositorPassScene.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passscene\OgreCompositorPassSceneDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passstencil\OgreCompositorPassStencil.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passstencil\OgreCompositorPassStencilDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passuav\OgreCompositorPassUav.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\pass\passuav\OgreCompositorPassUavDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorShadowNode.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorShadowNodeDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorWorkspace.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorWorkspaceDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorWorkspaceListener.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\win32\OgreComPtr.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compute\OgreComputeTools.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreConfig.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreConfigDialog.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\emscripten\OgreConfigDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\osx\OgreConfigDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\android\OgreConfigDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\glx\OgreConfigDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\ios\OgreConfigDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\gtk\OgreConfigDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\win32\OgreConfigDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\nacl\OgreConfigDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\win32\OgreConfigDialogImpWinRT.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreConfigFile.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreConfigOptionMap.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreConstBufferPacked.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreConstBufferPool.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreController.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreControllerManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreConvexBody.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreCustomCompositionPass.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreDataStream.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgreDDSCodec.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreDDSCodec2.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreDecal.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreDefaultHardwareBufferManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreDefaultWorkQueue.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreDefaultWorkQueueStandard.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreDefaultWorkQueueTBB.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreDeflate.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreDepthBuffer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgreDepthBuffer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreDescriptorSetSampler.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreDescriptorSetTexture.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreDescriptorSetUav.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreDistanceLodStrategy.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreDualQuaternion.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreDynLib.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreDynLibManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreEdgeListBuilder.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreEntity.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreErrorDialog.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\glx\OgreErrorDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\emscripten\OgreErrorDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\win32\OgreErrorDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\nacl\OgreErrorDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\gtk\OgreErrorDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\ios\OgreErrorDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\osx\OgreErrorDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\android\OgreErrorDialogImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\win32\OgreErrorDialogImpWinRT.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreETCCodec.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreException.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreExternalTextureSource.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreExternalTextureSourceManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreFactoryObj.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreFastArray.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreFileSystem.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreFileSystemLayer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreForward3D.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreForwardClustered.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreForwardPlusBase.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreFrameListener.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreFrameStats.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgreFreeImageCodec.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreFreeImageCodec2.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreFrustum.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreGL3PlusBuildSettings.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreGpuProgram.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreGpuProgramManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreGpuProgramParams.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreGpuProgramUsage.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreGpuResource.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHardwareBuffer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHardwareBufferManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHardwareCounterBuffer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHardwareIndexBuffer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHardwareOcclusionQuery.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgreHardwarePixelBuffer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHardwareUniformBuffer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHardwareVertexBuffer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHeaderPrefix.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHeaderSuffix.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHiddenAreaMeshVr.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHighLevelGpuProgram.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHighLevelGpuProgramManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlms.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlmsCommon.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlmsCompute.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlmsComputeJob.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlmsDatablock.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlmsDiskCache.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlmsJson.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlmsJsonCompute.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlmsListener.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlmsLowLevel.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlmsLowLevelDatablock.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlmsManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlmsPso.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlmsSamplerblock.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreHlmsTexturePack.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreId.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreIdString.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgreImage.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreImage2.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgreImageCodec.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreImageCodec2.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreImageDownsampler.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreIndexBufferPacked.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreIndirectBufferPacked.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreInternalCubemapProbe.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreItem.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreIteratorRange.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreIteratorWrapper.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreIteratorWrappers.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreKeyFrame.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreKfTransform.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreKfTransformArrayMemoryManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreLight.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreLightweightMutex.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreLodListener.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreLodStrategy.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreLodStrategyManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreLog.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreLogManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreLwConstString.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreLwString.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreManualObject.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreManualObject2.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMaterial.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMaterialManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMaterialSerializer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMath.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreMathlib.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\c\OgreMathlibC.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreMathlibNEON.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreMathlibSSE2.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMatrix3.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMatrix4.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMemoryAllocatedObject.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMemoryAllocatorConfig.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMemoryNedAlloc.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMemoryNedPooling.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMemoryStdAlloc.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMemorySTLAllocator.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMemoryTrackAlloc.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMemoryTracker.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMesh.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMesh2.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMesh2Serializer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMesh2SerializerImpl.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMeshFileFormat.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMeshManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMeshManager2.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMeshSerializer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMeshSerializerImpl.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\win32\OgreMinGWSupport.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMovableObject.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreMovablePlane.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreMultiSourceVertexBufferPool.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreNameGenerator.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreNode.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreNodeMemoryManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreNumerics.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreObjCmdBuffer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreObjectData.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreObjectMemoryManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreOfflineProfiler.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreOITDCodec.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreOldBone.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreOldNode.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreOldSkeletonInstance.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreOldSkeletonManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreOptimisedUtil.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\ios\OgreOSXCocoaTouchView.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreParticle.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreParticleAffector.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreParticleAffectorFactory.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreParticleEmitter.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreParticleEmitterCommands.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreParticleEmitterFactory.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreParticleIterator.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreParticleSystem.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreParticleSystemManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreParticleSystemRenderer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePass.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePatchMesh.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePatchSurface.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgrePixelBox.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePixelCountLodStrategy.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgrePixelFormat.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgrePixelFormatDescriptions.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePixelFormatGpu.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePixelFormatGpuUtils.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePlane.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePlaneBoundedVolume.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePlatform.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePlatformInformation.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePlugin.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePolygon.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePose.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePredefinedControllers.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePrefabFactory.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePrerequisites.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreProfiler.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreProfilerCommon.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePsoCacheHelper.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgrePVRTCCodec.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreQuaternion.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRadialDensityMask.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRadixSort.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRawPtr.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRay.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreReadOnlyBufferPacked.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRectangle2D.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRectangle2D2.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRenderable.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRenderObjectListener.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRenderOperation.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRenderPassDescriptor.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRenderQueue.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRenderQueueListener.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRenderSystem.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRenderSystemCapabilities.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRenderSystemCapabilitiesManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRenderSystemCapabilitiesSerializer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgreRenderTarget.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgreRenderTargetListener.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgreRenderTexture.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgreRenderToVertexBuffer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgreRenderWindow.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreResource.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreResourceBackgroundQueue.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreResourceGroupManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreResourceManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreResourceTransition.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRibbonTrail.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRoot.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRootLayout.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreRotationalSpline.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSceneManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSceneManagerEnumerator.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSceneNode.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSceneQuery.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreScriptCompiler.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreScriptLexer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreScriptLoader.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreScriptParser.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreScriptTranslator.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSearchOps.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSerializer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreShaderParams.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreShaderPrimitives.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreShadowCameraSetup.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreShadowCameraSetupConcentric.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreShadowCameraSetupFocused.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreShadowCameraSetupPlaneOptimal.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreShadowCameraSetupPSSM.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreShadowVolumeExtrudeProgram.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSharedPtr.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSimpleRenderable.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSimpleSpline.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSingleton.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSkeleton.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\animation\OgreSkeletonAnimation.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\animation\OgreSkeletonAnimationDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\animation\OgreSkeletonAnimManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\animation\OgreSkeletonDef.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSkeletonFileFormat.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\animation\OgreSkeletonInstance.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\animation\OgreSkeletonManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSkeletonSerializer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\animation\OgreSkeletonTrack.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSmallVector.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSphere.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreStableHeaders.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreStackVector.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreStagingBuffer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreStagingTexture.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreStagingTextureBufferImpl.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreStagingTextureManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreStaticFaceGroup.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreStaticGeometry.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSTBICodec.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreStdHeaders.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreStreamSerialiser.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreString.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreStringConverter.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreStringInterface.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreStringVector.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSubEntity.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSubItem.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSubMesh.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreSubMesh2.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\animation\OgreTagPoint.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreTagPoint.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreTangentSpaceCalc.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreTechnique.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreTexBufferPacked.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgreTexture.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreTextureBox.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\compositor\OgreTextureDefinition.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreTextureFilters.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreTextureGpu.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreTextureGpuListener.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreTextureGpuManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreTextureGpuManagerListener.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\deprecated\OgreTextureManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreTextureUnitState.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreThreadDefines.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreThreadDefinesBoost.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreThreadDefinesNone.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreThreadDefinesPoco.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreThreadDefinesSTD.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreThreadDefinesTBB.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreThreadHeaders.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreThreadHeadersBoost.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreThreadHeadersPoco.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreThreadHeadersSTD.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreThreadHeadersTBB.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreThreads.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreTimer.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\emscripten\OgreTimerImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\glx\OgreTimerImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\nacl\OgreTimerImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\osx\OgreTimerImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\android\OgreTimerImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\ios\OgreTimerImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\win32\OgreTimerImp.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\OgreTransform.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreUavBufferPacked.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreUnifiedHighLevelGpuProgram.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreUniformScalableTask.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreUserObjectBindings.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreUTFString.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreVaoManager.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreVector2.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreVector3.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreVector4.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreVertexArrayObject.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreVertexBoneAssignment.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreVertexBufferDownloadHelper.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreVertexBufferPacked.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\vao\OgreVertexElements.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreVertexIndexData.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreVertexRemapping.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreVertexShadowMapHelper.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreViewport.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreVisibilityFlags.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\threading\OgreWaitableEvent.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreWindow.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreWindowEventUtilities.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreWireAabb.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreWireBoundingBox.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreWorkarounds.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreWorkQueue.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\OgreZip.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ActionController.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Align.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Allocator.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Any.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_BackwardCompatibility.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_BiIndexBase.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Bitwise.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Button.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Canvas.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ChildSkinInfo.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ClipboardManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Colour.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ComboBox.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Common.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_CommonStateInfo.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ConsoleLogListener.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Constants.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ControllerEdgeHide.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ControllerFadeAlpha.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ControllerItem.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ControllerManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ControllerPosition.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ControllerRepeatClick.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_CoordConverter.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_CustomAllocator.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_DataFileStream.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_DataManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_DataMemoryStream.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_DataStream.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_DataStreamHolder.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_DDContainer.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_DDItemInfo.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Delegate.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_DelegateImplement.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_DeprecatedTypes.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_DeprecatedWidgets.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Diagnostic.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_DynLib.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_DynLibManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_EditBox.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_EditText.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Enumerator.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_EventPair.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Exception.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_FactoryManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_FileLogListener.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_FlowDirection.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_FontData.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_FontManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_GenericFactory.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_GeometryUtility.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Gui.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_IBItemInfo.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ICroppedRectangle.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_IDataStream.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_IFont.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_IItem.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_IItemContainer.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ILayer.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ILayerItem.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ILayerNode.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ILogFilter.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ILogListener.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ImageBox.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ImageInfo.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_InputManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_IObject.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_IPointer.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_IRenderTarget.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_IResource.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ISerializable.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_IStateInfo.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ISubWidget.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ISubWidgetRect.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ISubWidgetText.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ItemBox.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ITexture.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_IUnlinkWidget.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_IVertexBuffer.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_KeyCode.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_LanguageManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_LayerItem.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_LayerManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_LayerNode.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_LayoutData.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_LayoutManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_LevelLogFilter.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ListBox.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_LogLevel.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_LogManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_LogSource.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_LogStream.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Macros.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_MainSkin.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_MaskPickInfo.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_MenuBar.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_MenuControl.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_MenuItem.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_MenuItemType.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_MouseButton.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_MultiListBox.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_MultiListItem.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_OverlappedLayer.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Platform.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Plugin.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_PluginManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_PointerManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_PolygonalSkin.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_PopupMenu.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Precompiled.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Prerequest.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ProgressBar.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_RenderFormat.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_RenderItem.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_RenderManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_RenderTargetInfo.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ResizingPolicy.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ResourceImageSet.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ResourceImageSetData.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ResourceImageSetPointer.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ResourceLayout.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ResourceManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ResourceManualFont.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ResourceManualPointer.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ResourceSkin.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ResourceTrueTypeFont.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_RotatingSkin.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_RTTI.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ScrollBar.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ScrollView.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ScrollViewBase.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_SharedLayer.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_SharedLayerNode.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_SimpleText.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Singleton.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_SkinItem.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_SkinManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_StringUtility.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_SubSkin.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_SubWidgetBinding.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_SubWidgetInfo.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_SubWidgetManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_TabControl.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_TabItem.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_TCoord.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_TextBox.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_TextChangeHistory.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_TextIterator.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_TextureUtility.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_TextView.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_TextViewData.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_TileRect.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Timer.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_ToolTipManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_TPoint.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_TRect.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_TSize.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Types.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_UString.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Version.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_VertexData.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Widget.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_WidgetDefines.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_WidgetInput.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_WidgetManager.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_WidgetStyle.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_WidgetToolTip.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_WidgetTranslate.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_WidgetUserData.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_Window.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_WindowsClipboardHandler.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\mygui\MyGUI_XmlDocument.h">
+      <Filter>Header Files\mygui</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\core\RVA.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\core\Scanner.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\osx\macUtils.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\ios\macUtils.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\ogrestd\deque.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\ogrestd\list.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\ogrestd\map.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\ogrestd\set.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\math\array\sse2\single\sse_mathfun.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\ogrestd\vector.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\ogrestd\unordered_set.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\ogrestd\unordered_map.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\hash\MurmurHash3.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ogre\debugbreak\debugbreak.h">
+      <Filter>Header Files\ogre</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Building.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Character.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Faction.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\GameData.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\GameDataManager.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\GameWorld.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\util\hand.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Kenshi.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\util\lektor.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\MedicalSystem.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\ModInfo.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Platoon.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\PlayerInterface.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Root.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\stdafx.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Tasks.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\View.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Zone.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="Libraries\mygui\MyGUIEngine_x64.lib">
+      <Filter>Libraries</Filter>
+    </Library>
+    <Library Include="Libraries\ogre\OgreMain_x64.lib">
+      <Filter>Libraries</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Libraries\ogre\OgreMain_x64.def">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="Include\ogre\math\simple\c\OgreAabb.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\sse2\single\OgreArrayAabb.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\c\OgreArrayAabb.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\neon\single\OgreArrayAabb.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\neon\single\OgreArrayMatrix4.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\c\OgreArrayMatrix4.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\sse2\single\OgreArrayMatrix4.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\c\OgreArrayMatrixAf4x3.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\neon\single\OgreArrayMatrixAf4x3.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\sse2\single\OgreArrayMatrixAf4x3.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\c\OgreArrayQuaternion.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\sse2\single\OgreArrayQuaternion.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\neon\single\OgreArrayQuaternion.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\neon\single\OgreArraySphere.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\sse2\single\OgreArraySphere.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\c\OgreArraySphere.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\c\OgreArrayVector3.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\sse2\single\OgreArrayVector3.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\neon\single\OgreArrayVector3.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\animation\OgreBone.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\sse2\single\OgreBooleanMask.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\neon\single\OgreBooleanMask.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\c\OgreBooleanMask.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\OgreLight.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\OgreLodStrategyPrivate.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\c\OgreMathlibC.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\neon\single\OgreMathlibNEON.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\math\array\sse2\single\OgreMathlibSSE2.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
+    <None Include="Include\ogre\OgreMovableObject.inl">
+      <Filter>Header Files\ogre</Filter>
+    </None>
   </ItemGroup>
 </Project>
