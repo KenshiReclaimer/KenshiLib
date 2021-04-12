@@ -16,7 +16,7 @@
 namespace MyGUI
 {
 
-	struct Align
+	struct MYGUI_EXPORT Align
 	{
 		enum Enum
 		{
