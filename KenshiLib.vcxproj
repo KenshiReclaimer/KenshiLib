@@ -1,0 +1,810 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{bed1fbe0-1fff-498f-8ab9-788451cdd690}</ProjectGuid>
+    <RootNamespace>KenshiLib</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared" >
+  </ImportGroup>
+    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    </ImportGroup>
+    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    </ImportGroup>
+
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;OGRE_DEBUG_MODE=OGRE_DEBUG_LEVEL_RELEASE;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;OGRE_DEBUG_MODE=OGRE_DEBUG_LEVEL_RELEASE;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemGroup>
+    <None Include="Include\ogre\animation\OgreBone.inl" />
+    <None Include="Include\ogre\math\array\c\OgreArrayAabb.inl" />
+    <None Include="Include\ogre\math\array\c\OgreArrayMatrix4.inl" />
+    <None Include="Include\ogre\math\array\c\OgreArrayMatrixAf4x3.inl" />
+    <None Include="Include\ogre\math\array\c\OgreArrayQuaternion.inl" />
+    <None Include="Include\ogre\math\array\c\OgreArraySphere.inl" />
+    <None Include="Include\ogre\math\array\c\OgreArrayVector3.inl" />
+    <None Include="Include\ogre\math\array\c\OgreBooleanMask.inl" />
+    <None Include="Include\ogre\math\array\c\OgreMathlibC.inl" />
+    <None Include="Include\ogre\math\array\neon\single\OgreArrayAabb.inl" />
+    <None Include="Include\ogre\math\array\neon\single\OgreArrayMatrix4.inl" />
+    <None Include="Include\ogre\math\array\neon\single\OgreArrayMatrixAf4x3.inl" />
+    <None Include="Include\ogre\math\array\neon\single\OgreArrayQuaternion.inl" />
+    <None Include="Include\ogre\math\array\neon\single\OgreArraySphere.inl" />
+    <None Include="Include\ogre\math\array\neon\single\OgreArrayVector3.inl" />
+    <None Include="Include\ogre\math\array\neon\single\OgreBooleanMask.inl" />
+    <None Include="Include\ogre\math\array\neon\single\OgreMathlibNEON.inl" />
+    <None Include="Include\ogre\math\array\sse2\single\OgreArrayAabb.inl" />
+    <None Include="Include\ogre\math\array\sse2\single\OgreArrayMatrix4.inl" />
+    <None Include="Include\ogre\math\array\sse2\single\OgreArrayMatrixAf4x3.inl" />
+    <None Include="Include\ogre\math\array\sse2\single\OgreArrayQuaternion.inl" />
+    <None Include="Include\ogre\math\array\sse2\single\OgreArraySphere.inl" />
+    <None Include="Include\ogre\math\array\sse2\single\OgreArrayVector3.inl" />
+    <None Include="Include\ogre\math\array\sse2\single\OgreBooleanMask.inl" />
+    <None Include="Include\ogre\math\array\sse2\single\OgreMathlibSSE2.inl" />
+    <None Include="Include\ogre\math\simple\c\OgreAabb.inl" />
+    <None Include="Include\ogre\OgreLight.inl" />
+    <None Include="Include\ogre\OgreLodStrategyPrivate.inl" />
+    <None Include="Include\ogre\OgreMovableObject.inl" />
+    <None Include="Libraries\ogre\OgreMain_x64.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\core\RVA.cpp" />
+    <ClCompile Include="Source\core\Scanner.cpp" />
+    <ClCompile Include="Source\kenshi\Kenshi.cpp" />
+    <ClCompile Include="Source\kenshi\Root.cpp" />
+    <ClCompile Include="Source\kenshi\UI.cpp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ClInclude Include="Include\core\RVA.h" />
+    <ClInclude Include="Include\core\Scanner.h" />
+    <ClInclude Include="Include\kenshi\Building.h" />
+    <ClInclude Include="Include\kenshi\Character.h" />
+    <ClInclude Include="Include\kenshi\Faction.h" />
+    <ClInclude Include="Include\kenshi\GameData.h" />
+    <ClInclude Include="Include\kenshi\GameDataManager.h" />
+    <ClInclude Include="Include\kenshi\GameWorld.h" />
+    <ClInclude Include="Include\kenshi\Kenshi.h" />
+    <ClInclude Include="Include\kenshi\MedicalSystem.h" />
+    <ClInclude Include="Include\kenshi\ModInfo.h" />
+    <ClInclude Include="Include\kenshi\Platoon.h" />
+    <ClInclude Include="Include\kenshi\PlayerInterface.h" />
+    <ClInclude Include="Include\kenshi\Root.h" />
+    <ClInclude Include="Include\kenshi\Tasks.h" />
+    <ClInclude Include="Include\kenshi\util\hand.h" />
+    <ClInclude Include="Include\kenshi\util\lektor.h" />
+    <ClInclude Include="Include\kenshi\View.h" />
+    <ClInclude Include="Include\kenshi\Zone.h" />
+    <ClInclude Include="Include\mygui\MyGUI.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ActionController.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Align.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Allocator.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Any.h" />
+    <ClInclude Include="Include\mygui\MyGUI_BackwardCompatibility.h" />
+    <ClInclude Include="Include\mygui\MyGUI_BiIndexBase.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Bitwise.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Button.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Canvas.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ChildSkinInfo.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ClipboardManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Colour.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ComboBox.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Common.h" />
+    <ClInclude Include="Include\mygui\MyGUI_CommonStateInfo.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ConsoleLogListener.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Constants.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ControllerEdgeHide.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ControllerFadeAlpha.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ControllerItem.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ControllerManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ControllerPosition.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ControllerRepeatClick.h" />
+    <ClInclude Include="Include\mygui\MyGUI_CoordConverter.h" />
+    <ClInclude Include="Include\mygui\MyGUI_CustomAllocator.h" />
+    <ClInclude Include="Include\mygui\MyGUI_DataFileStream.h" />
+    <ClInclude Include="Include\mygui\MyGUI_DataManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_DataMemoryStream.h" />
+    <ClInclude Include="Include\mygui\MyGUI_DataStream.h" />
+    <ClInclude Include="Include\mygui\MyGUI_DataStreamHolder.h" />
+    <ClInclude Include="Include\mygui\MyGUI_DDContainer.h" />
+    <ClInclude Include="Include\mygui\MyGUI_DDItemInfo.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Delegate.h" />
+    <ClInclude Include="Include\mygui\MyGUI_DelegateImplement.h" />
+    <ClInclude Include="Include\mygui\MyGUI_DeprecatedTypes.h" />
+    <ClInclude Include="Include\mygui\MyGUI_DeprecatedWidgets.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Diagnostic.h" />
+    <ClInclude Include="Include\mygui\MyGUI_DynLib.h" />
+    <ClInclude Include="Include\mygui\MyGUI_DynLibManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_EditBox.h" />
+    <ClInclude Include="Include\mygui\MyGUI_EditText.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Enumerator.h" />
+    <ClInclude Include="Include\mygui\MyGUI_EventPair.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Exception.h" />
+    <ClInclude Include="Include\mygui\MyGUI_FactoryManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_FileLogListener.h" />
+    <ClInclude Include="Include\mygui\MyGUI_FlowDirection.h" />
+    <ClInclude Include="Include\mygui\MyGUI_FontData.h" />
+    <ClInclude Include="Include\mygui\MyGUI_FontManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_GenericFactory.h" />
+    <ClInclude Include="Include\mygui\MyGUI_GeometryUtility.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Gui.h" />
+    <ClInclude Include="Include\mygui\MyGUI_IBItemInfo.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ICroppedRectangle.h" />
+    <ClInclude Include="Include\mygui\MyGUI_IDataStream.h" />
+    <ClInclude Include="Include\mygui\MyGUI_IFont.h" />
+    <ClInclude Include="Include\mygui\MyGUI_IItem.h" />
+    <ClInclude Include="Include\mygui\MyGUI_IItemContainer.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ILayer.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ILayerItem.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ILayerNode.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ILogFilter.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ILogListener.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ImageBox.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ImageInfo.h" />
+    <ClInclude Include="Include\mygui\MyGUI_InputManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_IObject.h" />
+    <ClInclude Include="Include\mygui\MyGUI_IPointer.h" />
+    <ClInclude Include="Include\mygui\MyGUI_IRenderTarget.h" />
+    <ClInclude Include="Include\mygui\MyGUI_IResource.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ISerializable.h" />
+    <ClInclude Include="Include\mygui\MyGUI_IStateInfo.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ISubWidget.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ISubWidgetRect.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ISubWidgetText.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ItemBox.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ITexture.h" />
+    <ClInclude Include="Include\mygui\MyGUI_IUnlinkWidget.h" />
+    <ClInclude Include="Include\mygui\MyGUI_IVertexBuffer.h" />
+    <ClInclude Include="Include\mygui\MyGUI_KeyCode.h" />
+    <ClInclude Include="Include\mygui\MyGUI_LanguageManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_LayerItem.h" />
+    <ClInclude Include="Include\mygui\MyGUI_LayerManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_LayerNode.h" />
+    <ClInclude Include="Include\mygui\MyGUI_LayoutData.h" />
+    <ClInclude Include="Include\mygui\MyGUI_LayoutManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_LevelLogFilter.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ListBox.h" />
+    <ClInclude Include="Include\mygui\MyGUI_LogLevel.h" />
+    <ClInclude Include="Include\mygui\MyGUI_LogManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_LogSource.h" />
+    <ClInclude Include="Include\mygui\MyGUI_LogStream.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Macros.h" />
+    <ClInclude Include="Include\mygui\MyGUI_MainSkin.h" />
+    <ClInclude Include="Include\mygui\MyGUI_MaskPickInfo.h" />
+    <ClInclude Include="Include\mygui\MyGUI_MenuBar.h" />
+    <ClInclude Include="Include\mygui\MyGUI_MenuControl.h" />
+    <ClInclude Include="Include\mygui\MyGUI_MenuItem.h" />
+    <ClInclude Include="Include\mygui\MyGUI_MenuItemType.h" />
+    <ClInclude Include="Include\mygui\MyGUI_MouseButton.h" />
+    <ClInclude Include="Include\mygui\MyGUI_MultiListBox.h" />
+    <ClInclude Include="Include\mygui\MyGUI_MultiListItem.h" />
+    <ClInclude Include="Include\mygui\MyGUI_OverlappedLayer.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Platform.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Plugin.h" />
+    <ClInclude Include="Include\mygui\MyGUI_PluginManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_PointerManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_PolygonalSkin.h" />
+    <ClInclude Include="Include\mygui\MyGUI_PopupMenu.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Precompiled.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Prerequest.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ProgressBar.h" />
+    <ClInclude Include="Include\mygui\MyGUI_RenderFormat.h" />
+    <ClInclude Include="Include\mygui\MyGUI_RenderItem.h" />
+    <ClInclude Include="Include\mygui\MyGUI_RenderManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_RenderTargetInfo.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ResizingPolicy.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ResourceImageSet.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ResourceImageSetData.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ResourceImageSetPointer.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ResourceLayout.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ResourceManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ResourceManualFont.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ResourceManualPointer.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ResourceSkin.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ResourceTrueTypeFont.h" />
+    <ClInclude Include="Include\mygui\MyGUI_RotatingSkin.h" />
+    <ClInclude Include="Include\mygui\MyGUI_RTTI.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ScrollBar.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ScrollView.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ScrollViewBase.h" />
+    <ClInclude Include="Include\mygui\MyGUI_SharedLayer.h" />
+    <ClInclude Include="Include\mygui\MyGUI_SharedLayerNode.h" />
+    <ClInclude Include="Include\mygui\MyGUI_SimpleText.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Singleton.h" />
+    <ClInclude Include="Include\mygui\MyGUI_SkinItem.h" />
+    <ClInclude Include="Include\mygui\MyGUI_SkinManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_StringUtility.h" />
+    <ClInclude Include="Include\mygui\MyGUI_SubSkin.h" />
+    <ClInclude Include="Include\mygui\MyGUI_SubWidgetBinding.h" />
+    <ClInclude Include="Include\mygui\MyGUI_SubWidgetInfo.h" />
+    <ClInclude Include="Include\mygui\MyGUI_SubWidgetManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_TabControl.h" />
+    <ClInclude Include="Include\mygui\MyGUI_TabItem.h" />
+    <ClInclude Include="Include\mygui\MyGUI_TCoord.h" />
+    <ClInclude Include="Include\mygui\MyGUI_TextBox.h" />
+    <ClInclude Include="Include\mygui\MyGUI_TextChangeHistory.h" />
+    <ClInclude Include="Include\mygui\MyGUI_TextIterator.h" />
+    <ClInclude Include="Include\mygui\MyGUI_TextureUtility.h" />
+    <ClInclude Include="Include\mygui\MyGUI_TextView.h" />
+    <ClInclude Include="Include\mygui\MyGUI_TextViewData.h" />
+    <ClInclude Include="Include\mygui\MyGUI_TileRect.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Timer.h" />
+    <ClInclude Include="Include\mygui\MyGUI_ToolTipManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_TPoint.h" />
+    <ClInclude Include="Include\mygui\MyGUI_TRect.h" />
+    <ClInclude Include="Include\mygui\MyGUI_TSize.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Types.h" />
+    <ClInclude Include="Include\mygui\MyGUI_UString.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Version.h" />
+    <ClInclude Include="Include\mygui\MyGUI_VertexData.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Widget.h" />
+    <ClInclude Include="Include\mygui\MyGUI_WidgetDefines.h" />
+    <ClInclude Include="Include\mygui\MyGUI_WidgetInput.h" />
+    <ClInclude Include="Include\mygui\MyGUI_WidgetManager.h" />
+    <ClInclude Include="Include\mygui\MyGUI_WidgetStyle.h" />
+    <ClInclude Include="Include\mygui\MyGUI_WidgetToolTip.h" />
+    <ClInclude Include="Include\mygui\MyGUI_WidgetTranslate.h" />
+    <ClInclude Include="Include\mygui\MyGUI_WidgetUserData.h" />
+    <ClInclude Include="Include\mygui\MyGUI_Window.h" />
+    <ClInclude Include="Include\mygui\MyGUI_WindowsClipboardHandler.h" />
+    <ClInclude Include="Include\mygui\MyGUI_XmlDocument.h" />
+    <ClInclude Include="Include\ogre\android\OgreAndroidLogListener.h" />
+    <ClInclude Include="Include\ogre\android\OgreAPKFileSystemArchive.h" />
+    <ClInclude Include="Include\ogre\android\OgreAPKZipArchive.h" />
+    <ClInclude Include="Include\ogre\android\OgreConfigDialogImp.h" />
+    <ClInclude Include="Include\ogre\android\OgreErrorDialogImp.h" />
+    <ClInclude Include="Include\ogre\android\OgreTimerImp.h" />
+    <ClInclude Include="Include\ogre\animation\OgreBone.h" />
+    <ClInclude Include="Include\ogre\animation\OgreSkeletonAnimation.h" />
+    <ClInclude Include="Include\ogre\animation\OgreSkeletonAnimationDef.h" />
+    <ClInclude Include="Include\ogre\animation\OgreSkeletonAnimManager.h" />
+    <ClInclude Include="Include\ogre\animation\OgreSkeletonDef.h" />
+    <ClInclude Include="Include\ogre\animation\OgreSkeletonInstance.h" />
+    <ClInclude Include="Include\ogre\animation\OgreSkeletonManager.h" />
+    <ClInclude Include="Include\ogre\animation\OgreSkeletonTrack.h" />
+    <ClInclude Include="Include\ogre\animation\OgreTagPoint.h" />
+    <ClInclude Include="Include\ogre\commandbuffer\OgreCbCommon.h" />
+    <ClInclude Include="Include\ogre\commandbuffer\OgreCbDrawCall.h" />
+    <ClInclude Include="Include\ogre\commandbuffer\OgreCbLowLevelMaterial.h" />
+    <ClInclude Include="Include\ogre\commandbuffer\OgreCbPipelineStateObject.h" />
+    <ClInclude Include="Include\ogre\commandbuffer\OgreCbShaderBuffer.h" />
+    <ClInclude Include="Include\ogre\commandbuffer\OgreCbTexture.h" />
+    <ClInclude Include="Include\ogre\commandbuffer\OgreCommandBuffer.h" />
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorChannel.h" />
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorCommon.h" />
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorManager2.h" />
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorNamedBuffer.h" />
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorNode.h" />
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorNodeDef.h" />
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorShadowNode.h" />
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorShadowNodeDef.h" />
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorWorkspace.h" />
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorWorkspaceDef.h" />
+    <ClInclude Include="Include\ogre\compositor\OgreCompositorWorkspaceListener.h" />
+    <ClInclude Include="Include\ogre\compositor\OgreTextureDefinition.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\OgreCompositorPass.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\OgreCompositorPassDef.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\OgreCompositorPassProvider.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passclear\OgreCompositorPassClear.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passclear\OgreCompositorPassClearDef.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passcompute\OgreCompositorPassCompute.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passcompute\OgreCompositorPassComputeDef.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passdepthcopy\OgreCompositorPassDepthCopy.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passdepthcopy\OgreCompositorPassDepthCopyDef.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passiblspecular\OgreCompositorPassIblSpecular.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passiblspecular\OgreCompositorPassIblSpecularDef.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passmipmap\OgreCompositorPassMipmap.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passmipmap\OgreCompositorPassMipmapDef.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passquad\OgreCompositorPassQuad.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passquad\OgreCompositorPassQuadDef.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passscene\OgreCompositorPassScene.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passscene\OgreCompositorPassSceneDef.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passstencil\OgreCompositorPassStencil.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passstencil\OgreCompositorPassStencilDef.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passuav\OgreCompositorPassUav.h" />
+    <ClInclude Include="Include\ogre\compositor\pass\passuav\OgreCompositorPassUavDef.h" />
+    <ClInclude Include="Include\ogre\compute\OgreComputeTools.h" />
+    <ClInclude Include="Include\ogre\debugbreak\debugbreak.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgreDDSCodec.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgreDepthBuffer.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgreFreeImageCodec.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgreHardwarePixelBuffer.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgreImage.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgreImageCodec.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgrePixelBox.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgrePixelFormat.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgrePixelFormatDescriptions.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgreRenderTarget.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgreRenderTargetListener.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgreRenderTexture.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgreRenderToVertexBuffer.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgreRenderWindow.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgreTexture.h" />
+    <ClInclude Include="Include\ogre\deprecated\OgreTextureManager.h" />
+    <ClInclude Include="Include\ogre\emscripten\OgreConfigDialogImp.h" />
+    <ClInclude Include="Include\ogre\emscripten\OgreErrorDialogImp.h" />
+    <ClInclude Include="Include\ogre\emscripten\OgreTimerImp.h" />
+    <ClInclude Include="Include\ogre\glx\OgreConfigDialogImp.h" />
+    <ClInclude Include="Include\ogre\glx\OgreErrorDialogImp.h" />
+    <ClInclude Include="Include\ogre\glx\OgreTimerImp.h" />
+    <ClInclude Include="Include\ogre\gtk\OgreConfigDialogImp.h" />
+    <ClInclude Include="Include\ogre\gtk\OgreErrorDialogImp.h" />
+    <ClInclude Include="Include\ogre\hash\MurmurHash3.h" />
+    <ClInclude Include="Include\ogre\ios\macUtils.h" />
+    <ClInclude Include="Include\ogre\ios\OgreConfigDialogImp.h" />
+    <ClInclude Include="Include\ogre\ios\OgreErrorDialogImp.h" />
+    <ClInclude Include="Include\ogre\ios\OgreOSXCocoaTouchView.h" />
+    <ClInclude Include="Include\ogre\ios\OgreTimerImp.h" />
+    <ClInclude Include="Include\ogre\math\array\c\OgreArrayAabb.h" />
+    <ClInclude Include="Include\ogre\math\array\c\OgreArrayMatrix4.h" />
+    <ClInclude Include="Include\ogre\math\array\c\OgreArrayMatrixAf4x3.h" />
+    <ClInclude Include="Include\ogre\math\array\c\OgreArrayQuaternion.h" />
+    <ClInclude Include="Include\ogre\math\array\c\OgreArraySphere.h" />
+    <ClInclude Include="Include\ogre\math\array\c\OgreArrayVector3.h" />
+    <ClInclude Include="Include\ogre\math\array\c\OgreBooleanMask.h" />
+    <ClInclude Include="Include\ogre\math\array\c\OgreMathlibC.h" />
+    <ClInclude Include="Include\ogre\math\array\neon\single\neon_mathfun.h" />
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreArrayAabb.h" />
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreArrayMatrix4.h" />
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreArrayMatrixAf4x3.h" />
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreArrayQuaternion.h" />
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreArraySphere.h" />
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreArrayVector3.h" />
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreBooleanMask.h" />
+    <ClInclude Include="Include\ogre\math\array\neon\single\OgreMathlibNEON.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreArrayAabb.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreArrayConfig.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreArrayMatrix4.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreArrayMatrixAf4x3.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreArrayMemoryManager.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreArrayQuaternion.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreArrayRay.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreArraySphere.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreArrayVector3.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreBoneArrayMemoryManager.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreBoneMemoryManager.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreBoneTransform.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreBooleanMask.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreKfTransform.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreKfTransformArrayMemoryManager.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreMathlib.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreNodeMemoryManager.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreObjectData.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreObjectMemoryManager.h" />
+    <ClInclude Include="Include\ogre\math\array\OgreTransform.h" />
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreArrayAabb.h" />
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreArrayMatrix4.h" />
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreArrayMatrixAf4x3.h" />
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreArrayQuaternion.h" />
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreArraySphere.h" />
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreArrayVector3.h" />
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreBooleanMask.h" />
+    <ClInclude Include="Include\ogre\math\array\sse2\single\OgreMathlibSSE2.h" />
+    <ClInclude Include="Include\ogre\math\array\sse2\single\sse_mathfun.h" />
+    <ClInclude Include="Include\ogre\math\simple\c\OgreAabb.h" />
+    <ClInclude Include="Include\ogre\math\simple\OgreAabb.h" />
+    <ClInclude Include="Include\ogre\nacl\OgreConfigDialogImp.h" />
+    <ClInclude Include="Include\ogre\nacl\OgreErrorDialogImp.h" />
+    <ClInclude Include="Include\ogre\nacl\OgreTimerImp.h" />
+    <ClInclude Include="Include\ogre\Ogre.h" />
+    <ClInclude Include="Include\ogre\OgreAlignedAllocator.h" />
+    <ClInclude Include="Include\ogre\OgreAnimable.h" />
+    <ClInclude Include="Include\ogre\OgreAnimation.h" />
+    <ClInclude Include="Include\ogre\OgreAnimationState.h" />
+    <ClInclude Include="Include\ogre\OgreAnimationTrack.h" />
+    <ClInclude Include="Include\ogre\OgreAny.h" />
+    <ClInclude Include="Include\ogre\OgreArchive.h" />
+    <ClInclude Include="Include\ogre\OgreArchiveFactory.h" />
+    <ClInclude Include="Include\ogre\OgreArchiveManager.h" />
+    <ClInclude Include="Include\ogre\OgreAssert.h" />
+    <ClInclude Include="Include\ogre\OgreASTCCodec.h" />
+    <ClInclude Include="Include\ogre\OgreAsyncTextureTicket.h" />
+    <ClInclude Include="Include\ogre\OgreAtomicObject.h" />
+    <ClInclude Include="Include\ogre\OgreAtomicScalar.h" />
+    <ClInclude Include="Include\ogre\OgreAutoParamDataSource.h" />
+    <ClInclude Include="Include\ogre\OgreAxisAlignedBox.h" />
+    <ClInclude Include="Include\ogre\OgreBillboard.h" />
+    <ClInclude Include="Include\ogre\OgreBillboardChain.h" />
+    <ClInclude Include="Include\ogre\OgreBillboardParticleRenderer.h" />
+    <ClInclude Include="Include\ogre\OgreBillboardSet.h" />
+    <ClInclude Include="Include\ogre\OgreBitset.h" />
+    <ClInclude Include="Include\ogre\OgreBitwise.h" />
+    <ClInclude Include="Include\ogre\OgreBlendMode.h" />
+    <ClInclude Include="Include\ogre\OgreBuildSettings.h" />
+    <ClInclude Include="Include\ogre\OgreCamera.h" />
+    <ClInclude Include="Include\ogre\OgreCodec.h" />
+    <ClInclude Include="Include\ogre\OgreColourValue.h" />
+    <ClInclude Include="Include\ogre\OgreCommon.h" />
+    <ClInclude Include="Include\ogre\OgreConfig.h" />
+    <ClInclude Include="Include\ogre\OgreConfigDialog.h" />
+    <ClInclude Include="Include\ogre\OgreConfigFile.h" />
+    <ClInclude Include="Include\ogre\OgreConfigOptionMap.h" />
+    <ClInclude Include="Include\ogre\OgreConstBufferPool.h" />
+    <ClInclude Include="Include\ogre\OgreController.h" />
+    <ClInclude Include="Include\ogre\OgreControllerManager.h" />
+    <ClInclude Include="Include\ogre\OgreConvexBody.h" />
+    <ClInclude Include="Include\ogre\OgreCustomCompositionPass.h" />
+    <ClInclude Include="Include\ogre\OgreDataStream.h" />
+    <ClInclude Include="Include\ogre\OgreDDSCodec2.h" />
+    <ClInclude Include="Include\ogre\OgreDecal.h" />
+    <ClInclude Include="Include\ogre\OgreDefaultHardwareBufferManager.h" />
+    <ClInclude Include="Include\ogre\OgreDeflate.h" />
+    <ClInclude Include="Include\ogre\OgreDepthBuffer.h" />
+    <ClInclude Include="Include\ogre\OgreDescriptorSetSampler.h" />
+    <ClInclude Include="Include\ogre\OgreDescriptorSetTexture.h" />
+    <ClInclude Include="Include\ogre\OgreDescriptorSetUav.h" />
+    <ClInclude Include="Include\ogre\OgreDistanceLodStrategy.h" />
+    <ClInclude Include="Include\ogre\OgreDualQuaternion.h" />
+    <ClInclude Include="Include\ogre\OgreDynLib.h" />
+    <ClInclude Include="Include\ogre\OgreDynLibManager.h" />
+    <ClInclude Include="Include\ogre\OgreEdgeListBuilder.h" />
+    <ClInclude Include="Include\ogre\OgreEntity.h" />
+    <ClInclude Include="Include\ogre\OgreErrorDialog.h" />
+    <ClInclude Include="Include\ogre\OgreETCCodec.h" />
+    <ClInclude Include="Include\ogre\OgreException.h" />
+    <ClInclude Include="Include\ogre\OgreExternalTextureSource.h" />
+    <ClInclude Include="Include\ogre\OgreExternalTextureSourceManager.h" />
+    <ClInclude Include="Include\ogre\OgreFactoryObj.h" />
+    <ClInclude Include="Include\ogre\OgreFastArray.h" />
+    <ClInclude Include="Include\ogre\OgreFileSystem.h" />
+    <ClInclude Include="Include\ogre\OgreFileSystemLayer.h" />
+    <ClInclude Include="Include\ogre\OgreForward3D.h" />
+    <ClInclude Include="Include\ogre\OgreForwardClustered.h" />
+    <ClInclude Include="Include\ogre\OgreForwardPlusBase.h" />
+    <ClInclude Include="Include\ogre\OgreFrameListener.h" />
+    <ClInclude Include="Include\ogre\OgreFrameStats.h" />
+    <ClInclude Include="Include\ogre\OgreFreeImageCodec2.h" />
+    <ClInclude Include="Include\ogre\OgreFrustum.h" />
+    <ClInclude Include="Include\ogre\OgreGL3PlusBuildSettings.h" />
+    <ClInclude Include="Include\ogre\OgreGpuProgram.h" />
+    <ClInclude Include="Include\ogre\OgreGpuProgramManager.h" />
+    <ClInclude Include="Include\ogre\OgreGpuProgramParams.h" />
+    <ClInclude Include="Include\ogre\OgreGpuProgramUsage.h" />
+    <ClInclude Include="Include\ogre\OgreGpuResource.h" />
+    <ClInclude Include="Include\ogre\OgreHardwareBuffer.h" />
+    <ClInclude Include="Include\ogre\OgreHardwareBufferManager.h" />
+    <ClInclude Include="Include\ogre\OgreHardwareCounterBuffer.h" />
+    <ClInclude Include="Include\ogre\OgreHardwareIndexBuffer.h" />
+    <ClInclude Include="Include\ogre\OgreHardwareOcclusionQuery.h" />
+    <ClInclude Include="Include\ogre\OgreHardwareUniformBuffer.h" />
+    <ClInclude Include="Include\ogre\OgreHardwareVertexBuffer.h" />
+    <ClInclude Include="Include\ogre\OgreHeaderPrefix.h" />
+    <ClInclude Include="Include\ogre\OgreHeaderSuffix.h" />
+    <ClInclude Include="Include\ogre\OgreHiddenAreaMeshVr.h" />
+    <ClInclude Include="Include\ogre\OgreHighLevelGpuProgram.h" />
+    <ClInclude Include="Include\ogre\OgreHighLevelGpuProgramManager.h" />
+    <ClInclude Include="Include\ogre\OgreHlms.h" />
+    <ClInclude Include="Include\ogre\OgreHlmsCommon.h" />
+    <ClInclude Include="Include\ogre\OgreHlmsCompute.h" />
+    <ClInclude Include="Include\ogre\OgreHlmsComputeJob.h" />
+    <ClInclude Include="Include\ogre\OgreHlmsDatablock.h" />
+    <ClInclude Include="Include\ogre\OgreHlmsDiskCache.h" />
+    <ClInclude Include="Include\ogre\OgreHlmsJson.h" />
+    <ClInclude Include="Include\ogre\OgreHlmsJsonCompute.h" />
+    <ClInclude Include="Include\ogre\OgreHlmsListener.h" />
+    <ClInclude Include="Include\ogre\OgreHlmsLowLevel.h" />
+    <ClInclude Include="Include\ogre\OgreHlmsLowLevelDatablock.h" />
+    <ClInclude Include="Include\ogre\OgreHlmsManager.h" />
+    <ClInclude Include="Include\ogre\OgreHlmsPso.h" />
+    <ClInclude Include="Include\ogre\OgreHlmsSamplerblock.h" />
+    <ClInclude Include="Include\ogre\OgreHlmsTexturePack.h" />
+    <ClInclude Include="Include\ogre\OgreId.h" />
+    <ClInclude Include="Include\ogre\OgreIdString.h" />
+    <ClInclude Include="Include\ogre\OgreImage2.h" />
+    <ClInclude Include="Include\ogre\OgreImageCodec2.h" />
+    <ClInclude Include="Include\ogre\OgreImageDownsampler.h" />
+    <ClInclude Include="Include\ogre\OgreInternalCubemapProbe.h" />
+    <ClInclude Include="Include\ogre\OgreItem.h" />
+    <ClInclude Include="Include\ogre\OgreIteratorRange.h" />
+    <ClInclude Include="Include\ogre\OgreIteratorWrapper.h" />
+    <ClInclude Include="Include\ogre\OgreIteratorWrappers.h" />
+    <ClInclude Include="Include\ogre\OgreKeyFrame.h" />
+    <ClInclude Include="Include\ogre\OgreLight.h" />
+    <ClInclude Include="Include\ogre\OgreLodListener.h" />
+    <ClInclude Include="Include\ogre\OgreLodStrategy.h" />
+    <ClInclude Include="Include\ogre\OgreLodStrategyManager.h" />
+    <ClInclude Include="Include\ogre\OgreLog.h" />
+    <ClInclude Include="Include\ogre\OgreLogManager.h" />
+    <ClInclude Include="Include\ogre\OgreLwConstString.h" />
+    <ClInclude Include="Include\ogre\OgreLwString.h" />
+    <ClInclude Include="Include\ogre\OgreManualObject.h" />
+    <ClInclude Include="Include\ogre\OgreManualObject2.h" />
+    <ClInclude Include="Include\ogre\OgreMaterial.h" />
+    <ClInclude Include="Include\ogre\OgreMaterialManager.h" />
+    <ClInclude Include="Include\ogre\OgreMaterialSerializer.h" />
+    <ClInclude Include="Include\ogre\OgreMath.h" />
+    <ClInclude Include="Include\ogre\OgreMatrix3.h" />
+    <ClInclude Include="Include\ogre\OgreMatrix4.h" />
+    <ClInclude Include="Include\ogre\OgreMemoryAllocatedObject.h" />
+    <ClInclude Include="Include\ogre\OgreMemoryAllocatorConfig.h" />
+    <ClInclude Include="Include\ogre\OgreMemoryNedAlloc.h" />
+    <ClInclude Include="Include\ogre\OgreMemoryNedPooling.h" />
+    <ClInclude Include="Include\ogre\OgreMemoryStdAlloc.h" />
+    <ClInclude Include="Include\ogre\OgreMemorySTLAllocator.h" />
+    <ClInclude Include="Include\ogre\OgreMemoryTrackAlloc.h" />
+    <ClInclude Include="Include\ogre\OgreMemoryTracker.h" />
+    <ClInclude Include="Include\ogre\OgreMesh.h" />
+    <ClInclude Include="Include\ogre\OgreMesh2.h" />
+    <ClInclude Include="Include\ogre\OgreMesh2Serializer.h" />
+    <ClInclude Include="Include\ogre\OgreMesh2SerializerImpl.h" />
+    <ClInclude Include="Include\ogre\OgreMeshFileFormat.h" />
+    <ClInclude Include="Include\ogre\OgreMeshManager.h" />
+    <ClInclude Include="Include\ogre\OgreMeshManager2.h" />
+    <ClInclude Include="Include\ogre\OgreMeshSerializer.h" />
+    <ClInclude Include="Include\ogre\OgreMeshSerializerImpl.h" />
+    <ClInclude Include="Include\ogre\OgreMovableObject.h" />
+    <ClInclude Include="Include\ogre\OgreMovablePlane.h" />
+    <ClInclude Include="Include\ogre\OgreNameGenerator.h" />
+    <ClInclude Include="Include\ogre\OgreNode.h" />
+    <ClInclude Include="Include\ogre\OgreNumerics.h" />
+    <ClInclude Include="Include\ogre\OgreObjCmdBuffer.h" />
+    <ClInclude Include="Include\ogre\OgreOfflineProfiler.h" />
+    <ClInclude Include="Include\ogre\OgreOITDCodec.h" />
+    <ClInclude Include="Include\ogre\OgreOldBone.h" />
+    <ClInclude Include="Include\ogre\OgreOldNode.h" />
+    <ClInclude Include="Include\ogre\OgreOldSkeletonInstance.h" />
+    <ClInclude Include="Include\ogre\OgreOldSkeletonManager.h" />
+    <ClInclude Include="Include\ogre\OgreOptimisedUtil.h" />
+    <ClInclude Include="Include\ogre\OgreParticle.h" />
+    <ClInclude Include="Include\ogre\OgreParticleAffector.h" />
+    <ClInclude Include="Include\ogre\OgreParticleAffectorFactory.h" />
+    <ClInclude Include="Include\ogre\OgreParticleEmitter.h" />
+    <ClInclude Include="Include\ogre\OgreParticleEmitterCommands.h" />
+    <ClInclude Include="Include\ogre\OgreParticleEmitterFactory.h" />
+    <ClInclude Include="Include\ogre\OgreParticleIterator.h" />
+    <ClInclude Include="Include\ogre\OgreParticleSystem.h" />
+    <ClInclude Include="Include\ogre\OgreParticleSystemManager.h" />
+    <ClInclude Include="Include\ogre\OgreParticleSystemRenderer.h" />
+    <ClInclude Include="Include\ogre\OgrePass.h" />
+    <ClInclude Include="Include\ogre\OgrePatchMesh.h" />
+    <ClInclude Include="Include\ogre\OgrePatchSurface.h" />
+    <ClInclude Include="Include\ogre\OgrePixelCountLodStrategy.h" />
+    <ClInclude Include="Include\ogre\OgrePixelFormatGpu.h" />
+    <ClInclude Include="Include\ogre\OgrePixelFormatGpuUtils.h" />
+    <ClInclude Include="Include\ogre\OgrePlane.h" />
+    <ClInclude Include="Include\ogre\OgrePlaneBoundedVolume.h" />
+    <ClInclude Include="Include\ogre\OgrePlatform.h" />
+    <ClInclude Include="Include\ogre\OgrePlatformInformation.h" />
+    <ClInclude Include="Include\ogre\OgrePlugin.h" />
+    <ClInclude Include="Include\ogre\OgrePolygon.h" />
+    <ClInclude Include="Include\ogre\OgrePose.h" />
+    <ClInclude Include="Include\ogre\OgrePredefinedControllers.h" />
+    <ClInclude Include="Include\ogre\OgrePrefabFactory.h" />
+    <ClInclude Include="Include\ogre\OgrePrerequisites.h" />
+    <ClInclude Include="Include\ogre\OgreProfiler.h" />
+    <ClInclude Include="Include\ogre\OgreProfilerCommon.h" />
+    <ClInclude Include="Include\ogre\OgrePsoCacheHelper.h" />
+    <ClInclude Include="Include\ogre\OgrePVRTCCodec.h" />
+    <ClInclude Include="Include\ogre\OgreQuaternion.h" />
+    <ClInclude Include="Include\ogre\OgreRadialDensityMask.h" />
+    <ClInclude Include="Include\ogre\OgreRadixSort.h" />
+    <ClInclude Include="Include\ogre\OgreRawPtr.h" />
+    <ClInclude Include="Include\ogre\OgreRay.h" />
+    <ClInclude Include="Include\ogre\OgreRectangle2D.h" />
+    <ClInclude Include="Include\ogre\OgreRectangle2D2.h" />
+    <ClInclude Include="Include\ogre\OgreRenderable.h" />
+    <ClInclude Include="Include\ogre\OgreRenderObjectListener.h" />
+    <ClInclude Include="Include\ogre\OgreRenderOperation.h" />
+    <ClInclude Include="Include\ogre\OgreRenderPassDescriptor.h" />
+    <ClInclude Include="Include\ogre\OgreRenderQueue.h" />
+    <ClInclude Include="Include\ogre\OgreRenderQueueListener.h" />
+    <ClInclude Include="Include\ogre\OgreRenderSystem.h" />
+    <ClInclude Include="Include\ogre\OgreRenderSystemCapabilities.h" />
+    <ClInclude Include="Include\ogre\OgreRenderSystemCapabilitiesManager.h" />
+    <ClInclude Include="Include\ogre\OgreRenderSystemCapabilitiesSerializer.h" />
+    <ClInclude Include="Include\ogre\OgreResource.h" />
+    <ClInclude Include="Include\ogre\OgreResourceBackgroundQueue.h" />
+    <ClInclude Include="Include\ogre\OgreResourceGroupManager.h" />
+    <ClInclude Include="Include\ogre\OgreResourceManager.h" />
+    <ClInclude Include="Include\ogre\OgreResourceTransition.h" />
+    <ClInclude Include="Include\ogre\OgreRibbonTrail.h" />
+    <ClInclude Include="Include\ogre\OgreRoot.h" />
+    <ClInclude Include="Include\ogre\OgreRootLayout.h" />
+    <ClInclude Include="Include\ogre\OgreRotationalSpline.h" />
+    <ClInclude Include="Include\ogre\OgreSceneManager.h" />
+    <ClInclude Include="Include\ogre\OgreSceneManagerEnumerator.h" />
+    <ClInclude Include="Include\ogre\OgreSceneNode.h" />
+    <ClInclude Include="Include\ogre\OgreSceneQuery.h" />
+    <ClInclude Include="Include\ogre\OgreScriptCompiler.h" />
+    <ClInclude Include="Include\ogre\OgreScriptLexer.h" />
+    <ClInclude Include="Include\ogre\OgreScriptLoader.h" />
+    <ClInclude Include="Include\ogre\OgreScriptParser.h" />
+    <ClInclude Include="Include\ogre\OgreScriptTranslator.h" />
+    <ClInclude Include="Include\ogre\OgreSearchOps.h" />
+    <ClInclude Include="Include\ogre\OgreSerializer.h" />
+    <ClInclude Include="Include\ogre\OgreShaderParams.h" />
+    <ClInclude Include="Include\ogre\OgreShaderPrimitives.h" />
+    <ClInclude Include="Include\ogre\OgreShadowCameraSetup.h" />
+    <ClInclude Include="Include\ogre\OgreShadowCameraSetupConcentric.h" />
+    <ClInclude Include="Include\ogre\OgreShadowCameraSetupFocused.h" />
+    <ClInclude Include="Include\ogre\OgreShadowCameraSetupPlaneOptimal.h" />
+    <ClInclude Include="Include\ogre\OgreShadowCameraSetupPSSM.h" />
+    <ClInclude Include="Include\ogre\OgreShadowVolumeExtrudeProgram.h" />
+    <ClInclude Include="Include\ogre\OgreSharedPtr.h" />
+    <ClInclude Include="Include\ogre\OgreSimpleRenderable.h" />
+    <ClInclude Include="Include\ogre\OgreSimpleSpline.h" />
+    <ClInclude Include="Include\ogre\OgreSingleton.h" />
+    <ClInclude Include="Include\ogre\OgreSkeleton.h" />
+    <ClInclude Include="Include\ogre\OgreSkeletonFileFormat.h" />
+    <ClInclude Include="Include\ogre\OgreSkeletonSerializer.h" />
+    <ClInclude Include="Include\ogre\OgreSmallVector.h" />
+    <ClInclude Include="Include\ogre\OgreSphere.h" />
+    <ClInclude Include="Include\ogre\OgreStableHeaders.h" />
+    <ClInclude Include="Include\ogre\OgreStackVector.h" />
+    <ClInclude Include="Include\ogre\OgreStagingTexture.h" />
+    <ClInclude Include="Include\ogre\OgreStagingTextureBufferImpl.h" />
+    <ClInclude Include="Include\ogre\OgreStagingTextureManager.h" />
+    <ClInclude Include="Include\ogre\OgreStaticFaceGroup.h" />
+    <ClInclude Include="Include\ogre\OgreStaticGeometry.h" />
+    <ClInclude Include="Include\ogre\OgreSTBICodec.h" />
+    <ClInclude Include="Include\ogre\OgreStdHeaders.h" />
+    <ClInclude Include="Include\ogre\ogrestd\deque.h" />
+    <ClInclude Include="Include\ogre\ogrestd\list.h" />
+    <ClInclude Include="Include\ogre\ogrestd\map.h" />
+    <ClInclude Include="Include\ogre\ogrestd\set.h" />
+    <ClInclude Include="Include\ogre\ogrestd\unordered_map.h" />
+    <ClInclude Include="Include\ogre\ogrestd\unordered_set.h" />
+    <ClInclude Include="Include\ogre\ogrestd\vector.h" />
+    <ClInclude Include="Include\ogre\OgreStreamSerialiser.h" />
+    <ClInclude Include="Include\ogre\OgreString.h" />
+    <ClInclude Include="Include\ogre\OgreStringConverter.h" />
+    <ClInclude Include="Include\ogre\OgreStringInterface.h" />
+    <ClInclude Include="Include\ogre\OgreStringVector.h" />
+    <ClInclude Include="Include\ogre\OgreSubEntity.h" />
+    <ClInclude Include="Include\ogre\OgreSubItem.h" />
+    <ClInclude Include="Include\ogre\OgreSubMesh.h" />
+    <ClInclude Include="Include\ogre\OgreSubMesh2.h" />
+    <ClInclude Include="Include\ogre\OgreTagPoint.h" />
+    <ClInclude Include="Include\ogre\OgreTangentSpaceCalc.h" />
+    <ClInclude Include="Include\ogre\OgreTechnique.h" />
+    <ClInclude Include="Include\ogre\OgreTextureBox.h" />
+    <ClInclude Include="Include\ogre\OgreTextureFilters.h" />
+    <ClInclude Include="Include\ogre\OgreTextureGpu.h" />
+    <ClInclude Include="Include\ogre\OgreTextureGpuListener.h" />
+    <ClInclude Include="Include\ogre\OgreTextureGpuManager.h" />
+    <ClInclude Include="Include\ogre\OgreTextureGpuManagerListener.h" />
+    <ClInclude Include="Include\ogre\OgreTextureUnitState.h" />
+    <ClInclude Include="Include\ogre\OgreTimer.h" />
+    <ClInclude Include="Include\ogre\OgreUnifiedHighLevelGpuProgram.h" />
+    <ClInclude Include="Include\ogre\OgreUserObjectBindings.h" />
+    <ClInclude Include="Include\ogre\OgreUTFString.h" />
+    <ClInclude Include="Include\ogre\OgreVector2.h" />
+    <ClInclude Include="Include\ogre\OgreVector3.h" />
+    <ClInclude Include="Include\ogre\OgreVector4.h" />
+    <ClInclude Include="Include\ogre\OgreVertexBoneAssignment.h" />
+    <ClInclude Include="Include\ogre\OgreVertexIndexData.h" />
+    <ClInclude Include="Include\ogre\OgreVertexRemapping.h" />
+    <ClInclude Include="Include\ogre\OgreVertexShadowMapHelper.h" />
+    <ClInclude Include="Include\ogre\OgreViewport.h" />
+    <ClInclude Include="Include\ogre\OgreVisibilityFlags.h" />
+    <ClInclude Include="Include\ogre\OgreWindow.h" />
+    <ClInclude Include="Include\ogre\OgreWindowEventUtilities.h" />
+    <ClInclude Include="Include\ogre\OgreWireAabb.h" />
+    <ClInclude Include="Include\ogre\OgreWireBoundingBox.h" />
+    <ClInclude Include="Include\ogre\OgreWorkarounds.h" />
+    <ClInclude Include="Include\ogre\OgreWorkQueue.h" />
+    <ClInclude Include="Include\ogre\OgreZip.h" />
+    <ClInclude Include="Include\ogre\osx\macUtils.h" />
+    <ClInclude Include="Include\ogre\osx\OgreConfigDialogImp.h" />
+    <ClInclude Include="Include\ogre\osx\OgreErrorDialogImp.h" />
+    <ClInclude Include="Include\ogre\osx\OgreTimerImp.h" />
+    <ClInclude Include="Include\ogre\threading\OgreBarrier.h" />
+    <ClInclude Include="Include\ogre\threading\OgreDefaultWorkQueue.h" />
+    <ClInclude Include="Include\ogre\threading\OgreDefaultWorkQueueStandard.h" />
+    <ClInclude Include="Include\ogre\threading\OgreDefaultWorkQueueTBB.h" />
+    <ClInclude Include="Include\ogre\threading\OgreLightweightMutex.h" />
+    <ClInclude Include="Include\ogre\threading\OgreThreadDefines.h" />
+    <ClInclude Include="Include\ogre\threading\OgreThreadDefinesBoost.h" />
+    <ClInclude Include="Include\ogre\threading\OgreThreadDefinesNone.h" />
+    <ClInclude Include="Include\ogre\threading\OgreThreadDefinesPoco.h" />
+    <ClInclude Include="Include\ogre\threading\OgreThreadDefinesSTD.h" />
+    <ClInclude Include="Include\ogre\threading\OgreThreadDefinesTBB.h" />
+    <ClInclude Include="Include\ogre\threading\OgreThreadHeaders.h" />
+    <ClInclude Include="Include\ogre\threading\OgreThreadHeadersBoost.h" />
+    <ClInclude Include="Include\ogre\threading\OgreThreadHeadersPoco.h" />
+    <ClInclude Include="Include\ogre\threading\OgreThreadHeadersSTD.h" />
+    <ClInclude Include="Include\ogre\threading\OgreThreadHeadersTBB.h" />
+    <ClInclude Include="Include\ogre\threading\OgreThreads.h" />
+    <ClInclude Include="Include\ogre\threading\OgreUniformScalableTask.h" />
+    <ClInclude Include="Include\ogre\threading\OgreWaitableEvent.h" />
+    <ClInclude Include="Include\ogre\vao\OgreAsyncTicket.h" />
+    <ClInclude Include="Include\ogre\vao\OgreBufferInterface.h" />
+    <ClInclude Include="Include\ogre\vao\OgreBufferPacked.h" />
+    <ClInclude Include="Include\ogre\vao\OgreConstBufferPacked.h" />
+    <ClInclude Include="Include\ogre\vao\OgreIndexBufferPacked.h" />
+    <ClInclude Include="Include\ogre\vao\OgreIndirectBufferPacked.h" />
+    <ClInclude Include="Include\ogre\vao\OgreMultiSourceVertexBufferPool.h" />
+    <ClInclude Include="Include\ogre\vao\OgreReadOnlyBufferPacked.h" />
+    <ClInclude Include="Include\ogre\vao\OgreStagingBuffer.h" />
+    <ClInclude Include="Include\ogre\vao\OgreTexBufferPacked.h" />
+    <ClInclude Include="Include\ogre\vao\OgreUavBufferPacked.h" />
+    <ClInclude Include="Include\ogre\vao\OgreVaoManager.h" />
+    <ClInclude Include="Include\ogre\vao\OgreVertexArrayObject.h" />
+    <ClInclude Include="Include\ogre\vao\OgreVertexBufferDownloadHelper.h" />
+    <ClInclude Include="Include\ogre\vao\OgreVertexBufferPacked.h" />
+    <ClInclude Include="Include\ogre\vao\OgreVertexElements.h" />
+    <ClInclude Include="Include\ogre\win32\OgreComPtr.h" />
+    <ClInclude Include="Include\ogre\win32\OgreConfigDialogImp.h" />
+    <ClInclude Include="Include\ogre\win32\OgreConfigDialogImpWinRT.h" />
+    <ClInclude Include="Include\ogre\win32\OgreErrorDialogImp.h" />
+    <ClInclude Include="Include\ogre\win32\OgreErrorDialogImpWinRT.h" />
+    <ClInclude Include="Include\ogre\win32\OgreMinGWSupport.h" />
+    <ClInclude Include="Include\ogre\win32\OgreTimerImp.h" />
+    <ClInclude Include="Include\reclaimer\Reclaimer.h" />
+    <ClInclude Include="Include\stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="Libraries\mygui\MyGUIEngine_x64.lib" />
+    <Library Include="Libraries\ogre\OgreMain_x64.lib" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
