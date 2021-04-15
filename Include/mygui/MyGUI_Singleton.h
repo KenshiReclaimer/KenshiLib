@@ -12,7 +12,7 @@
 namespace MyGUI
 {
 
-#if MYGUI_COMPILER == MYGUI_COMPILER_MSVC || MYGUI_PLATFORM == MYGUI_PLATFORM_APPLE
+#if MYGUI_COMPILER == MYGUI_COMPILER_MSVC
 	template <class T>
 	class Singleton
 #else
@@ -23,13 +23,34 @@ namespace MyGUI
 	public:
 		typedef Singleton<T> Base;
 
-		Singleton();
+		Singleton()
+		{
+			MYGUI_ASSERT(nullptr == msInstance, "Singleton instance " << getClassTypeName() << " already exsist");
+			msInstance = static_cast<T*>(this);
+		}
 
-		virtual ~Singleton();
+		virtual ~Singleton()
+		{
+			if (nullptr == msInstance)
+				MYGUI_LOG(Critical, "Destroying Singleton instance " << getClassTypeName() << " before constructing it.");
+			msInstance = nullptr;
+		}
 
-		static T& getInstance();
-		static T* getInstancePtr();
-		static const char* getClassTypeName();
+		static T& getInstance()
+		{
+			MYGUI_ASSERT(nullptr != getInstancePtr(), "Singleton instance " << getClassTypeName() << " was not created");
+			return (*getInstancePtr());
+		}
+
+		static T* getInstancePtr()
+		{
+			return msInstance;
+		}
+
+		static const char* getClassTypeName()
+		{
+			return mClassTypeName;
+		}
 
 	private:
 		static T* msInstance;
