@@ -2072,6 +2072,9 @@
     <ClInclude Include="Include\kenshi\Zone.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="Include\reclaimer\Reclaimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Libraries\mygui\MyGUIEngine_x64.lib">
