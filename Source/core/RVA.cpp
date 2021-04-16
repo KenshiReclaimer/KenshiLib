@@ -15,7 +15,7 @@ size_t RVACore::c_size = GetRegionSize(RVACore::c_base + 0x1000);
 
 
 RVACore::RVACore(offset_t rva) : m_addr(c_base + rva) {}
-
+/* TODO FIX COMPILATION
 RVACore::RVACore(
     const std::string& pattern, 
     uintptr_t(*onFound)(uintptr_t),
@@ -35,7 +35,7 @@ RVACore::RVACore(
 
     m_addr = onFound(addr);
 }
-
+*/
 
 uintptr_t ProtectedDeref(uintptr_t addr)
 // Just here for placeholder, will probably use this in the future so fitting it now.
