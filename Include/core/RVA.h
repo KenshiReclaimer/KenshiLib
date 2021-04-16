@@ -6,18 +6,20 @@
 	Class that implements RVA resolution at runtime. Mostly like how F4SE/SKSE64 implement it.
 */
 
-using offset_t = size_t;
+typedef size_t offset_t;
 
 class RVACore
 {
 public:
 
     RVACore(offset_t rva);
+	/* TODO FIX COMPILER
 	RVACore(
 		const std::string& pattern, 
 		uintptr_t(*onFound)(uintptr_t) = [](uintptr_t addr) { return addr; },
 		const char* moduleName = nullptr
 		);
+	*/
 
     uintptr_t GetUIntPtr() const
 	{
@@ -31,17 +33,21 @@ protected:
 
     uintptr_t m_addr;
 
+	/* TODO FIX COMPILER
     RVACore() = delete;
     RVACore(RVACore & rhs) = delete;
 	RVACore & operator=(RVACore & rhs) = delete;
+	*/
 };
 
 template <typename T>
 class RVAPtr : public RVACore
 {
 public:
-	using Type = T;
 	using RVACore::RVACore;
+
+	// HACK temporary fix for RVA compilation
+	RVAPtr(offset_t ptr) : RVACore(ptr) {};
 
 	operator T *() const
 	{
@@ -64,10 +70,12 @@ public:
 	}
 
 private:
+	/* TODO FIX COMPILER
 	RVAPtr(RVAPtr& rhs) = delete;
+	*/
 };
 
-
+/* TODO FIX COMPILER
 template <typename _Ret, typename... _Args>
 class RVAFn : public RVACore
 {
@@ -81,7 +89,7 @@ public:
 
 private:
 };
-
+*/
 
 uintptr_t ProtectedDeref(uintptr_t addr);
 
