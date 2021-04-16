@@ -1976,12 +1976,6 @@
     <ClInclude Include="Include\mygui\MyGUI_XmlDocument.h">
       <Filter>Header Files\mygui</Filter>
     </ClInclude>
-    <ClInclude Include="Include\core\RVA.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\core\Scanner.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
     <ClInclude Include="Include\ogre\osx\macUtils.h">
       <Filter>Header Files\ogre</Filter>
     </ClInclude>
@@ -2018,58 +2012,67 @@
     <ClInclude Include="Include\ogre\debugbreak\debugbreak.h">
       <Filter>Header Files\ogre</Filter>
     </ClInclude>
+    <ClInclude Include="Include\reclaimer\Reclaimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Include\kenshi\Building.h">
-      <Filter>Header Files\core</Filter>
+      <Filter>Header Files\kenshi</Filter>
     </ClInclude>
     <ClInclude Include="Include\kenshi\Character.h">
-      <Filter>Header Files\core</Filter>
+      <Filter>Header Files\kenshi</Filter>
     </ClInclude>
     <ClInclude Include="Include\kenshi\Faction.h">
-      <Filter>Header Files\core</Filter>
+      <Filter>Header Files\kenshi</Filter>
     </ClInclude>
     <ClInclude Include="Include\kenshi\GameData.h">
-      <Filter>Header Files\core</Filter>
+      <Filter>Header Files\kenshi</Filter>
     </ClInclude>
     <ClInclude Include="Include\kenshi\GameDataManager.h">
-      <Filter>Header Files\core</Filter>
+      <Filter>Header Files\kenshi</Filter>
     </ClInclude>
     <ClInclude Include="Include\kenshi\GameWorld.h">
-      <Filter>Header Files\core</Filter>
+      <Filter>Header Files\kenshi</Filter>
     </ClInclude>
     <ClInclude Include="Include\kenshi\util\hand.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\util\lektor.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\MedicalSystem.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\ModInfo.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Platoon.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\PlayerInterface.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Root.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\stdafx.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Tasks.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\View.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Zone.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\core\RVA.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\core\Scanner.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="Include\kenshi\Kenshi.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\kenshi\util\lektor.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\kenshi\MedicalSystem.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\kenshi\ModInfo.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\kenshi\Platoon.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\kenshi\PlayerInterface.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\kenshi\Root.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\stdafx.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\kenshi\Tasks.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\kenshi\View.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\kenshi\Zone.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>
