@@ -51,7 +51,9 @@ namespace Kenshi
         struct PlayerInterface *playerInterface; //0x0580
         char pad_0588[160]; //0x0588
         struct lektor<hand> unkHand; //0x0628 hand
-        char pad_0640[584]; //0x0640
+        char pad_0640[0xC0]; //0x0640
+        float gameSpeed; //0x0700
+        char pad_0704[0x184]; //0x0704
         struct lektor<Character*> unkCharArray; //0x0888 Character*
         char pad_08A0[16]; //0x08A0
         struct ZoneManager *zoneManager; //0x08B0
