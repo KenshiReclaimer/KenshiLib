@@ -1,4 +1,5 @@
 #pragma once
+#include "mygui/MyGUI_Gui.h"
 
 
 namespace Kenshi 
@@ -20,6 +21,8 @@ namespace Kenshi
     struct PlayerInterface;
     struct ResearchManager;
     struct ResearchItem;
+
+    MyGUI::WidgetPtr FindWidget(MyGUI::EnumeratorWidgetPtr enumerator, std::string name);
 
     GameWorld& GetGameWorld();
     // GameWorld looks to be an object of all game state, whether its loaded or not.

@@ -22,6 +22,33 @@ Kenshi::GameWorld& Kenshi::GetGameWorld()
     return *c_inst.GetPtr();
 }
 
+
+// TODO templateize
+// Kenshi prefixes it's widgets with a bunch of non-usefull stuff
+MyGUI::WidgetPtr Kenshi::FindWidget(MyGUI::EnumeratorWidgetPtr enumerator, std::string name)
+{
+    while (enumerator.next())
+    {
+        std::string widgetName = enumerator.current()->getName();
+        size_t splitPos = widgetName.find('_');
+        /*
+        debug_out << widgetName;
+        if(splitPos != std::string::npos)
+            debug_out << " " << widgetName.substr(splitPos+1);
+        debug_out << "\n";
+        */
+        if (splitPos != std::string::npos && widgetName.substr(splitPos + 1) == name)
+            return enumerator.current();
+        if (enumerator.current()->getChildCount() > 0)
+        {
+            MyGUI::WidgetPtr childFoundWidget = Kenshi::FindWidget(enumerator.current()->getEnumerator(), name);
+            if (childFoundWidget != nullptr)
+                return childFoundWidget;
+        }
+    }
+    return nullptr;
+}
+
 #if 0
 Kenshi::PlayerInterface& Kenshi::GetPlayerInterface()
 {
