@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -21,8 +21,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <SpectreMitigation>false</SpectreMitigation>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -58,6 +59,7 @@
       <PreprocessorDefinitions>OGRE_DEBUG_MODE=OGRE_DEBUG_LEVEL_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -111,7 +113,6 @@
     <None Include="Include\ogre\OgreLight.inl" />
     <None Include="Include\ogre\OgreLodStrategyPrivate.inl" />
     <None Include="Include\ogre\OgreMovableObject.inl" />
-    <None Include="Libraries\ogre\OgreMain_x64.def" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\core\RVA.cpp" />
@@ -119,6 +120,7 @@
     <ClCompile Include="Source\kenshi\Kenshi.cpp" />
     <ClCompile Include="Source\kenshi\Root.cpp" />
     <ClCompile Include="Source\kenshi\UI.cpp" />
+    <ClCompile Include="Source\MyGUIHooks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\core\RVA.h" />
@@ -140,6 +142,7 @@
     <ClInclude Include="Include\kenshi\util\lektor.h" />
     <ClInclude Include="Include\kenshi\View.h" />
     <ClInclude Include="Include\kenshi\Zone.h" />
+    <ClInclude Include="Include\MyGUIHooks.h" />
     <ClInclude Include="Include\mygui\MyGUI.h" />
     <ClInclude Include="Include\mygui\MyGUI_ActionController.h" />
     <ClInclude Include="Include\mygui\MyGUI_Align.h" />
@@ -795,7 +798,6 @@
     <ClInclude Include="Include\ogre\win32\OgreErrorDialogImpWinRT.h" />
     <ClInclude Include="Include\ogre\win32\OgreMinGWSupport.h" />
     <ClInclude Include="Include\ogre\win32\OgreTimerImp.h" />
-    <ClInclude Include="Include\reclaimer\Reclaimer.h" />
     <ClInclude Include="Include\stdafx.h" />
   </ItemGroup>
   <ItemGroup>

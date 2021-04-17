@@ -45,6 +45,9 @@
     <ClCompile Include="Source\kenshi\UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\MyGUIHooks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\ogre\math\array\neon\single\neon_mathfun.h">
@@ -2072,7 +2075,7 @@
     <ClInclude Include="Include\kenshi\Zone.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="Include\reclaimer\Reclaimer.h">
+    <ClInclude Include="Include\MyGUIHooks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -2085,9 +2088,6 @@
     </Library>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Libraries\ogre\OgreMain_x64.def">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="Include\ogre\math\simple\c\OgreAabb.inl">
       <Filter>Header Files\ogre</Filter>
     </None>
