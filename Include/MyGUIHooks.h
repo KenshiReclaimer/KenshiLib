@@ -7,7 +7,7 @@
 namespace KenshiLib
 {
 	using WidgetCallbackHandle = void*;
-	using OnWidgetCallback = MyGUI::Widget* (MyGUI::Widget* widget, const std::string& _name, const std::string& _type, const std::string& _skin);
+	using OnWidgetCallback = MyGUI::Widget* (MyGUI::Widget* widget, const std::string& _name, const std::string& _type, const std::string& _skin, MyGUI::Widget* _parent);
 
 	WidgetCallbackHandle RegisterWidgetCallback(const std::string& _name, const std::string& _type, OnWidgetCallback* callback);
 
