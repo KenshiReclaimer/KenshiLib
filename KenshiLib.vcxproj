@@ -115,6 +115,7 @@
     <None Include="Include\ogre\OgreMovableObject.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\core\Hooker.cpp" />
     <ClCompile Include="Source\core\RVA.cpp" />
     <ClCompile Include="Source\core\Scanner.cpp" />
     <ClCompile Include="Source\kenshi\Kenshi.cpp" />
@@ -123,6 +124,7 @@
     <ClCompile Include="Source\MyGUIHooks.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\core\Hooker.h" />
     <ClInclude Include="Include\core\RVA.h" />
     <ClInclude Include="Include\core\Scanner.h" />
     <ClInclude Include="Include\kenshi\Building.h" />
