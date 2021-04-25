@@ -51,6 +51,9 @@
     <ClCompile Include="Source\core\Hooker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\core\md5.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\ogre\math\array\neon\single\neon_mathfun.h">
@@ -2091,6 +2094,12 @@
       <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="Include\kenshi\Kenshi.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\core\md5_loc.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\core\md5.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>
