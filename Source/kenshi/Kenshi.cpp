@@ -56,13 +56,21 @@ public:
 StaticMap<std::string, Kenshi::BinaryVersion> HashToVersionMap = StaticMap<std::string, Kenshi::BinaryVersion>()
     .Add("a5f78908f3f26591a6a3717bfbfafbca", Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51")) // RE_Kenshi 0.1 modified EXE
     .Add("57679de0ae258ead45a96949974517e2", Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51")) // Unmodified
-    .Add("525261fca4d339da67999c114118c6c6", Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"));
+    .Add("525261fca4d339da67999c114118c6c6", Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"))
+    .Add("83ea507cf9667bfe8de2d8a64e9ea57a", Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"));
 
 // Game world address Steam 1.51.1 0x001AAE060
 // Game world address GOG 1.51.1 0x001AADFB0
 StaticMap<Kenshi::BinaryVersion, offset_t> GameWorldOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51"), 0x001AAE060)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"), 0x001AADFB0);
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51"), 0x01AAE060)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"), 0x01AADFB0)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC9510);
+
+// TODO add other pointers before release
+StaticMap<Kenshi::BinaryVersion, offset_t> NumAttackSlotsOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51"), 0x01AADE28)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"), 0x01AADD78)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC92D8);
 
 
 std::string kenshiHash = GetEXEHash();
@@ -81,6 +89,13 @@ Kenshi::GameWorld& Kenshi::GetGameWorld()
     return *c_inst.GetPtr();
 }
 
+int& Kenshi::GetNumAttackSlots()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t attackSlotsOffset = NumAttackSlotsOffset.at(kenshiVersion);
+    static RVAPtr<int> c_inst(attackSlotsOffset);
+    return *c_inst.GetPtr();
+}
 
 // TODO templateize
 // Kenshi prefixes it's widgets with a bunch of non-usefull stuff
