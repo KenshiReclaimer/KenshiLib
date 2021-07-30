@@ -76,8 +76,11 @@ namespace Kenshi
 
     BinaryVersion GetKenshiVersion();
 
-    GameWorld& GetGameWorld();
     // GameWorld looks to be an object of all game state, whether its loaded or not.
     // Has things like a list of loaded mods and all the GameData loaded in, probably saves too.
+    GameWorld& GetGameWorld();
+
+    // Static var separate to GameWorld
+    int& GetNumAttackSlots();
 
 }
