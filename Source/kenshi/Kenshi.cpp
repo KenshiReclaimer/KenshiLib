@@ -66,12 +66,16 @@ StaticMap<Kenshi::BinaryVersion, offset_t> GameWorldOffset = StaticMap<Kenshi::B
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"), 0x01AADFB0)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC9510);
 
-// TODO add other pointers before release
 StaticMap<Kenshi::BinaryVersion, offset_t> NumAttackSlotsOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51"), 0x01AADE28)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"), 0x01AADD78)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC92D8);
 
+
+StaticMap<Kenshi::BinaryVersion, offset_t> InputHandlerOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"), 0x01AAD400)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51"), 0x01AAD4B0)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC8950);
 
 std::string kenshiHash = GetEXEHash();
 Kenshi::BinaryVersion kenshiVersion = HashToVersionMap.count(kenshiHash) > 0 ? HashToVersionMap.at(kenshiHash) : Kenshi::BinaryVersion(Kenshi::BinaryVersion::UNKNOWN, "UNKNOWN");
@@ -94,6 +98,14 @@ int& Kenshi::GetNumAttackSlots()
     Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
     offset_t attackSlotsOffset = NumAttackSlotsOffset.at(kenshiVersion);
     static RVAPtr<int> c_inst(attackSlotsOffset);
+    return *c_inst.GetPtr();
+}
+
+Kenshi::InputHandler& Kenshi::GetInputHandler()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t inputHandlerOffset = InputHandlerOffset.at(kenshiVersion);
+    static RVAPtr<InputHandler> c_inst(inputHandlerOffset);
     return *c_inst.GetPtr();
 }
 

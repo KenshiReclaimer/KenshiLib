@@ -28,6 +28,12 @@
     <Filter Include="Header Files\kenshi">
       <UniqueIdentifier>{f2ec4452-97a9-413a-b20d-f3bd59cd5fe5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ois">
+      <UniqueIdentifier>{a5ee8e37-91cf-41b9-9c74-c84045ab91db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ois\win32">
+      <UniqueIdentifier>{20a803ac-ae71-4095-b1f6-6ac1d886b623}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\core\RVA.cpp">
@@ -2083,6 +2089,69 @@
     </ClInclude>
     <ClInclude Include="Include\core\md5.h">
       <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\KeyBind.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\OIS.h">
+      <Filter>Header Files\ois</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\OISConfig.h">
+      <Filter>Header Files\ois</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\OISEffect.h">
+      <Filter>Header Files\ois</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\OISEvents.h">
+      <Filter>Header Files\ois</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\OISException.h">
+      <Filter>Header Files\ois</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\OISFactoryCreator.h">
+      <Filter>Header Files\ois</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\OISForceFeedback.h">
+      <Filter>Header Files\ois</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\OISInputManager.h">
+      <Filter>Header Files\ois</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\OISInterface.h">
+      <Filter>Header Files\ois</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\OISJoyStick.h">
+      <Filter>Header Files\ois</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\OISKeyboard.h">
+      <Filter>Header Files\ois</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\OISMouse.h">
+      <Filter>Header Files\ois</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\OISObject.h">
+      <Filter>Header Files\ois</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\OISPrereqs.h">
+      <Filter>Header Files\ois</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\win32\Win32ForceFeedback.h">
+      <Filter>Header Files\ois\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\win32\Win32InputManager.h">
+      <Filter>Header Files\ois\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\win32\Win32JoyStick.h">
+      <Filter>Header Files\ois\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\win32\Win32KeyBoard.h">
+      <Filter>Header Files\ois\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\win32\Win32Mouse.h">
+      <Filter>Header Files\ois\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ois\win32\Win32Prereqs.h">
+      <Filter>Header Files\ois\win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -131,6 +131,7 @@
     <ClInclude Include="Include\kenshi\GameDataManager.h" />
     <ClInclude Include="Include\kenshi\GameWorld.h" />
     <ClInclude Include="Include\kenshi\Kenshi.h" />
+    <ClInclude Include="Include\kenshi\KeyBind.h" />
     <ClInclude Include="Include\kenshi\MedicalSystem.h" />
     <ClInclude Include="Include\kenshi\ModInfo.h" />
     <ClInclude Include="Include\kenshi\Platoon.h" />
@@ -796,6 +797,26 @@
     <ClInclude Include="Include\ogre\win32\OgreErrorDialogImpWinRT.h" />
     <ClInclude Include="Include\ogre\win32\OgreMinGWSupport.h" />
     <ClInclude Include="Include\ogre\win32\OgreTimerImp.h" />
+    <ClInclude Include="Include\ois\OIS.h" />
+    <ClInclude Include="Include\ois\OISConfig.h" />
+    <ClInclude Include="Include\ois\OISEffect.h" />
+    <ClInclude Include="Include\ois\OISEvents.h" />
+    <ClInclude Include="Include\ois\OISException.h" />
+    <ClInclude Include="Include\ois\OISFactoryCreator.h" />
+    <ClInclude Include="Include\ois\OISForceFeedback.h" />
+    <ClInclude Include="Include\ois\OISInputManager.h" />
+    <ClInclude Include="Include\ois\OISInterface.h" />
+    <ClInclude Include="Include\ois\OISJoyStick.h" />
+    <ClInclude Include="Include\ois\OISKeyboard.h" />
+    <ClInclude Include="Include\ois\OISMouse.h" />
+    <ClInclude Include="Include\ois\OISObject.h" />
+    <ClInclude Include="Include\ois\OISPrereqs.h" />
+    <ClInclude Include="Include\ois\win32\Win32ForceFeedback.h" />
+    <ClInclude Include="Include\ois\win32\Win32InputManager.h" />
+    <ClInclude Include="Include\ois\win32\Win32JoyStick.h" />
+    <ClInclude Include="Include\ois\win32\Win32KeyBoard.h" />
+    <ClInclude Include="Include\ois\win32\Win32Mouse.h" />
+    <ClInclude Include="Include\ois\win32\Win32Prereqs.h" />
     <ClInclude Include="Include\reclaimer\Reclaimer.h" />
     <ClInclude Include="Include\stdafx.h" />
   </ItemGroup>
