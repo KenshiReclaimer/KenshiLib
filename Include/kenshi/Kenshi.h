@@ -21,6 +21,7 @@ namespace Kenshi
     struct PlayerInterface;
     struct ResearchManager;
     struct ResearchItem;
+    struct InputHandler;
 
     MyGUI::WidgetPtr FindWidget(MyGUI::EnumeratorWidgetPtr enumerator, std::string name);
 
@@ -79,6 +80,9 @@ namespace Kenshi
     // GameWorld looks to be an object of all game state, whether its loaded or not.
     // Has things like a list of loaded mods and all the GameData loaded in, probably saves too.
     GameWorld& GetGameWorld();
+
+    // Not 100% sure what this is called
+    InputHandler& GetInputHandler();
 
     // Static var separate to GameWorld
     int& GetNumAttackSlots();
