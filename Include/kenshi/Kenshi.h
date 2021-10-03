@@ -84,6 +84,11 @@ namespace Kenshi
     // Not 100% sure what this is called
     InputHandler& GetInputHandler();
 
+    // I haven't reverse-engineered this function, it probably does more than just load mods
+    // but we hook it for sync'ing with the mod loader
+    // (this function sets up GameWorld::loadedMods)
+    void* GetModLoadFunction();
+
     // Static var separate to GameWorld
     int& GetNumAttackSlots();
 
