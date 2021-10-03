@@ -77,12 +77,27 @@ StaticMap<Kenshi::BinaryVersion, offset_t> InputHandlerOffset = StaticMap<Kenshi
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51"), 0x01AAD4B0)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC8950);
 
+StaticMap<Kenshi::BinaryVersion, offset_t> ModLoadFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    // TODO other versions
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"), 0x006B9670)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51"), 0x006B9CF0)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x006BEF60);
+
 std::string kenshiHash = GetEXEHash();
 Kenshi::BinaryVersion kenshiVersion = HashToVersionMap.count(kenshiHash) > 0 ? HashToVersionMap.at(kenshiHash) : Kenshi::BinaryVersion(Kenshi::BinaryVersion::UNKNOWN, "UNKNOWN");
 
 Kenshi::BinaryVersion Kenshi::GetKenshiVersion()
 {
     return kenshiVersion;
+}
+
+
+void* Kenshi::GetModLoadFunction()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t modLoadFunction = ModLoadFunction.at(kenshiVersion);
+    static RVAPtr<void> c_inst(modLoadFunction);
+    return c_inst.GetPtr();
 }
 
 Kenshi::GameWorld& Kenshi::GetGameWorld()
