@@ -28,6 +28,7 @@ namespace Kenshi
         char pad_00BC[8]; //0x00BC
         Ogre::Vector3 N00000E8C; //0x00C4
         char pad_00D0[904]; //0x00D0
+        // inventory // 0x2E8
         MedicalSystem medicalSystem; //0x0458 MedicalSystem
     };
 

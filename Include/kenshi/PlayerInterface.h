@@ -10,9 +10,8 @@ namespace Kenshi
     {
         // FactoryCallbackInterface
         virtual ~PlayerInterface();
-	    
+	    // sizeof(std::string) = 0x30 ?
         std::string faction; //0x0008
-        char pad_0028[8]; //0x0028
         class N00000F7A *N000000E5; //0x0030
         class ResearchManager *research; //0x0038
         char pad_0040[16]; //0x0040
