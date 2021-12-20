@@ -48,6 +48,9 @@
     <ClCompile Include="Source\kenshi\Root.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\core\md5.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Source\kenshi\UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -58,6 +61,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\core\md5.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Debug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2170,6 +2176,9 @@
     </ClInclude>
     <ClInclude Include="Include\ois\win32\Win32Prereqs.h">
       <Filter>Header Files\ois\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Debug.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
