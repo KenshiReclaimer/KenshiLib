@@ -115,6 +115,7 @@
     <ClCompile Include="Source\core\md5.cpp" />
     <ClCompile Include="Source\core\RVA.cpp" />
     <ClCompile Include="Source\core\Scanner.cpp" />
+    <ClCompile Include="Source\Debug.cpp" />
     <ClCompile Include="Source\kenshi\Kenshi.cpp" />
     <ClCompile Include="Source\kenshi\Root.cpp" />
     <ClCompile Include="Source\kenshi\UI.cpp" />
@@ -124,6 +125,7 @@
     <ClInclude Include="Include\core\md5_loc.h" />
     <ClInclude Include="Include\core\RVA.h" />
     <ClInclude Include="Include\core\Scanner.h" />
+    <ClInclude Include="Include\Debug.h" />
     <ClInclude Include="Include\kenshi\Building.h" />
     <ClInclude Include="Include\kenshi\Character.h" />
     <ClInclude Include="Include\kenshi\Faction.h" />
