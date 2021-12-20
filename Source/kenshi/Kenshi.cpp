@@ -57,25 +57,28 @@ StaticMap<std::string, Kenshi::BinaryVersion> HashToVersionMap = StaticMap<std::
     .Add("a5f78908f3f26591a6a3717bfbfafbca", Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51")) // RE_Kenshi 0.1 modified EXE
     .Add("57679de0ae258ead45a96949974517e2", Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51")) // Unmodified
     .Add("525261fca4d339da67999c114118c6c6", Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"))
-    .Add("83ea507cf9667bfe8de2d8a64e9ea57a", Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"));
+    .Add("83ea507cf9667bfe8de2d8a64e9ea57a", Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"))
+    .Add("e737c0e734ea02fa3a714539bbb0c373", Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.55"));
 
 // Game world address Steam 1.51.1 0x001AAE060
 // Game world address GOG 1.51.1 0x001AADFB0
 StaticMap<Kenshi::BinaryVersion, offset_t> GameWorldOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51"), 0x01AAE060)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"), 0x01AADFB0)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC9510);
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC9510)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.55"), 0x1AC8460);
 
 StaticMap<Kenshi::BinaryVersion, offset_t> NumAttackSlotsOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51"), 0x01AADE28)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"), 0x01AADD78)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC92D8);
-
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC92D8)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.55"), 0x01AC8228);
 
 StaticMap<Kenshi::BinaryVersion, offset_t> InputHandlerOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"), 0x01AAD400)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51"), 0x01AAD4B0)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC8950);
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"), 0x01AAD400)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC8950)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.55"), 0x01AC78A0);
 
 StaticMap<Kenshi::BinaryVersion, offset_t> ModLoadFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
     // TODO other versions
