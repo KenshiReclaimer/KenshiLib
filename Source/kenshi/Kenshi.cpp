@@ -84,7 +84,8 @@ StaticMap<Kenshi::BinaryVersion, offset_t> ModLoadFunction = StaticMap<Kenshi::B
     // TODO other versions
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.51"), 0x006B9670)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.51"), 0x006B9CF0)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x006BEF60);
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x006BEF60)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.55"), 0x006BE8E0);
 
 std::string kenshiHash = GetEXEHash();
 Kenshi::BinaryVersion kenshiVersion = HashToVersionMap.count(kenshiHash) > 0 ? HashToVersionMap.at(kenshiHash) : Kenshi::BinaryVersion(Kenshi::BinaryVersion::UNKNOWN, "UNKNOWN");
