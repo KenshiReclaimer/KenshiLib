@@ -1,6 +1,7 @@
 #pragma once
 
-#include <stdafx.h>
+#include <kenshi/util/lektor.h>
+
 namespace Kenshi
 {
     struct GameData;
@@ -19,9 +20,7 @@ namespace Kenshi
         public:
             char pad_0000[8]; //0x0000
             std::string title; //0x0008
-            char pad_0028[8]; //0x0028
             std::string description; //0x0030
-            char pad_0050[8]; //0x0050
         }; //Size: 0x0058
 
         struct HealthPartStatus // total 0x88 bytes
@@ -51,7 +50,7 @@ namespace Kenshi
         class lektor<HealthPartStatus> healthParts; //0x0190 HealthPartStatus
         char pad_01A8[16]; //0x01A8
         std::string gender; //0x01B8
-        char pad_01D8[64]; //0x01D8
+        char pad_01E0[56]; //0x01E0
         Ogre::Vector3 position; //0x0218
         Ogre::Vector3 rotation; //0x0224
         char pad_0230[48]; //0x0230

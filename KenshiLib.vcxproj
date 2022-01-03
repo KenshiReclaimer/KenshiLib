@@ -116,6 +116,7 @@
     <ClCompile Include="Source\core\RVA.cpp" />
     <ClCompile Include="Source\core\Scanner.cpp" />
     <ClCompile Include="Source\Debug.cpp" />
+    <ClCompile Include="Source\kenshi\Inventory.cpp" />
     <ClCompile Include="Source\kenshi\Kenshi.cpp" />
     <ClCompile Include="Source\kenshi\Root.cpp" />
     <ClCompile Include="Source\kenshi\UI.cpp" />
@@ -132,6 +133,8 @@
     <ClInclude Include="Include\kenshi\GameData.h" />
     <ClInclude Include="Include\kenshi\GameDataManager.h" />
     <ClInclude Include="Include\kenshi\GameWorld.h" />
+    <ClInclude Include="Include\kenshi\Inventory.h" />
+    <ClInclude Include="Include\kenshi\Item.h" />
     <ClInclude Include="Include\kenshi\Kenshi.h" />
     <ClInclude Include="Include\kenshi\KeyBind.h" />
     <ClInclude Include="Include\kenshi\MedicalSystem.h" />

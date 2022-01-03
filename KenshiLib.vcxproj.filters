@@ -34,15 +34,15 @@
     <Filter Include="Header Files\ois\win32">
       <UniqueIdentifier>{20a803ac-ae71-4095-b1f6-6ac1d886b623}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\kenshi">
+      <UniqueIdentifier>{38cf539a-2379-436a-976c-12ad88c29a23}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\core\RVA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\core\Scanner.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\kenshi\Kenshi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\kenshi\Root.cpp">
@@ -56,6 +56,12 @@
     </ClCompile>
     <ClCompile Include="Source\Debug.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\kenshi\Kenshi.cpp">
+      <Filter>Source Files\kenshi</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\kenshi\Inventory.cpp">
+      <Filter>Source Files\kenshi</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2158,6 +2164,12 @@
     </ClInclude>
     <ClInclude Include="Include\Debug.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Inventory.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Item.h">
+      <Filter>Header Files\kenshi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
