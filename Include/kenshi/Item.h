@@ -2,6 +2,7 @@
 
 #include <string>
 #include <stdint.h>
+#include <boost/unordered_map.hpp>
 
 namespace Kenshi 
 {
@@ -50,10 +51,27 @@ namespace Kenshi
 		int count; // 0x12C
 		int blockWidth; // 0x130
 		int blockHeight; // 0x134
-		char unk_0138[0xB8]; // 0x138
-		// Item struct ends somewhere before/at 1E8
+		char unk_0138[0xB0]; // 0x138
+		// ends 0x1E8
+	};
+
+	class Gear : public Item
+	{
+		virtual ~Gear();
+
+	public:
+		// possibly 0x228 long?
+		char unk_01E8[0x8]; // 0x1E8
 		int32_t value; // 0x1F0 - this appears to be from Gear, not Item
 		char unk_01F4[0x34]; // 0x1F4
+		// ends 0x228
+	};
+
+	class Weapon : public Gear
+	{
+		virtual ~Weapon();
+
+	public:
 		float bloodLossMult;// 0x228
 		int32_t attackBonus;// 0x22C
 		char unk_0230[0x10]; //0x230
@@ -62,5 +80,20 @@ namespace Kenshi
 		char unk_0248[4]; // 0x248
 		int32_t defenceBonus; // 0x24C
 		int32_t indoorsBonus; // 0x250
+	};
+
+	class Armour : public Gear
+	{
+		virtual ~Armour();
+
+	public:
+		// Gear ends 0x228
+		float cutResistance; // 0x228
+		float bluntResistance; // 0x22C
+		float unk1; // 0x230
+		char unk_0234[0x4]; // 0x234
+		float cutEfficiency; // 0x238
+		char unk_023C[0x7C];// 0x23C
+		boost::unordered_map<GameData*, float> limbCoverage;// 0x2B8
 	};
 }
