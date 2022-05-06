@@ -2,11 +2,19 @@
 
 #include <kenshi/util/lektor.h>
 
+// 1.0.59 GOG MedicalSystem TakeDamage possibly @ kenshi_GOG_x64.exe+5056D0 
+// MedicalSystem::TakeDamage(HealthPartStatus* part, struct damage, uint64_t unk)
 namespace Kenshi
 {
     struct GameData;
     struct Character;
-    struct Effect;
+    struct Armour;
+    struct CharStats;
+    struct AnimationClass;
+    struct Character;
+
+    // possibly 0x1B0 long? 
+    // ^ based on highest byte written by constructor + next byte written to in Character constructor
 
     struct MedicalSystem
     /*

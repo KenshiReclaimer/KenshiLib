@@ -6,25 +6,24 @@
 namespace Kenshi 
 {
 	class GameData;
-	// LockedArmour extends Armour
-	// Armour extends Gear
-	// Sword extends Weapon
-	// Crossbow extends Weapon
-	// Weapon extends Gear
-	// RobotItem extends Gear
-	// Gear extends Item
-	// NestItem extends Item
-	// BlueprintItem extends Item
-	// MapItem extends Item - size might be 208?
-	// MoneyItem extends Item - size is probably 1E8
-	// ContainerItem extends Item, RaceLimiter (incomplete?)
-	// ContainerItem_1 extends Item, RaceLimiter
-	// Item extends InventoryItemBase
-	// InventoryItemBase extends RootObject, Ogre::AllocatedObject<Ogre::CategorisedAllocPolicy<0>>
-	// RootObject extends RootObjectBase
-	// RootObjectBase is base class
-	// RootObject is probably 0xC0 bytes long
-	class Item // not sure on size yet - somewhere between 0x198 and 0x1F0 (probably 1E8)
+	// LockedArmour extends Armour (possibly 0x2F8 long)
+	// Armour extends Gear (possibly 0x2F0 long)
+	// Sword extends Weapon (possibly 0x258 long)
+	// Crossbow extends Weapon (possibly 0x248 long)
+	// Weapon extends Gear (possibly 0x23C (???) long)
+	// RobotLimbItem extends Gear (possibly 0x280 long)
+	// Gear extends Item (possibly 0x228 (???) long)
+	// SeveredLimbItem extends Item (probably 0x228 long)
+	// NestItem extends Item (possibly 0x1E8 long)
+	// BlueprintItem extends Item (possibly 0x1F0 long)
+	// MapItem extends Item - (probably 0x208 long)
+	// MoneyItem extends Item - (probably 0x1E8 long) (interesting virtuals: 632, 648)
+	// ContainerItem extends Item, RaceLimiter (probably 0x298 long) (RaceLimiter vtable @ 1E8 implies Item is 1E8 long)
+	// Item extends InventoryItemBase (probably 0x1E8 long)
+	// InventoryItemBase extends RootObject, Ogre::AllocatedObject<Ogre::CategorisedAllocPolicy<0>> (at least 0x190 long)
+	// RootObject extends RootObjectBase (probably 0xC0 long?)
+	// RootObjectBase is base class (possibly approximately 0x74 long?)
+	class Item // size = 1E8
 	{
 		virtual ~Item();
 	public:

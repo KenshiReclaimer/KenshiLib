@@ -13,7 +13,11 @@ namespace Kenshi
     struct Faction;
     struct Inventory;
 
-    struct Character : public RootObject
+    // CharacterHuman extends Character (length 0x708)
+    // CharacterAnimal extends Character (length 0x718)
+    // Character (at least 0x6D0 long - probably 0x6D8)
+
+    class Character : public RootObject
     {
         virtual ~Character();
 
