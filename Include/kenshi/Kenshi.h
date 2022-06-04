@@ -92,4 +92,8 @@ namespace Kenshi
     // Static var separate to GameWorld
     int& GetNumAttackSlots();
 
+    void* GetSoundEngineGetIDFromString();
+    void* GetSoundEngineGetIDFromString2();
+    void* GetSoundEngineLoadBank();
+
 }

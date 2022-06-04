@@ -97,6 +97,24 @@ StaticMap<Kenshi::BinaryVersion, offset_t> ModLoadFunction = StaticMap<Kenshi::B
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x006BEF60)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x006BE8E0);
 
+StaticMap<Kenshi::BinaryVersion, offset_t> SoundEngineGetIDFromStringFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    // TODO other versions
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x00830670)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x0082FF90)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x00830670);
+
+StaticMap<Kenshi::BinaryVersion, offset_t> SoundEngineGetIDFromStringFunction2 = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    // TODO other versions
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x00830560)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x0082FE80)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x00830560);
+
+StaticMap<Kenshi::BinaryVersion, offset_t> SoundEngineLoadBankFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    // TODO other versions
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x00831020)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x00830940)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x00831020);
+
 std::string kenshiHash = GetEXEHash();
 Kenshi::BinaryVersion kenshiVersion = HashToVersionMap.count(kenshiHash) > 0 ? HashToVersionMap.at(kenshiHash) : Kenshi::BinaryVersion(Kenshi::BinaryVersion::UNKNOWN, "UNKNOWN");
 
@@ -136,6 +154,30 @@ Kenshi::InputHandler& Kenshi::GetInputHandler()
     offset_t inputHandlerOffset = InputHandlerOffset.at(kenshiVersion);
     static RVAPtr<InputHandler> c_inst(inputHandlerOffset);
     return *c_inst.GetPtr();
+}
+
+void* Kenshi::GetSoundEngineGetIDFromString()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t inputHandlerOffset = SoundEngineGetIDFromStringFunction.at(kenshiVersion);
+    static RVAPtr<void> c_inst(inputHandlerOffset);
+    return c_inst.GetPtr();
+}
+
+void* Kenshi::GetSoundEngineGetIDFromString2()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t inputHandlerOffset = SoundEngineGetIDFromStringFunction2.at(kenshiVersion);
+    static RVAPtr<void> c_inst(inputHandlerOffset);
+    return c_inst.GetPtr();
+}
+
+void* Kenshi::GetSoundEngineLoadBank()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t inputHandlerOffset = SoundEngineLoadBankFunction.at(kenshiVersion);
+    static RVAPtr<void> c_inst(inputHandlerOffset);
+    return c_inst.GetPtr();
 }
 
 // TODO templateize
