@@ -81,6 +81,11 @@ namespace Kenshi
     // Has things like a list of loaded mods and all the GameData loaded in, probably saves too.
     GameWorld& GetGameWorld();
 
+    // default 2000
+    float& GetMaxCameraDistance();
+    // default 10
+    float& GetMinCameraDistance();
+
     // Not 100% sure what this is called
     InputHandler& GetInputHandler();
 

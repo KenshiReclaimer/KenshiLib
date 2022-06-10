@@ -68,6 +68,16 @@ StaticMap<Kenshi::BinaryVersion, offset_t> NumAttackSlotsOffset = StaticMap<Kens
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x01AC92D8)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01AC8228);
 
+StaticMap<Kenshi::BinaryVersion, offset_t> MaxCameraDistanceOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x011F4E18)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x011F4E18)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x011F4B68);
+
+StaticMap<Kenshi::BinaryVersion, offset_t> MinCameraDistanceOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01188734)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x01188734)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01188704);
+
 StaticMap<Kenshi::BinaryVersion, offset_t> InputHandlerOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC8950)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x01AC8950)
@@ -85,13 +95,11 @@ StaticMap<Kenshi::BinaryVersion, offset_t> SoundEngineGetIDFromStringFunction = 
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x00830670);
 
 StaticMap<Kenshi::BinaryVersion, offset_t> SoundEngineGetIDFromStringFunction2 = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    // TODO other versions
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x00830560)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x0082FE80)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x00830560);
 
 StaticMap<Kenshi::BinaryVersion, offset_t> SoundEngineLoadBankFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    // TODO other versions
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x00831020)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x00830940)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x00831020);
@@ -126,6 +134,22 @@ int& Kenshi::GetNumAttackSlots()
     Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
     offset_t attackSlotsOffset = NumAttackSlotsOffset.at(kenshiVersion);
     static RVAPtr<int> c_inst(attackSlotsOffset);
+    return *c_inst.GetPtr();
+}
+
+float& Kenshi::GetMaxCameraDistance()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t maxCameraDistanceOffset = MaxCameraDistanceOffset.at(kenshiVersion);
+    static RVAPtr<float> c_inst(maxCameraDistanceOffset);
+    return *c_inst.GetPtr();
+}
+
+float& Kenshi::GetMinCameraDistance()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t minCameraDistanceOffset = MinCameraDistanceOffset.at(kenshiVersion);
+    static RVAPtr<float> c_inst(minCameraDistanceOffset);
     return *c_inst.GetPtr();
 }
 
