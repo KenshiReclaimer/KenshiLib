@@ -100,5 +100,9 @@ namespace Kenshi
     void* GetSoundEngineGetIDFromString();
     void* GetSoundEngineGetIDFromString2();
     void* GetSoundEngineLoadBank();
+    void* GetSoundEngineSetState();
+    void* GetSoundEngineSetSwitch();
+    void* GetSoundEnginePostEvent();
+    void* GetSoundEngineRegisterGameObj();
 
 }
