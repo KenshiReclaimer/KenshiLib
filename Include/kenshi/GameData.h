@@ -18,10 +18,12 @@ namespace Kenshi
         virtual ~GameData();
     public:
         char pad_0008[0x8]; // 0x08
-        GameDataManager* gameDataManager; // 0x10
+        GameDataManager* gameDataManager; // 0x10 GameDataManager container on GameWorld
         char pad_0018[0x10]; // 0x18
         std::string name; // 0x28
-        char unk_0050[0x78];// 0x50
+        char unk_0050[0x8];// 0x50
+        std::string ID; // 0x58
+        char unk_0080[0x48]; //0x80
         // sizeof(boost::unordered_map) = 48 = 0x30
         // Pretty sure my template is wrong - could be an allocator or something? these look like 0x40 bytes...
         boost::unordered_map<std::string, bool> booleans;// 0xc8
@@ -34,11 +36,14 @@ namespace Kenshi
         char unk_01B8[0x10];// 0x1B8
         boost::unordered_map<std::string, float> floats;// 0x1C8
         char unk_01F8[0x10];// 0x1F8
+        // These appear to be file names
         boost::unordered_map<std::string, std::string> strings2;// 0x208
         char unk_0238[0x10];// 0x238
         boost::unordered_map<std::string, Ogre::Vector3> vec3s;// 0x248
         char unk_0278[0x10];// 0x278
         boost::unordered_map<std::string, Ogre::Quaternion> quaternions;// 0x288
+        // 248 = boost::unordered_map<std::string, ogre::vector3> 
+        // 288 = boost::unordered_map<std::string, ogre::quaternion> 
         // 2C8 = boost::unordered_map<std::string, std::vector<GameDataReference>> 
     };
 }
