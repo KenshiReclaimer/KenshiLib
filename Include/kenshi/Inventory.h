@@ -57,7 +57,9 @@ namespace Kenshi
         // lektor<GameData * __ptr64>
         // Don't know what this is for, seems to be empty for human player characters?
         lektor<GameData*> gameDataLektor; // 0x90
-        char unk_00A8[0x18]; // 0xA8
+        char unk_00A8[0x8]; // 0xA8
+        float weight;// 0xB0
+        char unk_00B4[0xC]; // 0xB4
         // Sometimes null
         Character* parentCharacter; // 0xC0
         // Not null
@@ -87,6 +89,7 @@ namespace Kenshi
         // vtable Ogre::STLAllocator<boost::unordered::detail::ptr_bucket,Ogre::CategorisedAllocPolicy<0> >
         char unk_0030[0x8]; // 0x30
         //Ogre::STLAllocator<boost::unordered::detail::ptr_node<std::pair<std::basic_string<char,std::char_traits<char>,std::allocator<char> > const ,InventorySection * __ptr64> >,Ogre::CategorisedAllocPolicy<0> >
+        // boost::unordered_map<std::string, InventorySection*>
         char unk_0038[0x8]; // 0x38
         char unk_0040[0x20]; // 0x40
         // Pointer to sparse array of inventory sections
@@ -97,6 +100,7 @@ namespace Kenshi
         Character* patentCharacter; // 0x80
         // Not sure why there are two
         Character* patentCharacter2; // 0x88
+        float weight; // 0x90
         // Not sure where the struct ends, but should be close to here?
     };
 }

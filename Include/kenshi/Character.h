@@ -155,7 +155,9 @@ namespace Kenshi
         Ogre::Vector3 N00000E8C; //0x00C4
         char pad_00D0[0x218]; //0x00D0
         Inventory* inventory; // 0x02E8
-        char pad_02F0[0x160]; // 0x02F0
+        char pad_02F0[0x58]; // 0x02F0
+        bool isCarryingChar; // 0x0348 - adds 30 to weight if set to true
+        char pad_0349[0x107]; // 0x0349
         CharStats* charStats; // 0x450
         MedicalSystem medicalSystem; //0x0458 MedicalSystem
         char pad_01B0[0x8]; // 0x0608
