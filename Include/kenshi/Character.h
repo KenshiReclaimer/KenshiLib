@@ -25,21 +25,24 @@ namespace Kenshi
         Character* character; // 0x10
         char unk_0018[0x68]; // 0x18
         float strength; // 0x80
-        float unk_0084; // 0x84
+        float endurance; // 0x84
         float dexterity; // 0x88
         float perception; // 0x8C
         float toughness; // 0x90
         float athletics; // 0x94
         float fieldMedic; // 0x98
-        float unk_009C; // 0x9C
-        float unk_00A0; // 0xA0
+        float massCombat; // 0x9C - unused
+        float arrowDefence; // 0xA0 - unused
         float stealth; // 0xA4
         float swimming; // 0xA8
         float thievery; // 0xAC
         float lockpicking; // 0xB0
-        float unk_00B4; // 0xB4
+        float bluff; // 0xB4 - unused
         float assassination; // 0xB8
-        char unk_00BC[0x10]; // 0xBC
+        float survival; // 0xBC - unused
+        float tracking; // 0xC0 - unused
+        float climbing; // 0xC4 - unused
+        float doctor; // 0xC8 - unused
         float engineer; // 0xCC
         float weaponSmith; // 0xD0
         float armourSmith; // 0xD4
@@ -54,8 +57,8 @@ namespace Kenshi
         float katanas; // 0xF8
         float sabres; // 0xFC
         float hackers; // 0x100
-        float heavyWeapons; // 0x104
-        float blunt; // 0x108
+        float blunt; // 0x104
+        float heavyWeapons; // 0x108
         float martialArts; // 0x10C
         float crossbows; // 0x110
         float turrets; // 0x114
@@ -144,12 +147,14 @@ namespace Kenshi
         virtual void func69();
 
     public:
-    	uint64_t id; //0x0008
-        Faction *faction; //0x0010
+        uint64_t id; //0x0008
+        Faction* faction; //0x0010
         std::string name; //0x0018
-        GameData *dataNode; //0x0040
+        GameData* dataNode; //0x0040
         Ogre::Vector3 position; //0x0048
-        char pad_0054[92]; //0x0054
+        char pad_0054[80]; //0x0054
+        int32_t floor; //0x00A4
+        char pad_00A8[8]; //0x00A8
         Ogre::Vector3 rotation; //0x00B0
         char pad_00BC[0x8]; //0x00BC
         Ogre::Vector3 N00000E8C; //0x00C4
@@ -186,6 +191,16 @@ namespace Kenshi
         virtual ~CharacterAnimal();
 
     public:
-
+        char pad_0010[4]; // 0x06D8
+        float hpMultiplier; //0x06DC
+        char pad_06E0[8]; //0x06E0
+        float smellBlood; //0x06E8
+        float smellEggs; //0x06EC
+        float scaleMin; //0x06F0
+        float scaleMax; //0x06F4
+        float lifeSpan; //0x06F8
+        char pad_06FC[4]; //0x06FC
+        float statsMultiplier; //0x0700
+        char pad_0704[20]; //0x0704
     };
 }
