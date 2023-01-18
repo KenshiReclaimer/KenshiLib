@@ -96,6 +96,9 @@ namespace Kenshi
 
     // Static var separate to GameWorld
     int& GetNumAttackSlots();
+    int& GetMaxFactionSize();
+    int& GetMaxSquadSize();
+    int& GetMaxSquads();
 
     void* GetSoundEngineGetIDFromString();
     void* GetSoundEngineGetIDFromString2();

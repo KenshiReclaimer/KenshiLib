@@ -68,6 +68,21 @@ StaticMap<Kenshi::BinaryVersion, offset_t> NumAttackSlotsOffset = StaticMap<Kens
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x01AC92D8)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01AC8228);
 
+StaticMap<Kenshi::BinaryVersion, offset_t> MaxFactionSizeOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC9350)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x01AC9350)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01AC82A0);
+
+StaticMap<Kenshi::BinaryVersion, offset_t> MaxSquadSizeOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC9348)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x01AC9348)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01AC8298);
+
+StaticMap<Kenshi::BinaryVersion, offset_t> MaxSquadsOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC934C)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x01AC934C)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01AC829C);
+
 StaticMap<Kenshi::BinaryVersion, offset_t> MaxCameraDistanceOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x011F4E18)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x011F4E18)
@@ -154,6 +169,30 @@ int& Kenshi::GetNumAttackSlots()
 {
     Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
     offset_t attackSlotsOffset = NumAttackSlotsOffset.at(kenshiVersion);
+    static RVAPtr<int> c_inst(attackSlotsOffset);
+    return *c_inst.GetPtr();
+}
+
+int& Kenshi::GetMaxFactionSize()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t attackSlotsOffset = MaxFactionSizeOffset.at(kenshiVersion);
+    static RVAPtr<int> c_inst(attackSlotsOffset);
+    return *c_inst.GetPtr();
+}
+
+int& Kenshi::GetMaxSquadSize()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t attackSlotsOffset = MaxSquadSizeOffset.at(kenshiVersion);
+    static RVAPtr<int> c_inst(attackSlotsOffset);
+    return *c_inst.GetPtr();
+}
+
+int& Kenshi::GetMaxSquads()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t attackSlotsOffset = MaxSquadsOffset.at(kenshiVersion);
     static RVAPtr<int> c_inst(attackSlotsOffset);
     return *c_inst.GetPtr();
 }
