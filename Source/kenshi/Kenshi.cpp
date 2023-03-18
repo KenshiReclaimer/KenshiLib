@@ -113,6 +113,14 @@ StaticMap<Kenshi::BinaryVersion, offset_t> ModLoadFunction = StaticMap<Kenshi::B
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.60"), 0x006C07F0)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x006BE8E0);
 
+// TODO remove after dropping support for old versions
+StaticMap<Kenshi::BinaryVersion, offset_t> CurrentFontSizeOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x001AC8AF8)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x001AC7A48);
+
+StaticMap<Kenshi::BinaryVersion, offset_t> UpdateFontsFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x00311870)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x00311370);
 
 std::string kenshiHash = GetEXEHash();
 Kenshi::BinaryVersion kenshiVersion = HashToVersionMap.count(kenshiHash) > 0 ? HashToVersionMap.at(kenshiHash) : Kenshi::BinaryVersion(Kenshi::BinaryVersion::UNKNOWN, "UNKNOWN");
@@ -136,6 +144,26 @@ Kenshi::GameWorld& Kenshi::GetGameWorld()
     offset_t gameWorldOffset = GameWorldOffset.at(kenshiVersion);
     static RVAPtr<GameWorld> c_inst(gameWorldOffset);
     return *c_inst.GetPtr();
+}
+
+// On 1.0.55 + 1.0.59 Kenshi doesn't initailize MyGUI with this properly
+// TODO remove after dropping support for old versions
+float& Kenshi::GetCurrentFontSize()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t currentFontSizeOffset = CurrentFontSizeOffset.at(kenshiVersion);
+    static RVAPtr<float> c_inst(currentFontSizeOffset);
+    return *c_inst.GetPtr();
+}
+
+// this takes args, but it doesn't access them, so we can pretend it's a void(void)
+// It appears it has to be called *after* the UI is created
+void* Kenshi::GetUpdateFonts()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t currentFontSizeOffset = UpdateFontsFunction.at(kenshiVersion);
+    static RVAPtr<float> c_inst(currentFontSizeOffset);
+    return c_inst.GetPtr();
 }
 
 int& Kenshi::GetNumAttackSlots()
