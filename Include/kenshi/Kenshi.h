@@ -55,6 +55,15 @@ namespace Kenshi
             return "Unknown";
         }
 
+        std::string GetBinaryName()
+        {
+            if (platform == KenshiPlatform::STEAM)
+                return "Kenshi_x64.exe";
+            if (platform == KenshiPlatform::GOG)
+                return "Kenshi_GOG_x64.exe";
+            return "Unknown";
+        }
+
         std::string GetVersion()
         {
             return version;
@@ -67,6 +76,11 @@ namespace Kenshi
             if (this->version != b.version)
                 return this->version < b.version;
             return this->platform < b.platform;
+        }
+
+        bool operator== (const BinaryVersion& b) const
+        {
+            return this->version == b.version && this->platform == b.platform;
         }
 
     private:
