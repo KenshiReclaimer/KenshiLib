@@ -103,42 +103,6 @@ StaticMap<Kenshi::BinaryVersion, offset_t> ModLoadFunction = StaticMap<Kenshi::B
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x006BEF60)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x006BE8E0);
 
-    // TODO other versions
-// TODO why not use symbol lookups?
-StaticMap<Kenshi::BinaryVersion, offset_t> SoundEngineGetIDFromStringFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x00830670)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x0082FF90)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x00830670);
-
-StaticMap<Kenshi::BinaryVersion, offset_t> SoundEngineGetIDFromStringFunction2 = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x00830560)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x0082FE80)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x00830560);
-
-StaticMap<Kenshi::BinaryVersion, offset_t> SoundEngineLoadBankFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x00831020)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x00830940)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x00831020);
-
-StaticMap<Kenshi::BinaryVersion, offset_t> SoundEngineSetStateFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x00830BE0)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x00830500)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x00830BE0);
-
-StaticMap<Kenshi::BinaryVersion, offset_t> SoundEngineSetSwitchFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x008309F0)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x00830310)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x008309F0);
-
-StaticMap<Kenshi::BinaryVersion, offset_t> SoundEnginePostEventFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x00834AA0)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x008343C0)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x00834AA0);
-
-StaticMap<Kenshi::BinaryVersion, offset_t> SoundEngineRegisterGameObjFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x0082E430)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x0082DD50)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.59"), 0x0082E430);
 
 std::string kenshiHash = GetEXEHash();
 Kenshi::BinaryVersion kenshiVersion = HashToVersionMap.count(kenshiHash) > 0 ? HashToVersionMap.at(kenshiHash) : Kenshi::BinaryVersion(Kenshi::BinaryVersion::UNKNOWN, "UNKNOWN");
@@ -147,7 +111,6 @@ Kenshi::BinaryVersion Kenshi::GetKenshiVersion()
 {
     return kenshiVersion;
 }
-
 
 void* Kenshi::GetModLoadFunction()
 {
@@ -221,62 +184,6 @@ Kenshi::InputHandler& Kenshi::GetInputHandler()
     return *c_inst.GetPtr();
 }
 
-void* Kenshi::GetSoundEngineGetIDFromString()
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t inputHandlerOffset = SoundEngineGetIDFromStringFunction.at(kenshiVersion);
-    static RVAPtr<void> c_inst(inputHandlerOffset);
-    return c_inst.GetPtr();
-}
-
-void* Kenshi::GetSoundEngineGetIDFromString2()
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t inputHandlerOffset = SoundEngineGetIDFromStringFunction2.at(kenshiVersion);
-    static RVAPtr<void> c_inst(inputHandlerOffset);
-    return c_inst.GetPtr();
-}
-
-void* Kenshi::GetSoundEngineLoadBank()
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t inputHandlerOffset = SoundEngineLoadBankFunction.at(kenshiVersion);
-    static RVAPtr<void> c_inst(inputHandlerOffset);
-    return c_inst.GetPtr();
-}
-
-void* Kenshi::GetSoundEngineSetState() 
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t inputHandlerOffset = SoundEngineSetStateFunction.at(kenshiVersion);
-    static RVAPtr<void> c_inst(inputHandlerOffset);
-    return c_inst.GetPtr();
-}
-
-void* Kenshi::GetSoundEngineSetSwitch() 
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t inputHandlerOffset = SoundEngineSetSwitchFunction.at(kenshiVersion);
-    static RVAPtr<void> c_inst(inputHandlerOffset);
-    return c_inst.GetPtr();
-}
-
-void* Kenshi::GetSoundEnginePostEvent()
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t inputHandlerOffset = SoundEnginePostEventFunction.at(kenshiVersion);
-    static RVAPtr<void> c_inst(inputHandlerOffset);
-    return c_inst.GetPtr();
-}
-
-void* Kenshi::GetSoundEngineRegisterGameObj()
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t inputHandlerOffset = SoundEngineRegisterGameObjFunction.at(kenshiVersion);
-    static RVAPtr<void> c_inst(inputHandlerOffset);
-    return c_inst.GetPtr();
-}
-
 // TODO templateize
 // Kenshi prefixes it's widgets with a bunch of non-usefull stuff
 MyGUI::WidgetPtr Kenshi::FindWidget(MyGUI::EnumeratorWidgetPtr enumerator, std::string name)
@@ -285,12 +192,7 @@ MyGUI::WidgetPtr Kenshi::FindWidget(MyGUI::EnumeratorWidgetPtr enumerator, std::
     {
         std::string widgetName = enumerator.current()->getName();
         size_t splitPos = widgetName.find('_');
-        /*
-        debug_out << widgetName;
-        if(splitPos != std::string::npos)
-            debug_out << " " << widgetName.substr(splitPos+1);
-        debug_out << "\n";
-        */
+
         if (splitPos != std::string::npos && widgetName.substr(splitPos + 1) == name)
             return enumerator.current();
         if (enumerator.current()->getChildCount() > 0)
