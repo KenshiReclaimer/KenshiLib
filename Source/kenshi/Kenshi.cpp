@@ -147,7 +147,7 @@ void* Kenshi::GetCrashReporterFunction()
     Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
     offset_t crashReportFunction = CrashReportFunction.at(kenshiVersion);
     static RVAPtr<void> c_inst(crashReportFunction);
-    return *c_inst.GetPtr();
+    return c_inst.GetPtr();
 }
 
 // On 1.0.55 + 1.0.59 Kenshi doesn't initailize MyGUI with this properly
