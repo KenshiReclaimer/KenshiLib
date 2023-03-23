@@ -113,6 +113,10 @@ StaticMap<Kenshi::BinaryVersion, offset_t> ModLoadFunction = StaticMap<Kenshi::B
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.60"), 0x006C07F0)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x006BE8E0);
 
+// TODO other versions
+StaticMap<Kenshi::BinaryVersion, offset_t> CrashReportFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x005cabd0);
+
 // TODO remove after dropping support for old versions
 StaticMap<Kenshi::BinaryVersion, offset_t> CurrentFontSizeOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x001AC8AF8)
@@ -138,11 +142,11 @@ void* Kenshi::GetModLoadFunction()
     return c_inst.GetPtr();
 }
 
-Kenshi::GameWorld& Kenshi::GetGameWorld()
+void* Kenshi::GetCrashReporterFunction()
 {
     Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t gameWorldOffset = GameWorldOffset.at(kenshiVersion);
-    static RVAPtr<GameWorld> c_inst(gameWorldOffset);
+    offset_t crashReportFunction = CrashReportFunction.at(kenshiVersion);
+    static RVAPtr<void> c_inst(crashReportFunction);
     return *c_inst.GetPtr();
 }
 
@@ -164,6 +168,14 @@ void* Kenshi::GetUpdateFonts()
     offset_t currentFontSizeOffset = UpdateFontsFunction.at(kenshiVersion);
     static RVAPtr<float> c_inst(currentFontSizeOffset);
     return c_inst.GetPtr();
+}
+
+Kenshi::GameWorld& Kenshi::GetGameWorld()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t gameWorldOffset = GameWorldOffset.at(kenshiVersion);
+    static RVAPtr<GameWorld> c_inst(gameWorldOffset);
+    return *c_inst.GetPtr();
 }
 
 int& Kenshi::GetNumAttackSlots()

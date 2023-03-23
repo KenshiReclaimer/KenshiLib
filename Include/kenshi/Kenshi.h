@@ -64,6 +64,11 @@ namespace Kenshi
             return "Unknown";
         }
 
+        std::string ToString()
+        {
+            return version + " " + GetPlatformStr();
+        }
+
         std::string GetVersion()
         {
             return version;
@@ -107,6 +112,8 @@ namespace Kenshi
     // but we hook it for sync'ing with the mod loader
     // (this function sets up GameWorld::loadedMods)
     void* GetModLoadFunction();
+    // This function creates the "Kenshi has crashed" window
+    void* GetCrashReporterFunction();
 
     // On 1.0.55 + 1.0.59 Kenshi doesn't initailize MyGUI with this properly
     // TODO remove after dropping support for old versions
