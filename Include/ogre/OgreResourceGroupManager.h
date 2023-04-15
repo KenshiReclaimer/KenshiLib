@@ -36,11 +36,6 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "Threading/OgreThreadHeaders.h"
 #include <ctime>
-
-#include "ogrestd/list.h"
-#include "ogrestd/map.h"
-#include "ogrestd/unordered_set.h"
-
 #include "OgreHeaderPrefix.h"
 
 // If X11/Xlib.h gets included before this header (for example it happens when
@@ -91,7 +86,7 @@ namespace Ogre {
     class _OgreExport ResourceGroupListener
     {
     public:
-        virtual ~ResourceGroupListener();
+        virtual ~ResourceGroupListener() {}
 
         /** This event is fired when a resource group begins parsing scripts.
         @note
@@ -195,28 +190,13 @@ namespace Ogre {
                 By overriding this class' methods, you can change how resources
                 are loaded and the behavior for resource name collisions.
     */
-    class _OgreExport ResourceLoadingListener
+    class ResourceLoadingListener
     {
     public:
-        virtual ~ResourceLoadingListener();
+        virtual ~ResourceLoadingListener() {}
 
         /** This event is called when a resource beings loading. */
         virtual DataStreamPtr resourceLoading(const String &name, const String &group, Resource *resource) = 0;
-
-        /// Gets called when a groupless manager (like TextureGpuManager) wants to check if there's
-        /// a resource with that name provided by this listener.
-        /// This function is called from main thread.
-        virtual bool grouplessResourceExists( const String &name ) = 0;
-
-        /// Gets called when a groupless manager (like TextureGpuManager) loads a resource.
-        /// WARNING: This function is likely going to be called from a worker thread.
-        virtual DataStreamPtr grouplessResourceLoading( const String &name ) = 0;
-        /// Similar to resourceStreamOpened, gets called when a groupless manager has already
-        /// opened a resource and you may want to modify the stream.
-        /// If grouplessResourceLoading has been called, then this function won't.
-        /// WARNING: This function is likely going to be called from a worker thread.
-        virtual DataStreamPtr grouplessResourceOpened( const String &name, Archive *archive,
-                                                       DataStreamPtr &dataStream ) = 0;
 
         /** This event is called when a resource stream has been opened, but not processed yet. 
         @remarks
@@ -330,7 +310,7 @@ namespace Ogre {
         typedef map<String, Archive*>::type ResourceLocationIndex;
 
         /// List of resources which can be loaded / unloaded
-        typedef unordered_set<ResourcePtr>::type LoadUnloadResourceSet;
+        typedef list<ResourcePtr>::type LoadUnloadResourceList;
         /// Resource group entry
         struct ResourceGroup
         {
@@ -361,7 +341,7 @@ namespace Ogre {
             /// Created resources which are ready to be loaded / unloaded
             // Group by loading order of the type (defined by ResourceManager)
             // (e.g. skeletons and materials before meshes)
-            typedef map<Real, LoadUnloadResourceSet*>::type LoadResourceOrderMap;
+            typedef map<Real, LoadUnloadResourceList*>::type LoadResourceOrderMap;
             LoadResourceOrderMap loadResourceOrderMap;
             /// Linked world geometry, as passed to setWorldGeometry
             String worldGeometry;
@@ -523,25 +503,14 @@ namespace Ogre {
             has occurred (e.g. a group per game level), you must remember to call this
             method for the groups you create after this.
 
-        @param name
-            The name of the resource group to initialise
-        @param changeLocaleTemporarily
-            Ogre regrettably relies on locale conversion for parsing scripts, which means
-            a script with value "1.76" will be read as "1" in some systems because the
-            locale is configured to expect "1,76" instead.
-            When you pass true to this function, we will temporarily change the locale
-            to "C" and then restore it back when we're done.
-            However this is not ideal as it may affect your program if you have
-            other threads; or it could affect your code if a listener is triggered
-            and you expect a particular locale; therefore the final decision of changing
-            the locale is left to you.
+        @param name The name of the resource group to initialise
         */
-        void initialiseResourceGroup( const String& name, bool changeLocaleTemporarily );
+        void initialiseResourceGroup(const String& name);
 
         /** Initialise all resource groups which are yet to be initialised.
         @see ResourceGroupManager::intialiseResourceGroup
         */
-        void initialiseAllResourceGroups( bool changeLocaleTemporarily );
+        void initialiseAllResourceGroups(void);
 
         /** Prepares a resource group.
         @remarks
@@ -799,10 +768,6 @@ namespace Ogre {
             const String& groupName = DEFAULT_RESOURCE_GROUP_NAME,
             bool searchGroupsIfNotFound = true, Resource* resourceBeingLoaded = 0);
 
-        Archive* _getArchiveToResource( const String& resourceName,
-                                        const String& groupName = DEFAULT_RESOURCE_GROUP_NAME,
-                                        bool searchGroupsIfNotFound = true );
-
         /** Open all resources matching a given pattern (which can contain
             the character '*' as a wildcard), and return a collection of 
             DataStream objects on them.
@@ -1044,7 +1009,7 @@ namespace Ogre {
         /** Internal method called by ResourceManager when a resource is removed.
         @param res Weak reference to resource
         */
-        void _notifyResourceRemoved(const ResourcePtr& res);
+        void _notifyResourceRemoved(ResourcePtr& res);
 
         /** Internal method to notify the group manager that a resource has
             changed group (only applicable for autodetect group) */

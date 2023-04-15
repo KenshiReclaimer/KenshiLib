@@ -33,20 +33,16 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreMatrix3.h"
 #include "OgreMatrix4.h"
-#include "OgreVector3.h"
 #include "OgreQuaternion.h"
+#include "OgreString.h"
 #include "OgreRenderable.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreMesh.h"
 #include "OgreUserObjectBindings.h"
-
-#include "ogrestd/unordered_map.h"
-#include "ogrestd/set.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-namespace v1 {
+
 
     /** \addtogroup Core
     *  @{
@@ -78,7 +74,7 @@ namespace v1 {
             /// Transform is relative to world space
             TS_WORLD
         };
-        typedef unordered_map<String, OldNode*>::type ChildOldNodeMap;
+        typedef OGRE_HashMap<String, OldNode*> ChildOldNodeMap;
         typedef MapIterator<ChildOldNodeMap> ChildOldNodeIterator;
         typedef ConstMapIterator<ChildOldNodeMap> ConstChildOldNodeIterator;
 
@@ -88,7 +84,7 @@ namespace v1 {
         {
         public:
             Listener() {}
-            virtual ~Listener();
+            virtual ~Listener() {}
             /** Called when a OldNode gets updated.
             @remarks
                 Note that this happens when the OldNode's derived update happens,
@@ -103,6 +99,26 @@ namespace v1 {
             virtual void OldNodeAttached(const OldNode*) {}
             /** OldNode has been detached from a parent */
             virtual void OldNodeDetached(const OldNode*) {}
+        };
+
+        /** Inner class for displaying debug renderable for OldNode. */
+        class DebugRenderable : public Renderable, public NodeAlloc
+        {
+        protected:
+            OldNode* mParent;
+            MeshPtr mMeshPtr;
+            MaterialPtr mMat;
+            Real mScaling;
+        public:
+            DebugRenderable(OldNode* parent);
+            ~DebugRenderable();
+            const MaterialPtr& getMaterial(void) const;
+            void getRenderOperation(RenderOperation& op);
+            void getWorldTransforms(Matrix4* xform) const;
+            Real getSquaredViewDepth(const Camera* cam) const;
+            const LightList& getLights(void) const;
+            void setScaling(Real s) { mScaling = s; }
+
         };
 
     protected:
@@ -210,6 +226,8 @@ namespace v1 {
 
         typedef vector<OldNode*>::type QueuedUpdates;
         static QueuedUpdates msQueuedUpdates;
+
+        DebugRenderable* mDebug;
 
         /// User objects binding.
         UserObjectBindings mUserObjectBindings;
@@ -708,6 +726,9 @@ namespace v1 {
         /** Called by children to notify their parent that they no longer need an update. */
         virtual void cancelUpdate(OldNode* child);
 
+        /** Get a debug renderable for rendering the OldNode.  */
+        virtual DebugRenderable* getDebugRenderable(Real scaling);
+
         /** Queue a 'needUpdate' call to a OldNode safely.
         @remarks
             You can't call needUpdate() during the scene graph update, e.g. in
@@ -750,7 +771,6 @@ namespace v1 {
     /** @} */
     /** @} */
 
-}
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"

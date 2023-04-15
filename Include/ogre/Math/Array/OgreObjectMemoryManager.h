@@ -132,12 +132,6 @@ namespace Ogre
         void migrateTo( ObjectData &inOutTransform, size_t renderQueue,
                         ObjectMemoryManager *dstObjectMemoryManager );
 
-        /// @copydoc ArrayMemoryManager::defragment
-        void defragment(void);
-
-        /// @copydoc ArrayMemoryManager::shrinkToFit
-        void shrinkToFit(void);
-
         /** Retrieves the number of render queues that have been created.
         @remarks
             The return value is equal or below mMemoryManagers.size(), you should cache
@@ -150,13 +144,8 @@ namespace Ogre
         /** Retrieves the sum of the number of objects in all render queues.
         @remarks
             The value is cached to avoid iterating through all RQ levels, however
-            be **VERY CAREFUL** with this value it may not be equal to the sum of
+            be **very careful** with this value it may not be equal to the sum of
             all getFirstObjectData() from all render queues.
-            Specially careful when distributing work to different threads, since you may have to
-            include skipping unassigned slots, and thus the last thread may end up writing out
-            of bounds if you use getTotalNumObjects to allocate a buffer to hold results instead of
-            calculateTotalNumObjectDataIncludingFragmentedSlots (depends on how your algorithm
-            works).
         @par
             When ARRAY_PACKED_REALS = 4, and 4 objects have been created but
             the 2nd one has been deleted, getFirstObjectData will still return
@@ -164,10 +153,6 @@ namespace Ogre
             getTotalNumObjects will return the actual number of objects.
         */
         size_t getTotalNumObjects() const                   { return mTotalObjects; }
-
-        /// This is the opposite of getTotalNumObjects. This function returns the sum
-        /// of the return values of getFirstObjectData
-        size_t calculateTotalNumObjectDataIncludingFragmentedSlots() const;
 
         /// Returns the pointer to the dummy node (useful when detaching)
         SceneNode* _getDummyNode() const                    { return mDummyNode; }
@@ -183,12 +168,14 @@ namespace Ogre
         size_t getFirstObjectData( ObjectData &outObjectData, size_t renderQueue );
 
         //Derived from ArrayMemoryManager::RebaseListener
-        virtual void buildDiffList( uint16 level, const MemoryPoolVec &basePtrs,
+        virtual void buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
+                                    const MemoryPoolVec &basePtrs,
                                     ArrayMemoryManager::PtrdiffVec &outDiffsList );
-        virtual void applyRebase( uint16 level, const MemoryPoolVec &newBasePtrs,
-                                  const ArrayMemoryManager::PtrdiffVec &diffsList );
-        virtual void performCleanup( uint16 level, const MemoryPoolVec &basePtrs,
-                                     size_t const *elementsMemSizes,
+        virtual void applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
+                                    const MemoryPoolVec &newBasePtrs,
+                                    const ArrayMemoryManager::PtrdiffVec &diffsList );
+        virtual void performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
+                                     const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
                                      size_t startInstance, size_t diffInstances );
     };
 

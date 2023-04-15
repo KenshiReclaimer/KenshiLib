@@ -94,19 +94,6 @@ namespace Ogre
         /// Node this SkeletonInstance is attached to (so we can work in world space)
         Node                    *mParentNode;
 
-        struct SceneNodeBonePair
-        {
-            Bone        *boneChild;
-            SceneNode   *sceneNodeParent;
-            SceneNodeBonePair( Bone *_boneChild, SceneNode *_sceneNodeParent ) :
-                boneChild( _boneChild ), sceneNodeParent( _sceneNodeParent ) {}
-        };
-        typedef vector<SceneNodeBonePair>::type SceneNodeBonePairVec;
-                
-        SceneNodeBonePairVec    mCustomParentSceneNodes;
-
-        uint16 mRefCount;
-
     public:
         SkeletonInstance( const SkeletonDef *skeletonDef, BoneMemoryManager *boneMemoryManager );
         ~SkeletonInstance();
@@ -119,7 +106,7 @@ namespace Ogre
         void resetToPose(void);
 
         /** Sets the given node to manual. Manual bones won't be reset to binding pose
-            (see resetToPose) and thus are suitable for manual control. However if the
+            (@see resetToPose) and thus are suitable for manual control. However if the
             bone is animated, you're responsible for resetting the position/rotation/scale
             before each call to @see update
         @remarks
@@ -140,21 +127,12 @@ namespace Ogre
         */
         bool isManualBone( Bone *bone );
 
-        /** Sets a regular SceneNode to be parent of this Bone for manually controlling
-            a bone (e.g. have a bone follow a character). You may want to also call
-            setManualBone as well to prevent animation on this bone.
-        @param nodeParent
-            Node to be parent of this scene node. Use a null pointer to remove the attachment.
-        */
-        void setSceneNodeAsParentOfBone( Bone *bone, SceneNode *nodeParent );
-
         /// Gets full transform of a bone by its index.
         FORCEINLINE const SimpleMatrixAf4x3& _getBoneFullTransform( size_t index ) const
         {
             return mBones[index]._getFullTransform();
         }
 
-        bool hasBone( IdString name ) const;
         /// Gets the bone with given name. Throws if not found.
         Bone* getBone( IdString boneName );
 
@@ -168,23 +146,6 @@ namespace Ogre
         /// Returns the requested animations. Throws if not found. O(N) Linear search
         SkeletonAnimation* getAnimation( IdString name );
 
-        /// Return all animations associated with this skeleton
-        const SkeletonAnimationVec &getAnimations( void ) const { return mAnimations; }
-
-        /// Return all animations associated with this skeleton
-        /// Be careful with this one! Do not insert/remove elements
-        SkeletonAnimationVec &getAnimationsNonConst( void ) { return mAnimations; }
-
-        /// Returns all animations that are currently active
-        const ActiveAnimationsVec &getActiveAnimations( void ) const { return mActiveAnimations; }
-
-        /**    Add all animation clips found in skelName.
-        @remarks
-            skelName skeleton must have the same structure (bone count, bone hierarchy) as this,
-            otherwise it may output unexpected behavior or crashes.
-        */
-        void addAnimationsFromSkeleton( const String &skelName, const String &groupName );
-
         /// Internal use. Enables given animation. Input should belong to us and not already animated.
         void _enableAnimation( SkeletonAnimation *animation );
 
@@ -193,9 +154,6 @@ namespace Ogre
 
         /** Sets our parent node so that our bones are in World space.
             Iterates through all our bones and sets the root bones
-        @remarks
-            Bones explicitly parented to a different node via setSceneNodeAsParentOfBone
-            will remain parented to that node.
         */
         void setParentNode( Node *parentNode );
 
@@ -214,10 +172,6 @@ namespace Ogre
 
         const void* _getMemoryBlock(void) const;
         const void* _getMemoryUniqueOffset(void) const;
-
-        void _incrementRefCount(void);
-        void _decrementRefCount(void);
-        uint16 _getRefCount(void) const;
     };
 
     inline bool OrderSkeletonInstanceByMemory( const SkeletonInstance *_left,

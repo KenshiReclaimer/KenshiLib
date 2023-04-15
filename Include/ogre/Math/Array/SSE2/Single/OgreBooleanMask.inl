@@ -40,11 +40,6 @@ namespace Ogre
         return mMasks[idx];
     }
     //--------------------------------------------------------------------------------------
-    inline ArrayMaskR BooleanMask4::getAllSetMask(void)
-    {
-        return mMasks[MASK_XYZW];
-    }
-    //--------------------------------------------------------------------------------------
     inline bool BooleanMask4::allBitsSet( bool mask0[4], bool mask1[4] )
     {
 #if __cplusplus > 199711L //C++11

@@ -32,12 +32,8 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreBlendMode.h"
 #include "OgreMatrix4.h"
+#include "OgreTexture.h"
 #include "OgreIdString.h"
-#include "OgreTextureGpu.h"
-#include "OgreTextureGpuListener.h"
-
-#include "ogrestd/map.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -62,7 +58,7 @@ namespace Ogre {
         where you do not use vertex or fragment programs (shaders). Programmable 
         pipeline means that for this pass you are using vertex or fragment programs.
     */
-    class _OgreExport TextureUnitState : public TextureUnitStateAlloc, public TextureGpuListener
+    class _OgreExport TextureUnitState : public TextureUnitStateAlloc
     {
         friend class RenderSystem;
     public:
@@ -119,6 +115,31 @@ namespace Ogre {
             TT_SCALE_U,
             TT_SCALE_V,
             TT_ROTATE
+        };
+
+        /** Texture addressing modes - default is TAM_WRAP.
+        @note
+            These settings are relevant in both the fixed-function and the
+            programmable pipeline.
+        */
+        enum TextureAddressingMode
+        {
+            /// Texture wraps at values over 1.0.
+            TAM_WRAP,
+            /// Texture mirrors (flips) at joins over 1.0.
+            TAM_MIRROR,
+            /// Texture clamps at 1.0.
+            TAM_CLAMP,
+            /// Texture coordinates outside the range [0.0, 1.0] are set to the border colour.
+            TAM_BORDER,
+            /// Unknown
+            TAM_UNKNOWN = 99
+        };
+
+        /** Texture addressing mode for each texture coordinate. */
+        struct UVWAddressingMode
+        {
+            TextureAddressingMode u, v, w;
         };
 
         /** Enum identifying the frame indexes for faces of a cube map (not the composite 3D type.
@@ -187,15 +208,14 @@ namespace Ogre {
         @note
             Applies to both fixed-function and programmable pipeline.
         */
-        void setTextureName( const String& name,
-                             TextureTypes::TextureTypes ttype = TextureTypes::Type2D );
+        void setTextureName( const String& name, TextureType ttype = TEX_TYPE_2D);
 
         /** Sets this texture layer to use a single texture, given the
             pointer to the texture to use on this layer.
         @note
             Applies to both fixed-function and programmable pipeline.
         */
-        void setTexture( TextureGpu * texPtr);
+        void setTexture( const TexturePtr& texPtr);
 
         /** Sets this texture layer to use a combination of 6 texture maps, each one relating to a face of a cube.
         @remarks
@@ -330,12 +350,12 @@ namespace Ogre {
         @param texPtrs
             The 6 pointers to the textures which make up the 6 sides of the box. The textures must all 
             be the same size and be powers of 2 in width & height.
-            Must be an Ogre::TextureGpu array with a length of 6 unless forUVW is set to @c true.
+            Must be an Ogre::TexturePtr array with a length of 6 unless forUVW is set to @c true.
         @param forUVW
             Set to @c true if you want a single 3D texture addressable with 3D texture coordinates rather than
             6 separate textures. Useful for cubic environment mapping.
         */
-        void setCubicTexture( TextureGpu * const *texPtrs, bool forUVW = false );
+        void setCubicTexture( const TexturePtr* const texPtrs, bool forUVW = false );
 
         /** Sets the names of the texture images for an animated texture.
         @remarks
@@ -457,7 +477,9 @@ namespace Ogre {
             /// Tessellation control processing unit
             BT_TESSELLATION_HULL = 3,
             /// Tessellation evaluation processing unit
-            BT_TESSELLATION_DOMAIN = 4
+            BT_TESSELLATION_DOMAIN = 4,
+            /// Compute processing unit
+            BT_COMPUTE = 5
         };
         /** Enum identifying the type of content this texture unit contains.
         */
@@ -486,23 +508,6 @@ namespace Ogre {
         */
         BindingType getBindingType(void) const;
 
-        /** When a texture is used by both PBS datablocks and V1 materials it can lead to a few issues:
-            1. V1 materials will often expect a Type2D texture to actually be Type2D.
-            2. PBS datablocks will use TextureFlags::AutomaticBatching to group several textures of same
-               resolution and format into the same Type2DArray, and thus lower CPU overhead. This
-               means the 2D texture is not actually Type2D, but rather Type2DArray, and the slice
-               information is also required.
-        @par
-            The default is to disable this option, which means the texture may be loaded *twice*: one
-            for V1 materials, and another for PBS. If you do not want this, call
-            setAutomaticBatching( true ); before loading the texture.
-            Note that you will have to provide the slice index by hand and make sure the shader
-            you wrote understands this is a 2D Array texture.
-        @param automaticBatching
-        */
-        void setAutomaticBatching( bool automaticBatching );
-        bool getAutomaticBatching(void) const;
-
         /** Set the type of content this TextureUnitState references.
         @remarks
             The default is to reference a standard named texture, but this unit
@@ -530,7 +535,15 @@ namespace Ogre {
         @note
             Applies to both fixed-function and programmable pipeline.
         */
-        TextureTypes::TextureTypes getTextureType(void) const;
+        TextureType getTextureType(void) const;
+
+        /** Sets the desired pixel format when load the texture.
+        */
+        void setDesiredFormat(PixelFormat desiredFormat);
+
+        /** Gets the desired pixel format when load the texture.
+        */
+        PixelFormat getDesiredFormat(void) const;
 
         /** Sets how many mipmaps have been requested for the texture.
         */
@@ -674,6 +687,61 @@ namespace Ogre {
         void setTextureRotate(const Radian& angle);
         /// Get texture rotation effects angle value.
         const Radian& getTextureRotate(void) const;
+
+        /** Gets the texture addressing mode for a given coordinate, 
+            i.e. what happens at uv values above 1.0.
+        @note
+            The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
+        */
+        const UVWAddressingMode& getTextureAddressingMode(void) const;
+
+        /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
+        @note
+            The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
+        @note This is a shortcut method which sets the addressing mode for all
+            coordinates at once; you can also call the more specific method
+            to set the addressing mode per coordinate.
+        @note
+            This is a shortcut method which sets the addressing mode for all
+            coordinates at once; you can also call the more specific method
+            to set the addressing mode per coordinate.
+        @note
+            This applies for both the fixed-function and programmable pipelines.
+        */
+        void setTextureAddressingMode( TextureAddressingMode tam);
+
+        /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
+        @note
+            The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
+        @note
+            This applies for both the fixed-function and programmable pipelines.
+        */
+        void setTextureAddressingMode( TextureAddressingMode u, 
+            TextureAddressingMode v, TextureAddressingMode w);
+
+        /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
+        @note
+            The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
+        @note
+            This applies for both the fixed-function and programmable pipelines.
+        */
+        void setTextureAddressingMode( const UVWAddressingMode& uvw);
+
+        /** Sets the texture border colour.
+        @note
+            The default is ColourValue::Black, and this value only used when addressing mode
+            is TAM_BORDER.
+        @note
+            This applies for both the fixed-function and programmable pipelines.
+        */
+        void setTextureBorderColour(const ColourValue& colour);
+
+        /** Sets the texture border colour.
+        @note
+            The default is ColourValue::Black, and this value only used when addressing mode
+            is TAM_BORDER.
+        */
+        const ColourValue& getTextureBorderColour(void) const;
 
         /** Setting advanced blending options.
         @remarks
@@ -976,34 +1044,96 @@ namespace Ogre {
         */
         void retryTextureLoad() { mTextureLoadFailed = false; }
 
-        /// Changes the current samplerblock for a new one.
-        void setSamplerblock( const HlmsSamplerblock &samplerblock );
-
-        /// Changes the current samplerblock for a new one.
-        /// MUST'VE BEEN CREATED VIA HlmsManager!!!
-        /// INCREASES THE REFERENCE COUNT OF THE SAMPLERBLOCK
-        void _setSamplerblock( const HlmsSamplerblock *samplerblock );
-
-        /** Retrieves current samplerblock. Don't const_cast the return value to modify it.
-            @See HlmsDatablock remarks.
-        */
-        const HlmsSamplerblock* getSamplerblock(void) const;
-
         /// Get texture effects in a multimap paired array.
         const EffectMap& getEffects(void) const;
         /// Get the animated-texture animation duration.
         Real getAnimationDuration(void) const;
+
+        /** Set the texture filtering for this unit, using the simplified interface.
+        @remarks
+            You also have the option of specifying the minification, magnification
+            and mip filter individually if you want more control over filtering
+            options. See the alternative setTextureFiltering methods for details.
+        @note
+            This option applies in both the fixed function and the programmable pipeline.
+        @param filterType
+            The high-level filter type to use.
+        */
+        void setTextureFiltering(TextureFilterOptions filterType);
+        /** Set a single filtering option on this texture unit. 
+        @param ftype
+            The filtering type to set.
+        @param opts
+            The filtering option to set.
+        */
+        void setTextureFiltering(FilterType ftype, FilterOptions opts);
+        /** Set a the detailed filtering options on this texture unit. 
+        @param minFilter
+            The filtering to use when reducing the size of the texture. 
+            Can be FO_POINT, FO_LINEAR or FO_ANISOTROPIC.
+        @param magFilter
+            The filtering to use when increasing the size of the texture.
+            Can be FO_POINT, FO_LINEAR or FO_ANISOTROPIC.
+        @param mipFilter
+            The filtering to use between mip levels.
+            Can be FO_NONE (turns off mipmapping), FO_POINT or FO_LINEAR (trilinear filtering).
+        */
+        void setTextureFiltering(FilterOptions minFilter, FilterOptions magFilter, FilterOptions mipFilter);
+        /// Get the texture filtering for the given type.
+        FilterOptions getTextureFiltering(FilterType ftpye) const;
+        /// Returns true if texture filtering was not set explicitly and is determined by MaterialManager.
+        bool isDefaultFiltering() const     { return mIsDefaultFiltering; }
+
+        void setTextureCompareEnabled(bool enabled);
+        bool getTextureCompareEnabled() const;
+    
+        void setTextureCompareFunction(CompareFunction function);
+        CompareFunction getTextureCompareFunction() const;
+
+        /** Sets the anisotropy level to be used for this texture level.
+        @param maxAniso
+            The maximal anisotropy level, should be between 2 and the maximum
+            supported by hardware (1 is the default, ie. no anisotrophy).
+        @note
+            This option applies in both the fixed function and the programmable pipeline.
+        */
+        void setTextureAnisotropy(unsigned int maxAniso);
+        /// Get this layer texture anisotropy level.
+        unsigned int getTextureAnisotropy() const;
+
+        /** Sets the bias value applied to the mipmap calculation.
+        @remarks
+            You can alter the mipmap calculation by biasing the result with a 
+            single floating point value. After the mip level has been calculated,
+            this bias value is added to the result to give the final mip level.
+            Lower mip levels are larger (higher detail), so a negative bias will
+            force the larger mip levels to be used, and a positive bias
+            will cause smaller mip levels to be used. The bias values are in 
+            mip levels, so a -1 bias will force mip levels one larger than by the
+            default calculation.
+        @param bias
+            The bias value as described above, can be positive or negative.
+        */
+        void setTextureMipmapBias(float bias) { mMipmapBias = bias; }
+        /** Gets the bias value applied to the mipmap calculation.
+        @see TextureUnitState::setTextureMipmapBias
+        */
+        float getTextureMipmapBias(void) const { return mMipmapBias; }
 
         /** Set the compositor reference for this texture unit state.
         @remarks 
             Only valid when content type is compositor.
         @param textureName
             The name of the texture to reference.
+        @param mrtIndex
+            The index of the wanted texture, if referencing an MRT.
         */
-        void setCompositorReference( const String& textureName );
+        void setCompositorReference(const String& textureName, size_t mrtIndex = 0);
 
         /** Gets the name of the texture in the compositor that this texture references. */
         IdString getReferencedTextureName() const { return mCompositorRefTexName; }
+        /** Gets the MRT index of the texture in the compositor that this texture references. */ 
+        size_t getReferencedMRTIndex() const { return mCompositorRefMrtIndex; }
     
         /// Gets the parent Pass object.
         Pass* getParent(void) const { return mParent; }
@@ -1021,6 +1151,8 @@ namespace Ogre {
 
         /// Is this loaded?
         bool isLoaded(void) const;
+        /** Tells the class that it needs recompilation. */
+        void _notifyNeedsRecompile(void);
 
         /** Set the name of the Texture Unit State.
         @remarks
@@ -1060,14 +1192,14 @@ namespace Ogre {
         void _notifyParent(Pass* parent);
 
         /** Get the texture pointer for the current frame. */
-        TextureGpu* _getTexturePtr(void) const;
+        const TexturePtr& _getTexturePtr(void) const;
         /** Get the texture pointer for a given frame. */
-        TextureGpu* _getTexturePtr(size_t frame) const;
+        const TexturePtr& _getTexturePtr(size_t frame) const;
     
         /** Set the texture pointer for the current frame (internal use only!). */
-        void _setTexturePtr(TextureGpu *texptr);
+        void _setTexturePtr(const TexturePtr& texptr);
         /** Set the texture pointer for a given frame (internal use only!). */
-        void _setTexturePtr(TextureGpu *texptr, size_t frame);
+        void _setTexturePtr(const TexturePtr& texptr, size_t frame);
 
         size_t calculateSize(void) const;
 
@@ -1084,12 +1216,13 @@ protected:
         Real mAnimDuration;
         bool mCubic; /// Is this a series of 6 2D textures to make up a cube?
         
-        bool mAutomaticBatching;
-        TextureTypes::TextureTypes mTextureType;
+        TextureType mTextureType; 
+        PixelFormat mDesiredFormat;
         int mTextureSrcMipmaps; /// Request number of mipmaps.
 
         unsigned int mTextureCoordSetIndex;
-        HlmsSamplerblock const  *mSamplerblock;
+        UVWAddressingMode mAddressMode;
+        ColourValue mBorderColour;
 
         LayerBlendModeEx mColourBlendMode;
         SceneBlendFactor mColourBlendFallbackSrc;
@@ -1107,17 +1240,36 @@ protected:
         Radian mRotate;
         mutable Matrix4 mTexModMatrix;
 
+        /// Texture filtering - minification.
+        FilterOptions mMinFilter;
+        /// Texture filtering - magnification.
+        FilterOptions mMagFilter;
+        /// Texture filtering - mipmapping.
+        FilterOptions mMipFilter;
+
+        bool mCompareEnabled;
+        CompareFunction mCompareFunc;
+
+        /// Texture anisotropy.
+        unsigned int mMaxAniso;
+        /// Mipmap bias (always float, not Real).
+        float mMipmapBias;
+
+        bool mIsDefaultAniso;
+        bool mIsDefaultFiltering;
         /// Binding type (fragment, vertex, tessellation hull and domain pipeline).
         BindingType mBindingType;
         /// Content type of texture (normal loaded texture, auto-texture).
         ContentType mContentType;
+        /// The index of the referenced texture if referencing an MRT in a compositor.
+        size_t mCompositorRefMrtIndex;
 
         //-----------------------------------------------------------------------------
         // Complex members (those that can't be copied using memcpy) are at the end to 
         // allow for fast copying of the basic members.
         //
         vector<String>::type mFrames;
-        mutable vector<TextureGpu*>::type mFramePtrs;
+        mutable vector<TexturePtr>::type mFramePtrs;
         String mName;               ///< Optional name for the TUS.
         String mTextureNameAlias;   ///< Optional alias for texture frames.
         EffectMap mEffects;
@@ -1151,12 +1303,7 @@ protected:
         /** Internal method for ensuring the texture for a given frame is loaded. */
         void ensureLoaded(size_t frame) const;
 
-        void cleanFramePtrs(void);
 
-        /// TextureGpuListener overload
-        virtual void notifyTextureChanged( TextureGpu *texture,
-                                           TextureGpuListener::Reason reason,
-                                           void *extraData );
     };
 
     /** @} */

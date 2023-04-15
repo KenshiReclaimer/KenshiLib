@@ -31,7 +31,93 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 namespace Ogre {
+//
+// TODO: Puts following macros into OgrePlatform.h?
+//
 
+/* Initial CPU stuff to set.
+*/
+#define OGRE_CPU_UNKNOWN    0
+#define OGRE_CPU_X86        1
+#define OGRE_CPU_PPC        2
+#define OGRE_CPU_ARM        3
+#define OGRE_CPU_MIPS       4
+
+/* Find CPU type
+*/
+#if (defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))) || \
+    (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
+#   define OGRE_CPU OGRE_CPU_X86
+
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__BIG_ENDIAN__)
+#   define OGRE_CPU OGRE_CPU_PPC
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#   define OGRE_CPU OGRE_CPU_X86
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && (defined(__i386__) || defined(__x86_64__))
+#   define OGRE_CPU OGRE_CPU_X86
+#elif defined(__arm__) || defined(_M_ARM) || defined(__arm64__) || defined(__aarch64__)
+#   define OGRE_CPU OGRE_CPU_ARM
+#elif defined(__mips64) || defined(__mips64_)
+#   define OGRE_CPU OGRE_CPU_MIPS
+#else
+#   define OGRE_CPU OGRE_CPU_UNKNOWN
+#endif
+
+/* Find how to declare aligned variable.
+*/
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#   define OGRE_ALIGNED_DECL(type, var, alignment)  __declspec(align(alignment)) type var
+
+#elif (OGRE_COMPILER == OGRE_COMPILER_GNUC) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)
+#   define OGRE_ALIGNED_DECL(type, var, alignment)  type var __attribute__((__aligned__(alignment)))
+
+#else
+#   define OGRE_ALIGNED_DECL(type, var, alignment)  type var
+#endif
+
+/** Find perfect alignment (should supports SIMD alignment if SIMD available)
+*/
+#if OGRE_CPU == OGRE_CPU_X86
+#   define OGRE_SIMD_ALIGNMENT  16
+
+#else
+#   define OGRE_SIMD_ALIGNMENT  16
+#endif
+
+/* Declare variable aligned to SIMD alignment.
+*/
+#define OGRE_SIMD_ALIGNED_DECL(type, var)   OGRE_ALIGNED_DECL(type, var, OGRE_SIMD_ALIGNMENT)
+
+/* Define whether or not Ogre compiled with SSE support.
+*/
+#if OGRE_USE_SIMD == 1
+    #if   OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && OGRE_COMPILER == OGRE_COMPILER_MSVC && \
+        OGRE_PLATFORM != OGRE_PLATFORM_NACL
+    #   define __OGRE_HAVE_SSE  1
+    #elif OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && \
+          OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+    #   define __OGRE_HAVE_SSE  1
+    #endif
+
+    /* Define whether or not Ogre compiled with NEON support.
+     */
+    #if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_NEON__)
+    #   define __OGRE_HAVE_NEON  1
+    #endif
+#endif
+
+#ifndef __OGRE_HAVE_SSE
+#   define __OGRE_HAVE_SSE  0
+#endif
+
+#if OGRE_USE_SIMD == 0 || !defined(__OGRE_HAVE_NEON)
+#   define __OGRE_HAVE_NEON  0
+#endif
+
+#if !defined(__OGRE_HAVE_DIRECTXMATH)
+#   define __OGRE_HAVE_DIRECTXMATH  0
+#endif
+    
 	/** \addtogroup Core
 	*  @{
 	*/

@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-namespace v1 {
+
     /** \addtogroup Core
     *  @{
     */
@@ -55,8 +55,7 @@ namespace v1 {
         /// The billboard set that's doing the rendering
         BillboardSet* mBillboardSet;
     public:
-        BillboardParticleRenderer( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                   SceneManager *sceneManager );
+        BillboardParticleRenderer( IdType id, ObjectMemoryManager *objectMemoryManager );
         ~BillboardParticleRenderer();
 
         /** Command object for billboard type (see ParamCommand).*/
@@ -203,14 +202,14 @@ namespace v1 {
         const String& getType(void) const;
         /// @copydoc ParticleSystemRenderer::_updateRenderQueue
         void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera,
-            list<Particle*>::type& currentParticles, bool cullIndividually,
-            RenderableArray &outRenderables );
-        /// @copydoc ParticleSystemRenderer::_setDatablock
-        virtual void _setDatablock( HlmsDatablock *datablock );
-        /// @copydoc ParticleSystemRenderer::_setMaterialName
-        virtual void _setMaterialName( const String &matName, const String &resourceGroup );
+            list<Particle*>::type& currentParticles, bool cullIndividually);
+        /// @copydoc ParticleSystemRenderer::visitRenderables
+        void visitRenderables(Renderable::Visitor* visitor, 
+            bool debugRenderables = false);
+        /// @copydoc ParticleSystemRenderer::_setMaterial
+        void _setMaterial(MaterialPtr& mat);
         /// @copydoc ParticleSystemRenderer::_notifyCurrentCamera
-        void _notifyCurrentCamera( const Camera* camera, const Camera* lodCamera );
+        void _notifyCurrentCamera(Camera* cam);
         /// @copydoc ParticleSystemRenderer::_notifyParticleRotated
         void _notifyParticleRotated(void);
         /// @copydoc ParticleSystemRenderer::_notifyParticleResized
@@ -223,8 +222,8 @@ namespace v1 {
         void _notifyDefaultDimensions(Real width, Real height);
         /// @copydoc ParticleSystemRenderer::setRenderQueueGroup
         void setRenderQueueGroup(uint8 queueID);
-        /// @copydoc Renderable::setRenderQueueSubGroup
-        void setRenderQueueSubGroup( uint8 subGroup );
+        /// @copydoc MovableObject::setRenderQueueGroupAndPriority
+        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
         /// @copydoc ParticleSystemRenderer::setKeepParticlesInLocalSpace
         void setKeepParticlesInLocalSpace(bool keepLocal);
         /// @copydoc ParticleSystemRenderer::_getSortMode
@@ -264,7 +263,6 @@ namespace v1 {
     /** @} */
     /** @} */
 
-}
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"

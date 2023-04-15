@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 #include "OgrePlatform.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     //No need to include the heavy windows.h header for something like this!
     typedef void* HANDLE;
 #else
@@ -69,7 +69,7 @@ namespace Ogre
     */
     class _OgreExport LightweightMutex
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         OGRE_ALIGNED_DECL( long, mCounter, 4 );
         HANDLE  mSemaphore;
 #else
@@ -96,20 +96,6 @@ namespace Ogre
 
         /// Releases the lock aquired through either @see lock or @see tryLock
         void unlock();
-    };
-
-    class _OgreExport ScopedLock
-    {
-        LightweightMutex    &mMutex;
-    public:
-        ScopedLock( LightweightMutex &mutex ) : mMutex( mutex )
-        {
-            mMutex.lock();
-        }
-        ~ScopedLock()
-        {
-            mMutex.unlock();
-        }
     };
 }
 

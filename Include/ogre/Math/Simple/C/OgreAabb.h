@@ -147,9 +147,6 @@ namespace Ogre
         /// Tests whether the given point contained by this box.
         inline bool contains( const Vector3 &v ) const;
 
-        /// Returns the square of the minimum distance between a given point and any part of the box.
-        inline Real squaredDistance( const Vector3 &v ) const;
-
         /// Returns the minimum distance between a given point and any part of the box.
         inline Real distance( const Vector3 &v ) const;
 
@@ -158,9 +155,6 @@ namespace Ogre
 
         /// Returns the radius of a sphere enclosing the aabb from origin as center
         inline Real getRadiusOrigin() const;
-
-        inline bool operator == ( const Aabb &_r ) const;
-        inline bool operator != ( const Aabb &_r ) const;
 
         static const Aabb BOX_INFINITE;
         static const Aabb BOX_NULL;

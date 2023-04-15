@@ -47,59 +47,42 @@ namespace Ogre
     class _OgreExport CompositorPassClearDef : public CompositorPassDef
     {
     public:
-        /// Only execute this pass on non-tilers
-        bool                    mNonTilersOnly;
+        uint32                  mClearBufferFlags;
+        ColourValue             mColourValue;
+        Real                    mDepthValue;
+        uint32                  mStencilValue;
+
+        /** This value is only supported by a few APIs (D3D11 at the time of writting)
+            which instead of actually clearing the buffers, it informs the GPU that
+            the __entire__ contents will be overwritten, which is what happens
+            with fullscreen quad pass.
+        @remarks
+            When the API does not support discard-only clears, __the pass is ignored__
+        @par
+            The main purpose of this feature is to be friendly with multi-GPU systems
+            (since we're telling there is no dependency with a previous frame) while
+            avoid doing a full clear at the same time (wastes bandwidth)
+        @par
+            When performing PASS_QUAD that covers the entire render target and doesn't
+            have alpha blending, a discard is automatically performed on the colour
+            buffer.
+        @par
+            Warning: Incorrect usage of discard only clears can lead to visual artifacts
+        */
+        bool                    mDiscardOnly;
 
         /** By default clear all buffers. Stencil needs to be cleared because it hinders Fast Z Clear
             on GPU architectures that don't separate the stencil from depth and the program requested
             a Z Buffer with stencil (even if we never use it)
         */
-        CompositorPassClearDef( CompositorTargetDef *parentTargetDef ) :
-            CompositorPassDef( PASS_CLEAR, parentTargetDef ),
-            mNonTilersOnly( false )
+        CompositorPassClearDef( uint32 rtIndex ) :
+            CompositorPassDef( PASS_CLEAR, rtIndex ),
+            mClearBufferFlags( FBT_COLOUR|FBT_DEPTH|FBT_STENCIL ),
+            mColourValue( ColourValue::Black ),
+            mDepthValue( 1.0f ),
+            mStencilValue( 0 ),
+            mDiscardOnly( false )
         {
-            //Override so that it only gets executed on the first execution on the
-            //whole screen (i.e. clear the whole viewport during the left eye pass)
-            mExecutionMask          = 0x01;
-            mViewportModifierMask   = 0x00;
-
-            for( int i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
-                mLoadActionColour[i] = LoadAction::Clear;
-
-            mLoadActionDepth    = LoadAction::Clear;
-            mLoadActionStencil  = LoadAction::Clear;
-
-            setAllStoreActions( StoreAction::StoreAndMultisampleResolve );
-        }
-
-        /** Sets which buffers you want to clear for each attachment. Replaces
-            'mClearBufferFlags' from previous versions of Ogre.
-        @remarks
-            Manually setting load actions to anything other than
-            LoadAction::Clear or LoadAction::Load when there is a valid buffer
-            is undefined behavior.
-        @param buffersToClear
-            Bitmask. See RenderPassDescriptor::EntryTypes
-        */
-        void setBuffersToClear( uint32 buffersToClear )
-        {
-            for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
-            {
-                if( buffersToClear & (RenderPassDescriptor::Colour0 << i) )
-                    mLoadActionColour[i] = LoadAction::Clear;
-                else
-                    mLoadActionColour[i] = LoadAction::Load;
-            }
-
-            if( buffersToClear & RenderPassDescriptor::Depth )
-                mLoadActionDepth = LoadAction::Clear;
-            else
-                mLoadActionDepth = LoadAction::Load;
-
-            if( buffersToClear & RenderPassDescriptor::Stencil )
-                mLoadActionStencil = LoadAction::Clear;
-            else
-                mLoadActionStencil = LoadAction::Load;
         }
     };
 

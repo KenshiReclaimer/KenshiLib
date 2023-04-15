@@ -33,14 +33,10 @@ THE SOFTWARE.
 
 #include "Compositor/Pass/OgreCompositorPass.h"
 #include "Compositor/OgreCompositorCommon.h"
-#include "OgreMaterial.h"
 
 namespace Ogre
 {
-    namespace v1
-    {
-        class Rectangle2D;
-    }
+    class Rectangle2D;
     class CompositorPassQuadDef;
 
     /** \addtogroup Core
@@ -87,29 +83,22 @@ namespace Ogre
     {
         CompositorPassQuadDef const *mDefinition;
     protected:
-        v1::Rectangle2D *mFsRect;
-        HlmsDatablock   *mDatablock;
-        MaterialPtr     mMaterial;
+        Rectangle2D     *mFsRect;
         Pass            *mPass;
         Camera          *mCamera;
 
         Real        mHorizonalTexelOffset;
         Real        mVerticalTexelOffset;
 
-        void analyzeBarriers( void );
-
     public:
         CompositorPassQuad( const CompositorPassQuadDef *definition, Camera *defaultCamera,
-                            CompositorNode *parentNode, const RenderTargetViewDef *rtv,
+                            CompositorNode *parentNode, const CompositorChannel &target,
                             Real horizonalTexelOffset, Real verticalTexelOffset );
-        virtual ~CompositorPassQuad();
 
         virtual void execute( const Camera *lodCamera );
 
         /// Don't make this const (useful for compile-time multithreading errors)
-        /// Pointer can be null if using HLMS
         Pass* getPass(void)                                     { return mPass; }
-        Camera* getCamera(void)                                 { return mCamera; }
     };
 
     /** @} */

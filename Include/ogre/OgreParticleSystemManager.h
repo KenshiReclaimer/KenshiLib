@@ -32,9 +32,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreSingleton.h"
 #include "OgreScriptLoader.h"
-#include "OgreId.h"
-#include "OgreIteratorWrappers.h"
-#include "OgreMovableObject.h"
 #include "Math/Array/OgreObjectMemoryManager.h"
 #include "OgreHeaderPrefix.h"
 
@@ -121,12 +118,11 @@ namespace Ogre {
         void skipToNextOpenBrace(DataStreamPtr& chunk);
 
         /// Internal implementation of createSystem
-        ParticleSystem* createSystemImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                          SceneManager *manager, size_t quota,
-                                          const String& resourceGroup );
+        ParticleSystem* createSystemImpl(IdType id, ObjectMemoryManager *objectMemoryManager,
+                                            size_t quota, const String& resourceGroup);
         /// Internal implementation of createSystem
-        ParticleSystem* createSystemImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                          SceneManager *manager, const String& templateName );
+        ParticleSystem* createSystemImpl(IdType id, ObjectMemoryManager *objectMemoryManager,
+                                            const String& templateName);
         /// Internal implementation of destroySystem
         void destroySystemImpl(ParticleSystem* sys);
         
@@ -304,7 +300,7 @@ namespace Ogre {
         @param rendererType
             String name of the renderer type to be created. A factory of this type must have been registered.
         */
-        ParticleSystemRenderer* _createRenderer(const String& rendererType, SceneManager *sceneManager);
+        ParticleSystemRenderer* _createRenderer(const String& rendererType);
 
         /** Internal method for destroying a renderer.
         @remarks
@@ -392,8 +388,7 @@ namespace Ogre {
     {
     protected:
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                                   SceneManager *manager,
-                                                   const NameValuePairList* params = 0 );
+                                                    const NameValuePairList* params = 0 );
     public:
         ParticleSystemFactory() {}
         ~ParticleSystemFactory() {}

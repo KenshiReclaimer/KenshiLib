@@ -39,11 +39,6 @@ namespace Ogre
         size_t idx = (size_t)b[0] | ( (size_t)b[1] << 1 ) | ( (size_t)b[2] << 2 ) | ( (size_t)b[3] << 3 );
         return mMasks[idx];
     }
-	//--------------------------------------------------------------------------------------
-	inline ArrayMaskR BooleanMask4::getAllSetMask(void)
-	{
-		return mMasks[MASK_XYZW];
-	}
     //--------------------------------------------------------------------------------------
     inline bool BooleanMask4::allBitsSet( bool mask0[4], bool mask1[4] )
     {
@@ -61,12 +56,10 @@ namespace Ogre
         return vmovemaskq_u32( mask );
     }
     //--------------------------------------------------------------------------------------
-#ifndef _MSC_VER // everything is __n128 on MSVC, so extra overloads are not allowed
     inline uint32 BooleanMask4::getScalarMask( ArrayInt mask )
     {
         return vmovemaskq_u32( vreinterpretq_u32_s32( mask ) );
     }
-#endif
 
     #define IS_SET_MASK_X( intMask ) ((intMask & MASK_W) != 0)
     #define IS_SET_MASK_Y( intMask ) ((intMask & MASK_Z) != 0)

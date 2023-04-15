@@ -30,10 +30,10 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
+#include "OgreMatrix4.h"
 #include "OgreRenderable.h"
 #include "OgreUserObjectBindings.h"
 #include "OgreId.h"
-#include "OgreVector3.h"
 #include "Math/Array/OgreTransform.h"
 #include "OgreHeaderPrefix.h"
 
@@ -57,7 +57,6 @@ namespace Ogre {
     */
     class _OgreExport Node : public NodeAlloc, public IdObject
     {
-        friend class TagPoint;
     public:
         /** Enumeration denoting the spaces which a transform can be relative to.
         */
@@ -80,7 +79,7 @@ namespace Ogre {
         {
         public:
             Listener() {}
-            virtual ~Listener();
+            virtual ~Listener() {}
             /** Called when a node gets updated.
             @remarks
                 Note that this happens when the node's derived update happens,
@@ -98,7 +97,7 @@ namespace Ogre {
         };
 
         /** Inner class for displaying debug renderable for Node. */
-        /*class DebugRenderable : public Renderable, public NodeAlloc
+        class DebugRenderable : public Renderable, public NodeAlloc
         {
         protected:
             Node* mParent;
@@ -115,15 +114,11 @@ namespace Ogre {
             const LightList& getLights(void) const;
             void setScaling(Real s) { mScaling = s; }
 
-        };*/
+        };
 
     protected:
         /// Depth level in the hierarchy tree (0: Root node, 1: Child of root, etc)
         uint16 mDepthLevel;
-        /// Calling SceneManager::clearScene won't destroy this node nor detach its
-        /// objects (but may still destroy parent and children nodes if they're not
-        /// indestructible)
-        bool mIndestructibleByClearScene;
         /// Pointer to parent node
         Node* mParent;
         /// Collection of pointers to direct children; hashmap for efficiency
@@ -160,7 +155,7 @@ namespace Ogre {
         /** Internal method for creating a new child node - must be overridden per subclass. */
         virtual Node* createChildImpl( SceneMemoryMgrTypes sceneType ) = 0;
 
-#if OGRE_DEBUG_MODE >= OGRE_DEBUG_MEDIUM
+#ifndef NDEBUG
         mutable bool mCachedTransformOutOfDate;
 #endif
 
@@ -169,6 +164,8 @@ namespace Ogre {
 
         /// The memory manager used to allocate the Transform.
         NodeMemoryManager *mNodeMemoryManager;
+
+        DebugRenderable* mDebug;
 
         /// User objects binding.
         UserObjectBindings mUserObjectBindings;
@@ -205,26 +202,6 @@ namespace Ogre {
 
         /** Gets this node's parent (NULL if this is the root). */
         Node* getParent(void) const;
-
-        /** Calling SceneManager::clearScene won't destroy this node nor detach its
-            objects (but may still destroy parent and children nodes if they're not
-            indestructible) when this is true.
-        @remarks
-            This function provides trivial setter/getters rather than making
-            mIndestructibleByClearScene public for two reasons:
-                1. It's rare called
-                2. There's a lot of value in debugging when a node is set to indestructible,
-                   which could happen by accident; and would thus leak.
-        */
-        void setIndestructibleByClearScene( bool indestructible );
-        bool getIndestructibleByClearScene(void) const;
-
-        /** Migrates the node and all of its children to the new memory manager,
-            at the same depth level.
-        @param nodeMemoryManager
-            New memory manager to migrate to.
-        */
-        void migrateTo( NodeMemoryManager *nodeMemoryManager );
 
         /// Checks whether this node is static. @See setStatic
         bool isStatic() const;
@@ -673,9 +650,7 @@ namespace Ogre {
         */
         virtual_l2 FORCEINLINE const Matrix4& _getFullTransform(void) const
         {
-#if OGRE_DEBUG_MODE
             assert( !mCachedTransformOutOfDate );
-#endif
             return mTransform.mDerivedTransform[mTransform.mIndex];
         }
 
@@ -698,60 +673,26 @@ namespace Ogre {
             We don't pass by reference on purpose (avoid implicit aliasing)
         */
         static void updateAllTransforms( const size_t numNodes, Transform t );
-
+        
         /** Gets the local position, relative to this node, of the given world-space position */
         virtual_l2 Vector3 convertWorldToLocalPosition( const Vector3 &worldPos );
-        Vector3 convertWorldToLocalPositionUpdated( const Vector3 &worldPos )
-        {
-            _updateFromParent();
-            return convertWorldToLocalPosition( worldPos );
-        }
 
         /** Gets the world position of a point in the node local space
             useful for simple transforms that don't require a child node.*/
         virtual_l2 Vector3 convertLocalToWorldPosition( const Vector3 &localPos );
-        Vector3 convertLocalToWorldPositionUpdated( const Vector3 &localPos )
-        {
-            _updateFromParent();
-            return convertLocalToWorldPosition( localPos );
-        }
-
-        /** Gets the local direction, relative to this node, of the given world-space direction */
-        virtual_l2 Vector3 convertWorldToLocalDirection( const Vector3 &worldDir, bool useScale );
-        Vector3 convertWorldToLocalDirectionUpdated( const Vector3 &worldDir, bool useScale )
-        {
-            _updateFromParent();
-            return convertWorldToLocalDirection( worldDir, useScale );
-        }
-
-        /** Gets the world direction of a point in the node local space
-            useful for simple transforms that don't require a child node.*/
-        virtual_l2 Vector3 convertLocalToWorldDirection( const Vector3 &localDir, bool useScale );
-        Vector3 convertLocalToWorldDirectionUpdated( const Vector3 &localDir, bool useScale )
-        {
-            _updateFromParent();
-            return convertLocalToWorldDirection( localDir, useScale );
-        }
 
         /** Gets the local orientation, relative to this node, of the given world-space orientation */
         virtual_l2 Quaternion convertWorldToLocalOrientation( const Quaternion &worldOrientation );
-        Quaternion convertWorldToLocalOrientationUpdated( const Quaternion &worldOrientation )
-        {
-            _updateFromParent();
-            return convertWorldToLocalOrientation( worldOrientation );
-        }
 
         /** Gets the world orientation of an orientation in the node local space
             useful for simple transforms that don't require a child node.*/
         virtual_l2 Quaternion convertLocalToWorldOrientation( const Quaternion &localOrientation );
-        Quaternion convertLocalToWorldOrientationUpdated( const Quaternion &localOrientation )
-        {
-            _updateFromParent();
-            return convertLocalToWorldOrientation( localOrientation );
-        }
 
         /** Helper function, get the squared view depth.  */
         virtual Real getSquaredViewDepth(const Camera* cam) const;
+
+        /** Get a debug renderable for rendering the Node.  */
+        virtual DebugRenderable* getDebugRenderable(Real scaling);
 
         /** @deprecated use UserObjectBindings::setUserAny via getUserObjectBindings() instead.
             Sets any kind of user value on this object.
@@ -791,9 +732,7 @@ namespace Ogre {
         */
         virtual void _callMemoryChangeListeners(void) = 0;
 
-        virtual NodeMemoryManager* getDefaultNodeMemoryManager( SceneMemoryMgrTypes sceneType ) = 0;
-
-#if OGRE_DEBUG_MODE >= OGRE_DEBUG_MEDIUM
+#ifndef NDEBUG
         virtual void _setCachedTransformOutOfDate(void);
         bool isCachedTransformOutOfDate(void) const             { return mCachedTransformOutOfDate; }
 #endif

@@ -38,7 +38,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    extern _OgreExport const size_t OGRE_TRACK_POOL_SIZE;
+//1GB pool
+#define OGRE_TRACK_POOL_SIZE 1024*1024*1024
 
     /** \addtogroup Core
     *  @{
@@ -108,7 +109,7 @@ namespace Ogre
             );
 
             //Align...
-            uint8 *mem_block = (uint8*)( (size_t) (tmp + _alignment - 1) & (size_t)(~(_alignment - 1)) );
+            uint8 *mem_block = (uint8*)( (uint32) (tmp + _alignment - 1) & (uint32)(~(_alignment - 1)) );
 
             //Special case where malloc have already satisfied the alignment
             //We must add alignment to mem_block to mantain alignment AND

@@ -33,7 +33,6 @@ THE SOFTWARE.
 
 #include "Compositor/OgreCompositorNodeDef.h"
 #include "OgreMath.h"
-#include "OgreVector2.h"
 
 namespace Ogre
 {
@@ -56,74 +55,39 @@ namespace Ogre
     class ShadowTextureDefinition : public CompositorInstAlloc
     {
     public:
-        Vector2     uvOffset;
-        Vector2     uvLength;
-        uint8       arrayIdx;
+        uint        width;
+        uint        height;
+        float       widthFactor;
+        float       heightFactor;
+        PixelFormatList formatList; // more than one means MRT
+        uint        fsaa;           // FSAA level
+        bool        hwGammaWrite;   // Do sRGB gamma correction on write (only 8-bit per channel formats)
+        uint16      depthBufferId;  // Depth Buffer's pool ID
 
         size_t      light;  //Render Nth closest light
         size_t      split;  //Split for that light (only for PSSM/CSM)
-
-        /// Constant bias is per material (tweak HlmsDatablock::mShadowConstantBias).
-        /// This value lets you multiply it 'mShadowConstantBias * constantBiasScale'
-        /// per cascade / shadow map
-        ///
-        /// This is applied on top of the autocalculated bias from autoConstantBiasScale
-        float constantBiasScale;
-        /// Normal offset bias is per cascade / shadow map
-        ///
-        /// This is applied on top of the autocalculated bias from autoNormalOffsetBiasScale
-        float normalOffsetBias;
-
-        /// 0 to disable.
-        /// Non-zero to increase bias based on orthographic projection's window size.
-        float autoConstantBiasScale;
-        /// 0 to disable.
-        /// Non-zero to increase bias based on orthographic projection's window size.
-        float autoNormalOffsetBiasScale;
 
         ShadowMapTechniques shadowMapTechnique;
 
         //PSSM params
         Real                pssmLambda;
         Real                splitPadding;
-        Real                splitBlend;
-        Real                splitFade;
-        uint32              numSplits;
-        uint32              numStableSplits;
+        uint                numSplits;
 
     protected:
-        IdString    texName;
-        String      texNameStr;
+        IdString    name;
         size_t      sharesSetupWith;
 
     public:
-        ShadowTextureDefinition( ShadowMapTechniques t, const String &texRefName,
-                                 const Vector2 &_uvOffset, const Vector2 &_uvLength, uint8 _arrayIdx,
-                                 size_t _light, size_t _split ) :
-            uvOffset( _uvOffset ),
-            uvLength( _uvLength ),
-            arrayIdx( _arrayIdx ),
-            light( _light ),
-            split( _split ),
-            constantBiasScale( 1.0f ),
-            normalOffsetBias( 168.0f ),
-            autoConstantBiasScale( 100.0f ),
-            autoNormalOffsetBiasScale( 4.0f ),
-            shadowMapTechnique( t ),
-            pssmLambda( 0.95f ),
-            splitPadding( 1.0f ),
-            splitBlend( 0.125f ),
-            splitFade( 0.313f ),
-            numSplits( 3u ),
-            numStableSplits( 0u ),
-            texName( texRefName ),
-            texNameStr( texRefName ),
-            sharesSetupWith( -1 )
-        {
-        }
+        ShadowTextureDefinition( ShadowMapTechniques t, IdString _name,
+                                size_t _light, size_t _split ) :
+                width(1024), height(1024), widthFactor(1.0f), heightFactor(1.0f),
+                fsaa(0), hwGammaWrite(false), depthBufferId(2),
+                light(_light), split(_split), shadowMapTechnique(t),
+                pssmLambda( 0.95f ), splitPadding( 1.0f ), numSplits( 3 ),
+                name( _name ), sharesSetupWith( -1 ) {}
 
-        IdString getTextureName() const             { return texName; }
-        String getTextureNameStr() const            { return texNameStr; }
+        IdString getName() const            { return name; }
 
         void _setSharesSetupWithIdx( size_t idx )   { sharesSetupWith = idx; }
         size_t getSharesSetupWith() const           { return sharesSetupWith; }
@@ -148,19 +112,16 @@ namespace Ogre
 
     protected:
         typedef vector<ShadowTextureDefinition>::type   ShadowMapTexDefVec;
-        typedef vector<uint8>::type LightTypeMaskVec;
         ShadowMapTexDefVec  mShadowMapTexDefinitions;
-        /// Some shadow maps may only support a few light types (e.g.
-        /// PSSM only supports directional lights).
-        /// In the example this would be 1u << Light::LT_DIRECTIONAL
-        /// The size is one per light, not per shadow map.
-        LightTypeMaskVec    mLightTypesMask;
         ShadowMapTechniques mDefaultTechnique;
 
         /// Not the same as mShadowMapTexDefinitions.size(), because splits aren't included
         size_t              mNumLights;
         size_t              mMinRq; //Minimum RQ included by one of our passes
         size_t              mMaxRq; //Maximum RQ included by one of our passes
+
+        IdString addShadowTextureSourceName( const String &name, size_t index,
+                                             TextureSource textureSource );
 
     public:
         CompositorShadowNodeDef( const String &name, CompositorManager2 *compositorManager ) :
@@ -170,10 +131,7 @@ namespace Ogre
 
         /// Overloaded to prevent creating input channels.
         virtual IdString addTextureSourceName( const String &name, size_t index,
-                                               TextureSource textureSource );
-        virtual void addBufferInput( size_t inputChannel, IdString name );
-
-        virtual void postInitializePassDef( CompositorPassDef *passDef );
+                                                TextureSource textureSource );
 
         void setDefaultTechnique( ShadowMapTechniques techn )   { mDefaultTechnique = techn; }
 
@@ -183,7 +141,8 @@ namespace Ogre
         @param numTex
             The number of shadow textures expected to contain.
         */
-        void setNumShadowTextureDefinitions( size_t numTex );
+        void setNumShadowTextureDefinitions( size_t numTex )
+                                                        { mShadowMapTexDefinitions.reserve( numTex ); }
 
         /** Adds a new ShadowTexture definition.
         @remarks
@@ -195,31 +154,14 @@ namespace Ogre
             Split for the given light. Only valid for CSM/PSSM shadow maps.
             Must be unique for the same lightIdx.
         @param name
-            Name to a declared texture that will hold our shadow map.
-            Must not contain the "global_" prefix.
-        @param uvOffset
-            Values in range [0; 1] to determine what region of the texture will hold our shadow map
-            (i.e. UV atlas). Use Vector2::ZERO if it covers the entire texture.
-        @param uvLength
-            Values in range [0; 1] to determine what region of the texture will hold our shadow map
-            (i.e. UV atlas). Use Vector2::UNIT_SCALE if it covers the entire texture.
-        @param arrayIdx
-            If the texture is an array texture, index to the slice that holds our shadow map.
+            Name to alias this texture for reference. Must be unique and not contain the
+            "global_" prefix.
+        @param isAtlas
+            True if this shadow map is rendered in an UV atlas; which means we don't create
+            our own texture, but rather reference another through the local name.
         */
         ShadowTextureDefinition* addShadowTextureDefinition( size_t lightIdx, size_t split,
-                                                             const String &name,
-                                                             const Vector2 &uvOffset,
-                                                             const Vector2 &uvLength,
-                                                             uint8 arrayIdx );
-
-        /// Gets the number of shadow texture definitions in this node.
-        size_t getNumShadowTextureDefinitions() const   { return mShadowMapTexDefinitions.size(); }
-
-        /// Retrieves a shadow texture definition by its index.
-        const ShadowTextureDefinition* getShadowTextureDefinition( size_t texIndex ) const
-                                                        { return &mShadowMapTexDefinitions[texIndex]; }
-        ShadowTextureDefinition* getShadowTextureDefinitionNonConst( size_t texIndex )
-                                                        { return &mShadowMapTexDefinitions[texIndex]; }
+                                                             const String &name, bool isAtlas );
 
         /** Checks that paremeters are correctly set, and finalizes whatever needs to be
             done, probably because not enough data was available at the time of creation.

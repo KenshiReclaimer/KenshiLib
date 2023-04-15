@@ -30,17 +30,11 @@ THE SOFTWARE.
 #define __Serializer_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreDataStream.h"
+#include "OgreHeaderPrefix.h"
 
 #ifndef OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
 #define OGRE_SERIALIZER_VALIDATE_CHUNKSIZE OGRE_DEBUG_MODE
 #endif
-
-#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
-#    include "ogrestd/vector.h"
-#endif
-
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -100,7 +94,6 @@ namespace Ogre {
         virtual void readFileHeader(DataStreamPtr& stream);
         virtual unsigned short readChunk(DataStreamPtr& stream);
         
-        void readChar(DataStreamPtr& stream, uint8* pDest);
         void readBools(DataStreamPtr& stream, bool* pDest, size_t count);
         void readFloats(DataStreamPtr& stream, float* pDest, size_t count);
         void readFloats(DataStreamPtr& stream, double* pDest, size_t count);

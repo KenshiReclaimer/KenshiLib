@@ -31,11 +31,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
-#include "Threading/OgreLightweightMutex.h"
-
-#include "ogrestd/vector.h"
-#include <iosfwd>
-
+#include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
@@ -75,10 +71,10 @@ namespace Ogre {
     };
 
     /** @remarks Pure Abstract class, derive this class and register to the Log to listen to log messages */
-    class _OgreExport LogListener
+    class LogListener
     {
     public:
-        virtual ~LogListener();
+        virtual ~LogListener() {}
 
         /**
         @remarks
@@ -107,7 +103,7 @@ namespace Ogre {
     class _OgreExport Log : public LogAlloc
     {
     protected:
-        std::ofstream   *mLog;
+        std::ofstream   mLog;
         LoggingLevel    mLogLevel;
         bool            mDebugOut;
         bool            mSuppressFile;
@@ -120,8 +116,7 @@ namespace Ogre {
 
         class Stream;
 
-        LightweightMutex mMutex; // public to allow external locking
-
+        OGRE_AUTO_MUTEX; // public to allow external locking
         /**
         @remarks
             Usual constructor - called by LogManager.
@@ -203,27 +198,57 @@ namespace Ogre {
             threads. Multiple threads can hold their own Stream instances pointing
             at the same Log though and that is threadsafe.
         */
-        class _OgreExport Stream
+        class _OgrePrivate Stream
         {
         protected:
             Log* mTarget;
             LogMessageLevel mLevel;
             bool mMaskDebug;
             typedef StringStream BaseStream;
-            BaseStream *mCache;
+            BaseStream mCache;
 
         public:
-            Stream( Log *target, LogMessageLevel lml, bool maskDebug );
+
+            /// Simple type to indicate a flush of the stream to the log
+            struct Flush {};
+
+            Stream(Log* target, LogMessageLevel lml, bool maskDebug)
+                :mTarget(target), mLevel(lml), mMaskDebug(maskDebug)
+            {
+
+            }
             // copy constructor
-            Stream( const Stream &rhs );
-            ~Stream();
+            Stream(const Stream& rhs) 
+                : mTarget(rhs.mTarget), mLevel(rhs.mLevel), mMaskDebug(rhs.mMaskDebug)
+            {
+                // explicit copy of stream required, gcc doesn't like implicit
+                mCache.str(rhs.mCache.str());
+            } 
+            ~Stream()
+            {
+                // flush on destroy
+                if (mCache.tellp() > 0)
+                {
+                    mTarget->logMessage(mCache.str(), mLevel, mMaskDebug);
+                }
+            }
 
             template <typename T>
-            _OgrePrivate Stream& operator<< (const T& v)
+            Stream& operator<< (const T& v)
             {
-                *mCache << v;
+                mCache << v;
                 return *this;
             }
+
+            Stream& operator<< (const Flush& v)
+            {
+                                (void)v;
+                mTarget->logMessage(mCache.str(), mLevel, mMaskDebug);
+                mCache.str(BLANKSTRING);
+                return *this;
+            }
+
+
         };
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
     protected:

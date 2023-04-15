@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-namespace v1 {
     /** \addtogroup Core
     *  @{
     */
@@ -191,7 +190,7 @@ namespace v1 {
             are supported (no point or line types)
         */
         void addIndexData(const IndexData* indexData, size_t vertexSet = 0, 
-            OperationType opType = OT_TRIANGLE_LIST);
+            RenderOperation::OperationType opType = RenderOperation::OT_TRIANGLE_LIST);
 
         /** Builds the edge information based on the information built up so far.
         @remarks
@@ -220,7 +219,7 @@ namespace v1 {
             size_t vertexSet;           /// The vertex data set this geometry data refers to
             size_t indexSet;            /// The index data set this geometry data refers to
             const IndexData* indexData; /// The index information which describes the triangles.
-            OperationType opType;  /// The operation type used to render this geometry
+            RenderOperation::OperationType opType;  /// The operation type used to render this geometry
         };
         /** Comparator for sorting geometries by vertex set */
         struct geometryLess {
@@ -272,7 +271,6 @@ namespace v1 {
     /** @} */
     /** @} */
 
-}
 }
 
 #include "OgreHeaderSuffix.h"

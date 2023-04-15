@@ -35,9 +35,6 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreStringVector.h"
 #include "OgreScriptLoader.h"
-
-#include "ogrestd/unordered_map.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -213,8 +210,7 @@ namespace Ogre {
             manually later.
             @see Resource::isReloadable for resource is reloadable.
         */
-        void unloadAll(bool reloadableOnly = true)
-            { unloadAll(reloadableOnly ? Resource::LF_DEFAULT : Resource::LF_INCLUDE_NON_RELOADABLE); }
+        virtual void unloadAll(bool reloadableOnly = true);
 
         /** Caused all currently loaded resources to be reloaded.
         @remarks
@@ -227,8 +223,7 @@ namespace Ogre {
             manually later.
             @see Resource::isReloadable for resource is reloadable.
         */
-        void reloadAll(bool reloadableOnly = true)
-            { reloadAll(reloadableOnly ? Resource::LF_DEFAULT : Resource::LF_INCLUDE_NON_RELOADABLE); }
+        virtual void reloadAll(bool reloadableOnly = true);
 
         /** Unload all resources which are not referenced by any other object.
         @remarks
@@ -244,8 +239,7 @@ namespace Ogre {
         @param reloadableOnly If true (the default), only unloads resources
             which can be subsequently automatically reloaded.
         */
-        void unloadUnreferencedResources(bool reloadableOnly = true)
-            { unloadAll(reloadableOnly ? Resource::LF_ONLY_UNREFERENCED : Resource::LF_ONLY_UNREFERENCED_INCLUDE_NON_RELOADABLE); }
+        virtual void unloadUnreferencedResources(bool reloadableOnly = true);
 
         /** Caused all currently loaded but not referenced by any other object
             resources to be reloaded.
@@ -260,30 +254,7 @@ namespace Ogre {
         @param reloadableOnly If true (the default), only reloads resources
             which can be subsequently automatically reloaded.
         */
-        void reloadUnreferencedResources(bool reloadableOnly = true)
-            { reloadAll(reloadableOnly ? Resource::LF_ONLY_UNREFERENCED : Resource::LF_ONLY_UNREFERENCED_INCLUDE_NON_RELOADABLE); }
-
-        /** Unloads all resources.
-        @remarks
-            Unloaded resources are not removed, they simply free up their memory
-            as much as they can and wait to be reloaded.
-            @see ResourceGroupManager for unloading of resource groups.
-        @param flags Allow to restrict processing to only reloadable and/or
-            unreferenced resources.
-            @see Resource::LoadingFlags for additional information.
-        */
-        virtual void unloadAll(Resource::LoadingFlags flags);
-
-        /** Caused all currently loaded resources to be reloaded.
-        @remarks
-            All resources currently being held in this manager which are also
-            marked as currently loaded will be unloaded, then loaded again.
-        @param flags Allow to restrict processing to only reloadable and/or
-            unreferenced resources. Additionally, reloading could be done with
-            preserving some selected resource states that could be used elsewhere.
-            @see Resource::LoadingFlags for additional information.
-        */
-        virtual void reloadAll(Resource::LoadingFlags flags);
+        virtual void reloadUnreferencedResources(bool reloadableOnly = true);
 
         /** Remove a single resource.
         @remarks
@@ -302,7 +273,7 @@ namespace Ogre {
             destruction of resources, try making sure you release all your
             shared pointers before you shutdown OGRE.
         */
-        virtual void remove(const ResourcePtr& r);
+        virtual void remove(ResourcePtr& r);
 
         /** Remove a single resource by name.
         @remarks
@@ -558,15 +529,15 @@ namespace Ogre {
         /** Add a newly created resource to the manager (note weak reference) */
         virtual void addImpl( ResourcePtr& res );
         /** Remove a resource from this manager; remove it from the lists. */
-        virtual void removeImpl(const ResourcePtr& res );
+        virtual void removeImpl( ResourcePtr& res );
         /** Checks memory usage and pages out if required. This is automatically done after a new resource is loaded.
         */
         virtual void checkUsage(void);
 
 
     public:
-        typedef unordered_map< String, ResourcePtr >::type ResourceMap;
-        typedef unordered_map< String, ResourceMap >::type ResourceWithGroupMap;
+        typedef OGRE_HashMap< String, ResourcePtr > ResourceMap;
+        typedef OGRE_HashMap< String, ResourceMap > ResourceWithGroupMap;
         typedef map<ResourceHandle, ResourcePtr>::type ResourceHandleMap;
     protected:
         ResourceHandleMap mResourcesByHandle;

@@ -32,10 +32,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreStringVector.h"
 #include "OgreStringConverter.h"
-#include "OgreLwString.h"
-
-#include "ogrestd/set.h"
-
 #include "OgreHeaderPrefix.h"
 
 // Because there are more than 32 possible Capabilities, more than 1 int is needed to store them all.
@@ -65,12 +61,10 @@ namespace Ogre
     {
         CAPS_CATEGORY_COMMON = 0,
         CAPS_CATEGORY_COMMON_2 = 1,
-        CAPS_CATEGORY_COMMON_3 = 2,
-        CAPS_CATEGORY_D3D9 = 3,
-        CAPS_CATEGORY_GL = 4,
-        CAPS_CATEGORY_METAL = 5,
+        CAPS_CATEGORY_D3D9 = 2,
+        CAPS_CATEGORY_GL = 3,
         /// Placeholder for max value
-        CAPS_CATEGORY_COUNT = 6
+        CAPS_CATEGORY_COUNT = 4
     };
 
     /// Enum describing the different hardware capabilities we want to check for
@@ -98,11 +92,8 @@ namespace Ogre
         RSC_VERTEX_PROGRAM          = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 9),
         /// Supports fragment programs (pixel shaders)
         RSC_FRAGMENT_PROGRAM        = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 10),
-        // Removed. All targetted APIs by Ogre 2.0 support this feature.
-        // Feel free to overwrite this with another useful flag
-        //RSC_SCISSOR_TEST            = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, ),
-        /// Supports signed integer textures
-        RSC_TEXTURE_SIGNED_INT      = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 11),
+        /// Supports performing a scissor test to exclude areas of the screen
+        RSC_SCISSOR_TEST            = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 11),
         /// Supports separate stencil updates for both front and back faces
         RSC_TWO_SIDED_STENCIL       = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 12),
         /// Supports wrapping the stencil value at the range extremeties
@@ -135,6 +126,8 @@ namespace Ogre
         RSC_GEOMETRY_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 26),
         /// Supports rendering to vertex buffers
         RSC_HWRENDER_TO_VERTEX_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 27),
+        /// Supports different texture bindings
+        RSC_COMPLETE_TEXTURE_BINDING = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 28),
 
         /// Supports compressed textures
         RSC_TEXTURE_COMPRESSION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 0),
@@ -161,11 +154,7 @@ namespace Ogre
         /// Supports Alpha to Coverage (A2C)
         RSC_ALPHA_TO_COVERAGE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 11),
         /// Supports Blending operations other than +
-        // Removed. All targetted APIs by Ogre 2.0 support this feature.
-        // Feel free to overwrite this with another useful flag
-        //RSC_ADVANCED_BLEND_OPERATIONS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, ),
-        /// Supports HW gamma, both in the framebuffer and as texture.
-        RSC_HW_GAMMA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 12),
+        RSC_ADVANCED_BLEND_OPERATIONS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 12),
         /// Supports a separate depth buffer for RTTs. D3D 9 & 10, OGL w/FBO (RSC_FBO implies this flag)
         RSC_RTT_SEPARATE_DEPTHBUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 13),
         /// Supports using the MAIN depth buffer for RTTs. D3D 9&10, OGL w/FBO support unknown
@@ -199,53 +188,9 @@ namespace Ogre
         /// Explicit FSAA resolves (i.e. sample MSAA textures directly in the shader without resolving)
         RSC_EXPLICIT_FSAA_RESOLVE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 27),
 
-        /// Supports different texture bindings
-        RSC_COMPLETE_TEXTURE_BINDING = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 0),
-        /// TEX_TYPE_2D_ARRAY is supported
-        RSC_TEXTURE_2D_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 1),
-        /// TEX_TYPE_CUBE_MAP_ARRAY is supported
-        RSC_TEXTURE_CUBE_MAP_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 2),
-        /// Hardware/API supports texture gather operation.
-        RSC_TEXTURE_GATHER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 3),
-        /// Supports UAVs (OpenGL: SSBOs and Image texture. D3D11: UAVs & structured buffers)
-        RSC_UAV = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 4),
-        /// API requires ResourceTransition for everything (e.g. D3D12, Vulkan, Mantle).
-        /// Not set for D3D11, and GL. Doesn't mean ResourceTransition aren't
-        /// required (i.e. GL needs them for UAVs and Compute Shaders)
-        RSC_EXPLICIT_API = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 5),
-        /// Textures and samplers are separate in the shader. OpenGL can't do this.
-        RSC_SEPARATE_SAMPLERS_FROM_TEXTURES = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 6),
-        /// Supports doing MSAA on TextureTypes::Type2DArray
-        RSC_MSAA_2D_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 7),
-        /// GPU is a tiler, and thus benefits from tight LoadAction & SaveAction
-        /// semanticsthat avoid loading from & storing contents of what's been
-        /// drawn from the tiler's cache to RAM.
-        RSC_IS_TILER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 8),
-        /// When RSC_IS_TILER is set, this variable being set means the stencil can
-        /// also be cleared like colour and depth in a tiler-fashion. Otherwise,
-        /// stencil is cleared as if GPU were a non-tiler.
-        RSC_TILER_CAN_CLEAR_STENCIL_REGION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 9),
-        RSC_CONST_BUFFER_SLOTS_IN_SHADER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 10),
-        RSC_TEXTURE_COMPRESSION_ASTC = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 11),
-        RSC_STORE_AND_MULTISAMPLE_RESOLVE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 12),
-        RSC_DEPTH_CLAMP = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 13),
-
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported
         RSC_PERSTAGECONSTANT = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 0),
-        /// DX11 has this annoying requirement that "typed UAV loads" are not allowed.
-        /// Meaning you can only read from UAVs if it's in format PGF_R32_UINT.
-        ///
-        /// You can workaround this issue by creating the UAV as TextureFlags::Reinterpretable
-        /// and performing bitpacking by hand in the shader.
-        ///
-        /// See
-        /// https://docs.microsoft.com/en-us/windows/desktop/direct3dhlsl/
-        /// dx-graphics-hlsl-unpacking-packing-dxgi-format
-        RSC_TYPED_UAV_LOADS = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 1),
-        /// If capability is not set then only geometry shader can have 
-        /// outputs with SV_RenderTargetArrayIndex and SV_ViewportArrayIndex semantic.
-        RSC_VP_AND_RT_ARRAY_INDEX_FROM_ANY_SHADER = OGRE_CAPS_VALUE(CAPS_CATEGORY_D3D9, 2),
 
         // ***** GL Specific Caps *****
         /// Supports OpenGL version 1.5
@@ -267,9 +212,7 @@ namespace Ogre
         /// Support for Separate Shader Objects
         RSC_SEPARATE_SHADER_OBJECTS = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 9),
         /// Support for Vertex Array Objects (VAOs)
-        RSC_VAO              = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 10),
-
-        // ***** Metal Specific Caps *****
+        RSC_VAO              = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 10)
     };
 
     /// DriverVersion is used by RenderSystemCapabilities and both GL and D3D9
@@ -288,17 +231,25 @@ namespace Ogre
 
         String toString() const 
         {
-            char tmpBuffer[64];
-            LwString str( LwString::FromEmptyPointer( tmpBuffer, sizeof( tmpBuffer ) ) );
-            str.a( major, ".", minor, ".", release, ".", build );
-            return str.c_str();
+            StringStream str;
+            str << major << "." << minor << "." << release << "." << build;
+            return str.str();
         }
 
-        void fromString(const String& versionString);
-
-        bool hasMinVersion( int minMajor, int minMinor ) const
+        void fromString(const String& versionString)
         {
-            return major > minMajor || (major == minMajor && minor >= minMinor);
+            StringVector tokens = StringUtil::split(versionString, ".");
+            if(!tokens.empty())
+            {
+                major = StringConverter::parseInt(tokens[0]);
+                if (tokens.size() > 1)
+                    minor = StringConverter::parseInt(tokens[1]);
+                if (tokens.size() > 2)
+                    release = StringConverter::parseInt(tokens[2]);
+                if (tokens.size() > 3)
+                    build = StringConverter::parseInt(tokens[3]);
+            }
+
         }
     };
 
@@ -322,9 +273,8 @@ namespace Ogre
         GPU_QUALCOMM = 14,
         GPU_MOZILLA = 15, // WebGL on Mozilla/Firefox based browser
         GPU_WEBKIT = 16, // WebGL on WebKit/Chrome base browser
-        GPU_IMGTEC = 17, // PowerVR
         /// placeholder
-        GPU_VENDOR_COUNT = 18
+        GPU_VENDOR_COUNT = 17
     };
 
     /** singleton class for storing the capabilities of the graphics card. 
@@ -386,12 +336,6 @@ namespace Ogre
         ushort mFragmentProgramConstantBoolCount;
         /// The number of simultaneous render targets supported
         ushort mNumMultiRenderTargets;
-        /// Maximum texture width/height for 2D textures
-        uint32 mMaxTextureResolution2D;
-        /// Maximum texture width/height for 3D (volume) textures
-        uint32 mMaxTextureResolution3D;
-        /// Maximum texture width/height for cube maps
-        uint32 mMaxTextureResolutionCubemap;
         /// The maximum point size
         Real mMaxPointSize;
         /// Are non-POW2 textures feature-limited?
@@ -428,17 +372,6 @@ namespace Ogre
         ushort mComputeProgramConstantIntCount;           
         /// The number of boolean constants compute programs support
         ushort mComputeProgramConstantBoolCount;
-
-        /// Note that it's the maximum per axis, but GPUs may *not* necessarily
-        /// support issuing a threadgroup of
-        ///     mMaxThreadsPerThreadgroupAxis[0] * mMaxThreadsPerThreadgroupAxis[1] *
-        ///     mMaxThreadsPerThreadgroupAxis[2]
-        ///
-        /// The actual limit is mMaxThreadsPerThreadgroup
-        uint32 mMaxThreadsPerThreadgroupAxis[3];
-
-        /// Max threads per threadgroup
-        uint32 mMaxThreadsPerThreadgroup;
 
 
 
@@ -757,28 +690,6 @@ namespace Ogre
         {
             mFragmentProgramConstantBoolCount = c;           
         }
-        /// Maximum resolution (width or height)
-        void setMaximumResolutions( uint32 res2d, uint32 res3d, uint32 resCube )
-        {
-            mMaxTextureResolution2D = res2d;
-            mMaxTextureResolution3D = res3d;
-            mMaxTextureResolutionCubemap = resCube;
-        }
-        /// Maximum resolution (width or height)
-        ushort getMaximumResolution2D(void) const
-        {
-            return mMaxTextureResolution2D;
-        }
-        /// Maximum resolution (width or height)
-        ushort getMaximumResolution3D(void) const
-        {
-            return mMaxTextureResolution3D;
-        }
-        /// Maximum resolution (width or height)
-        ushort getMaximumResolutionCubemap(void) const
-        {
-            return mMaxTextureResolutionCubemap;
-        }
         /// Maximum point screen size in pixels
         void setMaxPointSize(Real s)
         {
@@ -812,7 +723,7 @@ namespace Ogre
             mMaxSupportedAnisotropy = s;
         }
         /// Get the maximum supported anisotropic filtering
-        Real getMaxSupportedAnisotropy() const
+        Real getMaxSupportedAnisotropy()
         {
             return mMaxSupportedAnisotropy;
         }
@@ -971,27 +882,6 @@ namespace Ogre
             return mComputeProgramConstantBoolCount;           
         }
 
-        void setMaxThreadsPerThreadgroupAxis( const uint32 value[3] )
-        {
-            mMaxThreadsPerThreadgroupAxis[0] = value[0];
-            mMaxThreadsPerThreadgroupAxis[1] = value[1];
-            mMaxThreadsPerThreadgroupAxis[2] = value[2];
-        }
-
-        void setMaxThreadsPerThreadgroup( uint32 value )
-        {
-            mMaxThreadsPerThreadgroup = value;
-        }
-
-        const uint32* getMaxThreadsPerThreadgroupAxis(void) const
-        {
-            return mMaxThreadsPerThreadgroupAxis;
-        }
-
-        uint32 getMaxThreadsPerThreadgroup(void) const
-        {
-            return mMaxThreadsPerThreadgroup;
-        }
     };
 
     /** @} */

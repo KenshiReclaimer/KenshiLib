@@ -35,9 +35,6 @@ THE SOFTWARE.
 #include "OgreColourValue.h"
 #include "OgreStringVector.h"
 #include "OgreException.h"
-
-#include "ogrestd/map.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -288,7 +285,7 @@ namespace Ogre {
 
     public:
         AnimableObject() {}
-        virtual ~AnimableObject();
+        virtual ~AnimableObject() {}
 
         /** Gets a list of animable value names for this object. */
         const StringVector& getAnimableValueNames(void) const

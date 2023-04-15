@@ -37,7 +37,6 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -79,9 +78,9 @@ namespace v1 {
         @param useVertexColours If true, use vertex colours from the chain elements (must
             be true if you intend to use fading)
         */
-        RibbonTrail( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager,
-                     size_t maxElements = 20, size_t numberOfChains = 1, bool useTextureCoords = true,
-                     bool useVertexColours = true );
+        RibbonTrail( IdType id, ObjectMemoryManager *objectMemoryManager, size_t maxElements = 20,
+                    size_t numberOfChains = 1, bool useTextureCoords = true,
+                    bool useVertexColours = true );
         /// destructor
         virtual ~RibbonTrail();
 
@@ -228,8 +227,7 @@ namespace v1 {
     {
     protected:
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                                   SceneManager *manager,
-                                                   const NameValuePairList* params = 0 );
+                                                    const NameValuePairList* params = 0 );
     public:
         RibbonTrailFactory() {}
         ~RibbonTrailFactory() {}
@@ -243,7 +241,6 @@ namespace v1 {
     /** @} */
     /** @} */
 
-}
 }
 
 #include "OgreHeaderSuffix.h"

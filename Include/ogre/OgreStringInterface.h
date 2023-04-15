@@ -32,10 +32,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
 #include "Threading/OgreThreadHeaders.h"
-
-#include "ogrestd/map.h"
-#include "ogrestd/vector.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -85,7 +81,7 @@ namespace Ogre {
         virtual String doGet(const void* target) const = 0;
         virtual void doSet(void* target, const String& val) = 0;
 
-        virtual ~ParamCommand();
+        virtual ~ParamCommand() { }
     };
     typedef map<String, ParamCommand* >::type ParamCommandMap;
 
@@ -152,6 +148,7 @@ namespace Ogre {
 
 
     };
+    typedef map<String, ParamDictionary>::type ParamDictionaryMap;
     
     /** Class defining the common interface which classes can use to 
         present a reflection-style, self-defining parameter set to callers.
@@ -165,6 +162,11 @@ namespace Ogre {
     class _OgreExport StringInterface 
     {
     private:
+        OGRE_STATIC_MUTEX( msDictionaryMutex );
+
+        /// Dictionary of parameters
+        static ParamDictionaryMap msDictionary;
+
         /// Class name for this instance to be used as a lookup (must be initialised by subclasses)
         String mParamDictName;
         ParamDictionary* mParamDict;
@@ -180,7 +182,25 @@ namespace Ogre {
         @return
             true if a new dictionary was created, false if it was already there
         */
-        bool createParamDictionary(const String& className);
+        bool createParamDictionary(const String& className)
+        {
+            OGRE_LOCK_MUTEX( msDictionaryMutex );
+
+            ParamDictionaryMap::iterator it = msDictionary.find(className);
+
+            if ( it == msDictionary.end() )
+            {
+                mParamDict = &msDictionary.insert( std::make_pair( className, ParamDictionary() ) ).first->second;
+                mParamDictName = className;
+                return true;
+            }
+            else
+            {
+                mParamDict = &it->second;
+                mParamDictName = className;
+                return false;
+            }
+        }
 
     public:
         StringInterface() : mParamDict(NULL) { }
@@ -308,6 +328,7 @@ namespace Ogre {
 
     /** @} */
     /** @} */
+
 
 }
 

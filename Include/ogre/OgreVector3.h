@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreQuaternion.h"
-#include "OgreVector2.h"
 
 namespace Ogre
 {
@@ -93,12 +92,6 @@ namespace Ogre
         {
         }
 
-        /** Swizzle-like narrowing operations
-        */
-        inline Vector2 xy() const
-        {
-            return Vector2(x, y);
-        }
 
         /** Exchange the contents of this vector with another. 
         */
@@ -543,9 +536,9 @@ namespace Ogre
         */
         inline void makeFloor( const Vector3& cmp )
         {
-            x = std::min( x, cmp.x );
-            y = std::min( y, cmp.y );
-            z = std::min( z, cmp.z );
+            x = Ogre::min( x, cmp.x );
+            y = Ogre::min( y, cmp.y );
+            z = Ogre::min( z, cmp.z );
         }
 
         /** Sets this vector's components to the maximum of its own and the
@@ -557,9 +550,9 @@ namespace Ogre
         */
         inline void makeCeil( const Vector3& cmp )
         {
-            x = std::max( x, cmp.x );
-            y = std::max( y, cmp.y );
-            z = std::max( z, cmp.z );
+            x = Ogre::max( x, cmp.x );
+            y = Ogre::max( y, cmp.y );
+            z = Ogre::max( z, cmp.z );
         }
 
         /// Causes negative members to become positive
@@ -822,7 +815,12 @@ namespace Ogre
 
         /** Function for writing to a stream.
         */
-        _OgreExport friend std::ostream &operator<<( std::ostream &o, const Vector3 &v );
+        inline _OgreExport friend std::ostream& operator <<
+            ( std::ostream& o, const Vector3& v )
+        {
+            o << "Vector3(" << v.x << ", " << v.y << ", " << v.z << ")";
+            return o;
+        }
     };
     /** @} */
     /** @} */

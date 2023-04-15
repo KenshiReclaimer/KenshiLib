@@ -72,8 +72,6 @@ namespace Ogre
         ArrayVector3    mCenter;
         ArrayVector3    mHalfSize;
 
-        ArrayAabb() {}
-
         ArrayAabb( const ArrayVector3 &center, const ArrayVector3 &halfSize ) :
                 mCenter( center ), mHalfSize( halfSize )
         {
@@ -158,9 +156,6 @@ namespace Ogre
 
         /// Tests whether the given point contained by this box.
         inline ArrayMaskR contains( const ArrayVector3 &v ) const;
-
-        /// Returns the square of the minimum distance between a given point and any part of the box.
-        inline ArrayReal squaredDistance( const ArrayVector3 &v ) const;
 
         /// Returns the minimum distance between a given point and any part of the box.
         inline ArrayReal distance( const ArrayVector3 &v ) const;

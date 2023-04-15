@@ -47,41 +47,22 @@ namespace Ogre {
     */
     class _OgreExport GpuProgramManager : public ResourceManager, public Singleton<GpuProgramManager>
     {
-    private:
-        using ResourceManager::createImpl;
-        using ResourceManager::load;
-
     public:
 
         typedef set<String>::type SyntaxCodes;
         typedef map<String, GpuSharedParametersPtr>::type SharedParametersMap;
 
-        struct Hash
-        {
-            uint64 hashVal[2];
-
-            bool operator < ( const Hash &_r ) const
-            {
-                if( hashVal[0] < _r.hashVal[0] ) return true;
-                if( hashVal[0] > _r.hashVal[0] ) return false;
-
-                if( hashVal[1] < _r.hashVal[1] ) return true;
-                //if( hashVal[1] > _r.hashVal[1] ) return false;
-
-                return false;
-            }
-        };
-
         typedef MemoryDataStreamPtr Microcode;
-        typedef map<Hash, Microcode>::type MicrocodeMap;
+        typedef map<String, Microcode>::type MicrocodeMap;
 
     protected:
+
         SharedParametersMap mSharedParametersMap;
         MicrocodeMap mMicrocodeCache;
         bool mSaveMicrocodesToCache;
         bool mCacheDirty;           // When this is true the cache is 'dirty' and should be resaved to disk.
-
-        static Hash computeHashWithRenderSystemName( const String &source );
+            
+        static String addRenderSystemToName( const String &  name );
 
         /// Specialised create method with specific parameters
         virtual Resource* createImpl(const String& name, ResourceHandle handle, 
@@ -182,11 +163,6 @@ namespace Ogre {
             GpuProgramType gptype, const String& syntaxCode, bool isManual = false, 
             ManualResourceLoader* loader = 0);
 
-#if OGRE_COMPILER == OGRE_COMPILER_CLANG
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Woverloaded-virtual"
-#endif
-
         /** Overrides the standard ResourceManager getResourceByName method.
         @param name The name of the program to retrieve
         @param preferHighLevelPrograms If set to true (the default), high level programs will be
@@ -194,9 +170,6 @@ namespace Ogre {
         */
         ResourcePtr getResourceByName(const String& name, bool preferHighLevelPrograms = true);
 
-#if OGRE_COMPILER == OGRE_COMPILER_CLANG
-#pragma clang diagnostic pop
-#endif
 
         /** Create a new set of shared parameters, which can be used across many 
             GpuProgramParameters objects of different structures.
@@ -229,11 +202,11 @@ namespace Ogre {
         /** Check if a microcode is available for a program in the microcode cache.
         @param name The name of the program.
         */
-        virtual bool isMicrocodeAvailableInCache( const String &source ) const;
+        virtual bool isMicrocodeAvailableInCache( const String & name ) const;
         /** Returns a microcode for a program from the microcode cache.
         @param name The name of the program.
         */
-        virtual const Microcode & getMicrocodeFromCache( const String &source ) const;
+        virtual const Microcode & getMicrocodeFromCache( const String & name ) const;
 
         /** Creates a microcode to be later added to the cache.
         @param size The size of the microcode in bytes
@@ -243,12 +216,12 @@ namespace Ogre {
         /** Adds a microcode for a program to the microcode cache.
         @param name The name of the program.
         */
-        virtual void addMicrocodeToCache( const String & source, const Microcode & microcode );
+        virtual void addMicrocodeToCache( const String & name, const Microcode & microcode );
 
         /** Removes a microcode for a program from the microcode cache.
         @param name The name of the program.
         */
-        virtual void removeMicrocodeFromCache( const String & source );
+        virtual void removeMicrocodeFromCache( const String & name );
 
         /** Saves the microcode cache to disk.
         @param stream The destination stream
@@ -258,9 +231,6 @@ namespace Ogre {
         @param stream The source stream
         */
         virtual void loadMicrocodeCache( DataStreamPtr stream );
-
-        /// Deletes all microcodes. Useful when hot reloading.
-        virtual void clearMicrocodeCache(void);
         
 
 

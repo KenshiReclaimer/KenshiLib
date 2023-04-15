@@ -41,8 +41,7 @@ namespace Ogre {
 #define OGRE_PLATFORM_NACL 6
 #define OGRE_PLATFORM_WINRT 7
 #define OGRE_PLATFORM_EMSCRIPTEN 8
-#define OGRE_PLATFORM_FREEBSD 9
-
+    
 #define OGRE_COMPILER_MSVC 1
 #define OGRE_COMPILER_GNUC 2
 #define OGRE_COMPILER_BORL 3
@@ -55,46 +54,6 @@ namespace Ogre {
 
 #define OGRE_ARCHITECTURE_32 1
 #define OGRE_ARCHITECTURE_64 2
-
-#define OGRE_CPU_UNKNOWN    0
-#define OGRE_CPU_X86        1
-#define OGRE_CPU_PPC        2
-#define OGRE_CPU_ARM        3
-#define OGRE_CPU_MIPS       4
-
-/* Find CPU type */
-#if defined(__i386__) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64) || defined(_M_AMD64) || defined(__e2k__)
-#   define OGRE_CPU OGRE_CPU_X86
-#elif defined(__ppc__) || defined(__ppc64__) || defined(_M_PPC)
-#   define OGRE_CPU OGRE_CPU_PPC
-#elif defined(__arm__) || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM) || defined(_M_ARM64) 
-#   define OGRE_CPU OGRE_CPU_ARM
-#elif defined(__mips__) || defined(__mips64) || defined(__mips64_) || defined(_M_MIPS)
-#   define OGRE_CPU OGRE_CPU_MIPS
-#else
-#   define OGRE_CPU OGRE_CPU_UNKNOWN
-#endif
-
-/* Find the arch type */
-#if defined(__x86_64__) || defined(_M_X64) || defined(_M_X64) || defined(_M_AMD64) \
- || defined(__ppc64__) \
- || defined(__arm64__) || defined(__aarch64__) || defined(_M_ARM64) \
- || defined(__mips64) || defined(__mips64_) \
- || defined(__alpha__) || defined(__ia64__) || defined(__e2k__) || defined(__s390__) || defined(__s390x__)
-#   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_64
-#else
-#   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_32
-#endif
-
-/* Determine CPU endian.
-   We were once in situation when XCode could produce mixed endian fat binary with x86 and ppc archs inside, so it's safer to sniff compiler macros too
- */
-#if defined(OGRE_CONFIG_BIG_ENDIAN) || (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
-#    define OGRE_ENDIAN OGRE_ENDIAN_BIG
-#else
-#    define OGRE_ENDIAN OGRE_ENDIAN_LITTLE
-#endif
-
 
 /* Finds the compiler type and version.
 */
@@ -124,7 +83,7 @@ namespace Ogre {
 #elif defined( __BORLANDC__ )
 #   define OGRE_COMPILER OGRE_COMPILER_BORL
 #   define OGRE_COMP_VER __BCPLUSPLUS__
-#   define __FUNCTION__ __FUNC__
+#   define __FUNCTION__ __FUNC__ 
 #else
 #   pragma error "No known compiler. Abort! Abort!"
 
@@ -196,20 +155,24 @@ namespace Ogre {
 #   ifndef OGRE_STATIC_LIB
 #       error OGRE must be built as static for NaCl (OGRE_STATIC=true in CMake)
 #   endif
-#   ifdef OGRE_BUILD_RENDERSYSTEM_GL3PLUS
-#       error OpenGL is not supported on NaCl (OGRE_BUILD_RENDERSYSTEM_GL3PLUS=false in CMake)
+#   ifdef OGRE_BUILD_RENDERSYSTEM_D3D9
+#       error D3D9 is not supported on NaCl (OGRE_BUILD_RENDERSYSTEM_D3D9 false in CMake)
 #   endif
-#   ifdef OGRE_BUILD_RENDERSYSTEM_GLES2
-#       if OGRE_NO_GLES3_SUPPORT
-#           define OGRE_TEXTURE_ATLAS
-#       endif
-#   else
+#   ifdef OGRE_BUILD_RENDERSYSTEM_GL
+#       error OpenGL is not supported on NaCl (OGRE_BUILD_RENDERSYSTEM_GL=false in CMake)
+#   endif
+#   ifndef OGRE_BUILD_RENDERSYSTEM_GLES2
 #       error GLES2 render system is required for NaCl (OGRE_BUILD_RENDERSYSTEM_GLES2=false in CMake)
 #   endif
-#elif defined(__FreeBSD__)
-#   define OGRE_PLATFORM OGRE_PLATFORM_FREEBSD
 #else
 #   define OGRE_PLATFORM OGRE_PLATFORM_LINUX
+#endif
+
+    /* Find the arch type */
+#if defined(__x86_64__) || defined(_M_X64) || defined(__powerpc64__) || defined(__alpha__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__) || defined(__arm64__) || defined(__aarch64__) || defined(__mips64) || defined(__mips64_)
+#   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_64
+#else
+#   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_32
 #endif
 
 // For generating compiler warnings - should work on any compiler
@@ -230,21 +193,6 @@ namespace Ogre {
 #endif
 // Disable OGRE_WCHAR_T_STRINGS until we figure out what to do about it.
 #define OGRE_WCHAR_T_STRINGS 0
-
-// For safely overriding virtual functions
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-#   define OGRE_OVERRIDE override
-#elif OGRE_COMPILER == OGRE_COMPILER_GNUC
-#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)
-#   define OGRE_OVERRIDE
-#else
-#   define OGRE_OVERRIDE
-#endif
-#elif __cplusplus >= 201103L // Noone defines this these days...
-#   define OGRE_OVERRIDE override
-#else
-#   define OGRE_OVERRIDE
-#endif
 
 //----------------------------------------------------------------------------
 // Windows Settings
@@ -267,6 +215,13 @@ namespace Ogre {
 #           endif
 #       endif
 #       define _OgrePrivate
+#   endif
+// Win32 compilers use _DEBUG for specifying debug builds.
+// for MinGW, we set DEBUG
+#   if defined(_DEBUG) || defined(DEBUG)
+#       define OGRE_DEBUG_MODE 1
+#   else
+#       define OGRE_DEBUG_MODE 0
 #   endif
 
 // Disable unicode support on MingW for GCC 3, poorly supported in stdlibc++
@@ -295,10 +250,9 @@ namespace Ogre {
 #endif // OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 
 //----------------------------------------------------------------------------
-// Linux/Apple/iOS/Android/NaCl/Emscripten/FreeBSD Settings
+// Linux/Apple/iOS/Android/NaCl/Emscripten Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
-    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN || \
-    OGRE_PLATFORM == OGRE_PLATFORM_FREEBSD
+    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 
 // Enable GCC symbol visibility
 #   if defined( OGRE_GCC_VISIBILITY )
@@ -312,11 +266,17 @@ namespace Ogre {
 // A quick define to overcome different names for the same function
 #   define stricmp strcasecmp
 
+#   ifdef DEBUG
+#       define OGRE_DEBUG_MODE 1
+#   else
+#       define OGRE_DEBUG_MODE 0
+#   endif
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     #define OGRE_PLATFORM_LIB "OgrePlatform.bundle"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     #define OGRE_PLATFORM_LIB "OgrePlatform.a"
-#else //OGRE_PLATFORM_LINUX || OGRE_PLATFORM_FREEBSD
+#else //OGRE_PLATFORM_LINUX
     #define OGRE_PLATFORM_LIB "libOgrePlatform.so"
 #endif
 
@@ -327,69 +287,19 @@ namespace Ogre {
 #endif
 
 //----------------------------------------------------------------------------
-// Debug mode and asserts
-
-// No checks done at all
-#define OGRE_DEBUG_NONE     0
-// We perform basic assert checks and other non-performance intensive checks
-#define OGRE_DEBUG_LOW      1
-// We alter classes to add some debug variables for a bit more thorough checking
-// and also perform checks that may cause some performance hit
-#define OGRE_DEBUG_MEDIUM   2
-// We perform intensive validation without concerns for performance
-#define OGRE_DEBUG_HIGH     3
-
-// We cannot tell whether something is a debug build or not simply by checking NDEBUG because
-// it's perfectly valid for a user to #undef NDEBUG to get assertions in a release build.
-// DEBUG is set automatically on MSVC and _DEBUG is set automatically on MINGW.
-// Some environments don't provide any debug flags besides NDEBUG by default, so we issue a
-// warning here.
-#ifndef OGRE_DEBUG_MODE
-#   if !defined(NDEBUG) && !defined(_DEBUG) && !defined(DEBUG) && !defined(OGRE_IGNORE_UNKNOWN_DEBUG)
-#       pragma message (\
-    "Ogre can't tell whether this is a debug build. If it is, please add _DEBUG to the preprocessor "\
-    "definitions. Otherwise, you can set OGRE_IGNORE_UNKNOWN_DEBUG to suppress this warning. Ogre will "\
-    "assume this is not a debug build by default. To add _DEBUG with g++, invoke g++ with the argument "\
-    "-D_DEBUG. To add it in CMake, include "\
-    "set( CMAKE_CXX_FLAGS_DEBUG \"${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG=1 -D_DEBUG=1\" ) at the top of your "\
-    "CMakeLists.txt file. IDEs usually provide the possibility to add preprocessor definitions in the build "\
-    "settings. You can also manually set OGRE_DEBUG_MODE to either 1 or 0 instead of adding _DEBUG." )
-#   endif
-#   if defined(NDEBUG) && defined(_DEBUG) && !defined(OGRE_IGNORE_DEBUG_FLAG_CONTRADICTION)
-#       pragma message (\
-         "You have both NDEBUG and _DEBUG defined. Ogre will assume you're running a debug build. To suppress this "\
-         "warning, set OGRE_IGNORE_DEBUG_FLAG_CONTRADICTION.")
-#   endif
-
-#   if defined(_DEBUG) || defined(DEBUG)
-#       define OGRE_DEBUG_MODE OGRE_DEBUG_LEVEL_DEBUG
-#   else
-#       define OGRE_DEBUG_MODE OGRE_DEBUG_LEVEL_RELEASE
-#   endif
-#endif
-
-#if OGRE_DEBUG_MODE >= OGRE_DEBUG_LOW
-#   define OGRE_ASSERTS_ENABLED
-#endif
-
-#define OGRE_ASSERT_LOW OGRE_ASSERT
-
-#if OGRE_DEBUG_MODE >= OGRE_DEBUG_MEDIUM
-#   define OGRE_ASSERT_MEDIUM OGRE_ASSERT
-#else
-#   define OGRE_ASSERT_MEDIUM(condition) ((void)0)
-#endif
-
-#if OGRE_DEBUG_MODE >= OGRE_DEBUG_HIGH
-#   define OGRE_ASSERT_HIGH OGRE_ASSERT
-#else
-#   define OGRE_ASSERT_HIGH(condition) ((void)0)
-#endif
-
-
-//----------------------------------------------------------------------------
 // Android Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#   ifdef OGRE_UNICODE_SUPPORT
+#       undef OGRE_UNICODE_SUPPORT
+#   endif
+#   define OGRE_UNICODE_SUPPORT 1
+    // A quick define to overcome different names for the same function
+#   define stricmp strcasecmp
+#   ifdef DEBUG
+#       define OGRE_DEBUG_MODE 1
+#   else
+#       define OGRE_DEBUG_MODE 0
+#   endif
 #   ifndef CLOCKS_PER_SEC
 #       define CLOCKS_PER_SEC  1000
 #   endif
@@ -397,6 +307,15 @@ namespace Ogre {
 
 #ifndef __OGRE_HAVE_DIRECTXMATH
 #   define __OGRE_HAVE_DIRECTXMATH 0
+#endif
+
+//----------------------------------------------------------------------------
+// Endian Settings
+// check for BIG_ENDIAN config flag, set OGRE_ENDIAN correctly
+#ifdef OGRE_CONFIG_BIG_ENDIAN
+#    define OGRE_ENDIAN OGRE_ENDIAN_BIG
+#else
+#    define OGRE_ENDIAN OGRE_ENDIAN_LITTLE
 #endif
 
 //----------------------------------------------------------------------------
@@ -474,51 +393,6 @@ namespace Ogre {
 
 #endif
 
-// Find how to declare aligned variable.
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-    #define OGRE_ALIGNED_DECL(type, var, alignment)  __declspec(align(alignment)) type var
-#elif (OGRE_COMPILER == OGRE_COMPILER_GNUC) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)
-    #define OGRE_ALIGNED_DECL(type, var, alignment)  type var __attribute__((__aligned__(alignment)))
-#else
-    #define OGRE_ALIGNED_DECL(type, var, alignment)  type var
-#endif
-
-// Find perfect alignment (should supports SIMD alignment if SIMD available)
-#if OGRE_CPU == OGRE_CPU_X86
-    #define OGRE_SIMD_ALIGNMENT 16
-#else
-    #define OGRE_SIMD_ALIGNMENT 16
-#endif
-
-// Declare variable aligned to SIMD alignment.
-#define OGRE_SIMD_ALIGNED_DECL(type, var)   OGRE_ALIGNED_DECL(type, var, OGRE_SIMD_ALIGNMENT)
-
-#if OGRE_USE_SIMD == 1
-    // Define whether or not Ogre compiled with SSE support.
-    #if   OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86 && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        #define __OGRE_HAVE_SSE  1
-    #endif
-
-    // Define whether or not Ogre compiled with NEON support.
-    #if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && \
-        ( defined(__ARM_NEON__) || defined(_WIN32_WINNT_WIN8) && _WIN32_WINNT >= _WIN32_WINNT_WIN8 )
-        #define __OGRE_HAVE_NEON  1
-    #endif
-#endif
-
-#ifndef __OGRE_HAVE_SSE
-    #define __OGRE_HAVE_SSE  0
-#endif
-
-#if OGRE_USE_SIMD == 0 || !defined( __OGRE_HAVE_NEON )
-#    define __OGRE_HAVE_NEON 0
-#endif
-
-#if !defined(__OGRE_HAVE_DIRECTXMATH)
-    #define __OGRE_HAVE_DIRECTXMATH  0
-#endif
-
-
 // Integer formats of fixed bit width
 typedef unsigned int uint32;
 typedef unsigned short uint16;
@@ -531,13 +405,8 @@ typedef signed char int8;
     typedef unsigned __int64 uint64;
     typedef __int64 int64;
 #else
-#   if defined __x86_64__ && !defined __ILP32__
-    typedef unsigned long int uint64;
-    typedef long int int64;
-#   else
     typedef unsigned long long uint64;
     typedef long long int64;
-#   endif
 #endif
 
 #ifndef OGRE_RESTRICT_ALIASING
@@ -602,7 +471,7 @@ typedef signed char int8;
 // We have this issue in OgreMemorySTLAlloc.h - so we see it over and over
 #   pragma warning (disable : 4345)
 #endif
-    
+
 }
 
 #endif

@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 // Precompiler options
 #include "OgrePrerequisites.h"
+#include "OgreString.h"
 #include <exception>
 #include "OgreHeaderPrefix.h"
 
@@ -58,12 +59,6 @@ THE SOFTWARE.
 // STANDARD mode
 #else
 #   define OgreAssert( a, b ) assert( (a) && (b) )
-#endif
-
-#if OGRE_DEBUG_MODE
-#   define OgreAssertDbg( a, b ) OgreAssert( a, b )
-#else
-#   define OgreAssertDbg( a, b )
 #endif
 
 namespace Ogre {
@@ -130,7 +125,7 @@ namespace Ogre {
         Exception(const Exception& rhs);
 
         /// Needed for compatibility with std::exception
-        virtual ~Exception() throw();
+        ~Exception() throw() {}
 
         /** Assignment operator.
         */
@@ -186,75 +181,65 @@ namespace Ogre {
     // Specialised exceptions allowing each to be caught specifically
     // backwards-compatible since exception codes still used
 
-    class _OgreExport UnimplementedException : public Exception
+    class _OgreExport UnimplementedException : public Exception 
     {
     public:
-        UnimplementedException( int inNumber, const String &inDescription, const String &inSource,
-                                const char *inFile, long inLine );
-        virtual ~UnimplementedException() throw();
+        UnimplementedException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+            : Exception(inNumber, inDescription, inSource, "UnimplementedException", inFile, inLine) {}
     };
     class _OgreExport FileNotFoundException : public Exception
     {
     public:
-        FileNotFoundException( int inNumber, const String &inDescription, const String &inSource,
-                               const char *inFile, long inLine );
-        virtual ~FileNotFoundException() throw();
+        FileNotFoundException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+            : Exception(inNumber, inDescription, inSource, "FileNotFoundException", inFile, inLine) {}
     };
     class _OgreExport IOException : public Exception
     {
     public:
-        IOException( int inNumber, const String &inDescription, const String &inSource,
-                     const char *inFile, long inLine );
-        virtual ~IOException() throw();
+        IOException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+            : Exception(inNumber, inDescription, inSource, "IOException", inFile, inLine) {}
     };
     class _OgreExport InvalidStateException : public Exception
     {
     public:
-        InvalidStateException( int inNumber, const String &inDescription, const String &inSource,
-                               const char *inFile, long inLine );
-        virtual ~InvalidStateException() throw();
+        InvalidStateException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+            : Exception(inNumber, inDescription, inSource, "InvalidStateException", inFile, inLine) {}
     };
     class _OgreExport InvalidParametersException : public Exception
     {
     public:
-        InvalidParametersException( int inNumber, const String &inDescription, const String &inSource,
-                                    const char *inFile, long inLine );
-        virtual ~InvalidParametersException() throw();
+        InvalidParametersException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+            : Exception(inNumber, inDescription, inSource, "InvalidParametersException", inFile, inLine) {}
     };
     class _OgreExport ItemIdentityException : public Exception
     {
     public:
-        ItemIdentityException( int inNumber, const String &inDescription, const String &inSource,
-                               const char *inFile, long inLine );
-        virtual ~ItemIdentityException() throw();
+        ItemIdentityException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+            : Exception(inNumber, inDescription, inSource, "ItemIdentityException", inFile, inLine) {}
     };
     class _OgreExport InternalErrorException : public Exception
     {
     public:
-        InternalErrorException( int inNumber, const String &inDescription, const String &inSource,
-                                const char *inFile, long inLine );
-        virtual ~InternalErrorException() throw();
+        InternalErrorException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+            : Exception(inNumber, inDescription, inSource, "InternalErrorException", inFile, inLine) {}
     };
     class _OgreExport RenderingAPIException : public Exception
     {
     public:
-        RenderingAPIException( int inNumber, const String &inDescription, const String &inSource,
-                               const char *inFile, long inLine );
-        virtual ~RenderingAPIException() throw();
+        RenderingAPIException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+            : Exception(inNumber, inDescription, inSource, "RenderingAPIException", inFile, inLine) {}
     };
     class _OgreExport RuntimeAssertionException : public Exception
     {
     public:
-        RuntimeAssertionException( int inNumber, const String &inDescription, const String &inSource,
-                                   const char *inFile, long inLine );
-        virtual ~RuntimeAssertionException() throw();
+        RuntimeAssertionException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+            : Exception(inNumber, inDescription, inSource, "RuntimeAssertionException", inFile, inLine) {}
     };
     class _OgreExport InvalidCallException : public Exception
     {
     public:
-        InvalidCallException( int inNumber, const String &inDescription, const String &inSource,
-                              const char *inFile, long inLine );
-        virtual ~InvalidCallException() throw();
+        InvalidCallException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+            : Exception(inNumber, inDescription, inSource, "InvalidCallException", inFile, inLine) {}
     };
 
     /** Class implementing dispatch methods in order to construct by-value

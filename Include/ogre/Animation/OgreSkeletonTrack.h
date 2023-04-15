@@ -33,8 +33,6 @@ THE SOFTWARE.
 #include "Math/Array/OgreArrayQuaternion.h"
 #include "Math/Array/OgreKfTransform.h"
 
-#include "ogrestd/vector.h"
-
 namespace Ogre
 {
     class KfTransformArrayMemoryManager;

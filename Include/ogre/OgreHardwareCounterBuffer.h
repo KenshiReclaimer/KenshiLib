@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-namespace v1 {
     class HardwareBufferManagerBase;
 
     /** \addtogroup Core
@@ -71,7 +70,6 @@ namespace v1 {
         explicit HardwareCounterBufferSharedPtr(HardwareCounterBuffer* buf);
     };
 
-}
 }
 
 #include "OgreHeaderSuffix.h"

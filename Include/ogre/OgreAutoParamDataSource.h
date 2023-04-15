@@ -102,8 +102,7 @@ namespace Ogre {
         mutable bool mSpotlightViewProjMatrixDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
         mutable bool mSpotlightWorldViewProjMatrixDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
         mutable bool mShadowCamDepthRangesDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
-        mutable ColourValue mAmbientLight[2];
-        mutable Vector3 mAmbientLightHemisphereDir;
+        mutable ColourValue mAmbientLight;
         mutable ColourValue mFogColour;
         mutable Vector4 mFogParams;
         mutable int mPassNumber;
@@ -116,14 +115,12 @@ namespace Ogre {
         const Camera* mCurrentCamera;
         const LightList* mCurrentLightList;
         const Frustum* mCurrentTextureProjector[OGRE_MAX_SIMULTANEOUS_LIGHTS];
-        const RenderPassDescriptor* mCurrentRenderPassDesc;
+        const RenderTarget* mCurrentRenderTarget;
         const Viewport* mCurrentViewport;
         const SceneManager* mCurrentSceneManager;
         const Pass* mCurrentPass;
-        const HlmsComputeJob *mCurrentJob;
         const CompositorShadowNode *mCurrentShadowNode;
         vector<Real>::type          mNullPssmSplitPoint;
-        vector<Real>::type          mNullPssmBlendPoint;
 
         ObjectMemoryManager mObjectMemoryManager;
         NodeMemoryManager *mNodeMemoryManager;
@@ -150,7 +147,6 @@ namespace Ogre {
          void setCurrentSceneManager(const SceneManager* sm);
         /** Sets the current pass */
          void setCurrentPass(const Pass* pass);
-         void setCurrentJob(const HlmsComputeJob* job);
          void setCurrentShadowNode(const CompositorShadowNode *sn);
 
          const Camera* getCurrentCamera() const;
@@ -173,7 +169,6 @@ namespace Ogre {
          const Vector4& getCameraPositionObjectSpace(void) const;
          const Vector4& getLodCameraPosition(void) const;
          const Vector4& getLodCameraPositionObjectSpace(void) const;
-         const Vector2 getRSDepthRange(void) const;
          bool hasLightList() const { return mCurrentLightList != 0; }
          float getLightCount() const;
          float getLightCastsShadows(size_t index) const;
@@ -187,8 +182,7 @@ namespace Ogre {
          Real getLightPowerScale(size_t index) const;
          Vector4 getLightAttenuation(size_t index) const;
          Vector4 getSpotlightParams(size_t index) const;
-         void setAmbientLightColour( const ColourValue hemispheres[2],
-                                     const Vector3 &hemisphereDir );
+         void setAmbientLightColour(const ColourValue& ambient);
          const ColourValue& getAmbientLightColour(void) const;
          const ColourValue& getSurfaceAmbientColour(void) const;
          const ColourValue& getSurfaceDiffuseColour(void) const;
@@ -207,15 +201,9 @@ namespace Ogre {
          const Matrix4& getSpotlightWorldViewProjMatrix(size_t index) const;
          const Matrix4& getTextureTransformMatrix(size_t index) const;
          const vector<Real>::type& getPssmSplits( size_t shadowMapIdx ) const;
-         const vector<Real>::type& getPssmBlends( size_t shadowMapIdx ) const;
-         Real getPssmFade( size_t shadowMapIdx ) const;
-         const RenderPassDescriptor* getCurrentRenderPassDesc(void) const;
+         const RenderTarget* getCurrentRenderTarget(void) const;
          const Renderable* getCurrentRenderable(void) const;
          const Pass* getCurrentPass(void) const;
-         const HlmsComputeJob* getCurrentJob(void) const;
-         Vector4 getUavSize(size_t index) const;
-         Vector4 getInverseUavSize(size_t index) const;
-         Vector4 getPackedUavSize(size_t index) const;
          Vector4 getTextureSize(size_t index) const;
          Vector4 getInverseTextureSize(size_t index) const;
          Vector4 getPackedTextureSize(size_t index) const;
@@ -267,10 +255,9 @@ namespace Ogre {
          int getPassNumber(void) const;
          void setPassNumber(const int passNumber);
          void incPassNumber(void);
-         void updateLightCustomGpuParameter( const GpuProgramParameters_AutoConstantEntry &constantEntry,
-                                             GpuProgramParameters *params ) const;
+         void updateLightCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry, GpuProgramParameters *params) const;
 
-         const Light& _getBlankLight(void) const		{ return mBlankLight; }
+		 const Light& _getBlankLight(void) const		{ return mBlankLight; }
     };
     /** @} */
     /** @} */

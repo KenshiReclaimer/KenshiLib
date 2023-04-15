@@ -26,10 +26,6 @@ THE SOFTWARE
 #ifndef __OgreDefaultWorkQueueStandard_H__
 #define __OgreDefaultWorkQueueStandard_H__
 
-#if OGRE_THREAD_SUPPORT
-#include "ogrestd/vector.h"
-#endif
-
 #include "../OgreWorkQueue.h"
 
 namespace Ogre

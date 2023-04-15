@@ -36,17 +36,21 @@ Torus Knot Software Ltd.
 #include "OgrePlane.h"
 #include "OgreQuaternion.h"
 #include "OgreColourValue.h"
+#include "OgreCommon.h"
 #include "OgreSceneQuery.h"
 #include "OgreAutoParamDataSource.h"
 #include "OgreAnimationState.h"
+#include "OgreRenderQueue.h"
+#include "OgreRenderQueueSortingGrouping.h"
 #include "OgreResourceGroupManager.h"
+#include "OgreShadowTextureManager.h"
+#include "OgreInstanceManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreLodListener.h"
 #include "OgreRawPtr.h"
 #include "Math/Array/OgreNodeMemoryManager.h"
 #include "Math/Array/OgreObjectMemoryManager.h"
 #include "Animation/OgreSkeletonAnimManager.h"
-#include "Compositor/Pass/OgreCompositorPass.h"
 #include "Threading/OgreThreads.h"
 #include "OgreHeaderPrefix.h"
 
@@ -58,8 +62,6 @@ namespace Ogre {
     *  @{
     */
 
-    typedef vector<TextureGpu*>::type TextureGpuVec;
-
     /** Structure for holding a position & orientation pair. */
     struct ViewPoint
     {
@@ -67,27 +69,82 @@ namespace Ogre {
         Quaternion orientation;
     };
 
-    typedef FastArray<MovableObject::MovableObjectArray> VisibleObjectsPerRq;
-    typedef FastArray<VisibleObjectsPerRq> VisibleObjectsPerThreadArray;
+    /** There are two Instancing techniques that perform culling of their own:
+            * HW Basic
+            * HW VTF
+        Frustum culling is highly parallelizable & scalable. However, we first cull
+        InstanceBatches & regular entities, then ask the culled InstanceBatches to
+        perform their culling to the InstancedEntities they own.
+        This results performance boost for skipping large amounts of instanced entities
+        when the whole batch isn't visible.
+        However, this also means threading frustum culling of instanced entities got harder.
+    @par
+        There are four approaches:
+            * Ask all existing batches to frustum cull. Then use only the ones we want. Sheer
+              brute force. Scales very well with cores, but sacrifices performance unnecessary
+              when only a few batches are visible. This approach is not taken by Ogre.
+
+            * Sync every time an InstanceBatchHW or InstanceBatchHW_VTF tries to frustum cull to
+              delegate the job on worker threads. Considering there could be hundreds of
+              InstanceBatches, this would cause a huge amount of thread synchronization overhead &
+              context switches. This approach is not taken by Ogre.
+
+            * Each thread after having culled all InstancedBatches & Entities, will parse the
+              culled list to ask all MovableObjects to perform culling of their own. Entities
+              will ignore this call (however they add to a small overhead for traversing them
+              and calling a virtual function) while InstanceBatchHW & InstanceBatchHW_VTF will
+              perform their own culling from within the multiple threads. This approach scales
+              well with cores and only visible batches. However load balancing may be an issue
+              for certain scenes:
+              eg. an InstanceBatch with 5000 InstancedEntities in one thread, while the other
+              three threads get one InstanceBatch each with 50 InstancedEntities. The first
+              thread will have considerably more work to do than the other three.
+              This approach is a good balance when compared to the first two. This is the
+              approach taken by Ogre when INSTANCING_CULLING_THREADED is on
+
+            * Don't multithread instanced entitites' frustum culling. Only the InstanceBatch &
+              Entity's frustum culling will be threaded. This is what happens when
+              INSTANCING_CULLING_SINGLE is on.
+
+        Whether INSTANCING_CULLING_THREADED improves or degrades performance depends highly on your
+        scene.
+    @par
+        <b>When to use INSTANCING_CULLING_SINGLETHREAD?</b>
+        If your scene doesn't use HW Basic or HW VTF instancing techniques, or you have very few
+        Instanced entities compared to the amount of regular Entities.
+        Turning threading on, you'll be wasting your time traversing the list from multiple threads
+        in search of InstanceBatchHW & InstanceBatchHW_VTF
+
+        <b>When to use INSTANCING_CULLING_THREADED?</b>
+        If your scene makes intensive use of HW Basic and/or HW VTF instancing techniques. Note
+        that threaded culling is performed in SCENE_STATIC instances too.
+        The most advantage is seen when the instances per batch is very high and when doing many
+        PASS_SCENE, which require frustum culling multiple times per frame (eg. pssm shadows,
+        multiple light sources with shadows, very advanced compositing, etc)
+
+        Note that you can switch between methods at any time at runtime.
+    */
+    enum InstancingThreadedCullingMethod
+    {
+        INSTANCING_CULLING_SINGLETHREAD,
+        INSTANCING_CULLING_THREADED,
+    };
+
+    typedef FastArray<MovableObject::MovableObjectArray> VisibleObjectsPerThreadArray;
 
     // Forward declarations
     class DefaultIntersectionSceneQuery;
     class DefaultRaySceneQuery;
     class DefaultSphereSceneQuery;
     class DefaultAxisAlignedBoxSceneQuery;
+    class Rectangle2D;
     class LodListener;
     struct MovableObjectLodChangedEvent;
     struct EntityMeshLodChangedEvent;
     struct EntityMaterialLodChangedEvent;
+    class CompositorChain;
     class CompositorShadowNode;
     class UniformScalableTask;
-
-    class RadialDensityMask;
-
-    namespace v1
-    {
-        class Rectangle2D;
-    }
 
     /// All variables are read-only for the worker threads.
     struct CullFrustumRequest
@@ -97,11 +154,6 @@ namespace Ogre {
         uint8                           firstRq;
         /// Last RenderQueue ID to render (exclusive)
         uint8                           lastRq;
-        /// Whether this is a shadow mapping pass
-        bool                            casterPass;
-        /// Whether we should immediately add to render queue v2 objects
-        bool                            addToRenderQueue;
-        bool                            cullingLights;
         /** Memory manager of the objects to cull. Could contain all Lights, all Entity, etc.
             Could be more than one depending on the high level cull system (i.e. tree-based sys)
             Must be const (it is read only for all threads).
@@ -113,17 +165,15 @@ namespace Ogre {
         Camera const                    *lodCamera;
 
         CullFrustumRequest() :
-            firstRq( 0 ), lastRq( 0 ), casterPass( false ), addToRenderQueue( true ),
-            cullingLights( false ), objectMemManager( 0 ), camera( 0 ), lodCamera( 0 )
+            firstRq( 0 ), lastRq( 0 ), objectMemManager( 0 ), camera( 0 ), lodCamera( 0 )
         {
         }
-        CullFrustumRequest( uint8 _firstRq, uint8 _lastRq, bool _casterPass,
-                            bool _addToRenderQueue, bool _cullingLights,
+        CullFrustumRequest( uint8 _firstRq, uint8 _lastRq,
                             const ObjectMemoryManagerVec *_objectMemManager,
                             const Camera *_camera, const Camera *_lodCamera ) :
-            firstRq( _firstRq ), lastRq( _lastRq ), casterPass( _casterPass ),
-            addToRenderQueue( _addToRenderQueue ), cullingLights( _cullingLights ),
-            objectMemManager( _objectMemManager ), camera( _camera ), lodCamera( _lodCamera )
+            firstRq( _firstRq ), lastRq( _lastRq ),
+            objectMemManager( _objectMemManager ), camera( _camera ),
+            lodCamera( _lodCamera )
         {
         }
     };
@@ -139,8 +189,7 @@ namespace Ogre {
         UpdateLodRequest( uint8 _firstRq, uint8 _lastRq,
                             const ObjectMemoryManagerVec *_objectMemManager,
                             const Camera *_camera, const Camera *_lodCamera, Real _lodBias ) :
-            CullFrustumRequest( _firstRq, _lastRq, false, false, false,
-                                _objectMemManager, _camera, _lodCamera ),
+            CullFrustumRequest( _firstRq, _lastRq, _objectMemManager, _camera, _lodCamera ),
             lodBias( _lodBias )
         {
         }
@@ -162,6 +211,20 @@ namespace Ogre {
         }
     };
 
+    struct InstanceBatchCullRequest
+    {
+        Frustum const   *frustum;
+        Camera const    *lodCamera;
+        uint32          combinedVisibilityFlags;
+        InstanceBatchCullRequest() : frustum( 0 ), lodCamera( 0 ), combinedVisibilityFlags( 0 ) {}
+        InstanceBatchCullRequest( const Frustum *_frustum, const Camera *_lodCamera,
+                                  uint32 _combinedVisibilityFlags ) :
+                        frustum( _frustum ), lodCamera( _lodCamera ),
+                        combinedVisibilityFlags( _combinedVisibilityFlags )
+        {
+        }
+    };
+
     struct BuildLightListRequest
     {
         size_t startLightIdx;
@@ -172,23 +235,6 @@ namespace Ogre {
             startLightIdx( _startLightIdx )
         {
         }
-    };
-
-    /** Struct that holds a number of cameras used in the current rendering pass
-     */
-    struct CamerasInProgress
-    {
-        const Camera *renderingCamera;
-        const Camera *cullingCamera;
-        const Camera *lodCamera;
-
-        CamerasInProgress():
-            renderingCamera(0), cullingCamera(0), lodCamera(0) {}
-        CamerasInProgress( const Camera* camera ) :
-            renderingCamera(camera), cullingCamera(camera), lodCamera(camera) {}
-        CamerasInProgress( const Camera *_renderingCamera, const Camera *_cullingCamera,
-                           const Camera *_lodCamera ) :
-            renderingCamera(_renderingCamera), cullingCamera(_cullingCamera), lodCamera(_lodCamera) {}
     };
 
     /** Manages the organisation and rendering of a 'scene' i.e. a collection 
@@ -220,7 +266,7 @@ namespace Ogre {
         dependent on the Camera, which will always call back the SceneManager
         which created it to render the scene. 
      */
-    class _OgreExport SceneManager : public SceneMgtAlignedAlloc, public IdObject
+    class _OgreExport SceneManager : public SceneMgtAlignedAlloc
     {
     public:
         /// Default query mask for entities @see SceneQuery
@@ -243,8 +289,41 @@ namespace Ogre {
             IRS_RENDER_TO_TEXTURE
         };
 
-        typedef vector<SceneNode*>::type SceneNodeList;
-        typedef vector<MovableObject*>::type MovableObjectVec;
+        /** Enumeration of the possible modes allowed for processing the special case
+        render queue list.
+        @see SceneManager::setSpecialCaseRenderQueueMode
+        */
+        enum SpecialCaseRenderQueueMode
+        {
+            /// Render only the queues in the special case list
+            SCRQM_INCLUDE,
+            /// Render all except the queues in the special case list
+            SCRQM_EXCLUDE
+        };
+
+        struct SkyDomeGenParameters
+        {
+            Real skyDomeCurvature;
+            Real skyDomeTiling;
+            Real skyDomeDistance;
+            int skyDomeXSegments; 
+            int skyDomeYSegments;
+            int skyDomeYSegments_keep;
+        };
+
+        struct SkyPlaneGenParameters
+        {
+            Real skyPlaneScale;
+            Real skyPlaneTiling; 
+            Real skyPlaneBow; 
+            int skyPlaneXSegments; 
+            int skyPlaneYSegments; 
+        };
+
+        struct SkyBoxGenParameters
+        {
+            Real skyBoxDistance;
+        };
 
         /** Class that allows listening in on the various stages of SceneManager
             processing, so that custom behaviour can be implemented from outside.
@@ -345,22 +424,38 @@ namespace Ogre {
                         { (void)source; }
         };
 
-        enum EnvFeatures
+        /** Inner helper class to implement the visitor pattern for rendering objects
+            in a queue. 
+        */
+        class _OgreExport SceneMgrQueuedRenderableVisitor : public QueuedRenderableVisitor
         {
-            /// Normally environmental cubemap probes are used for specular reflection
-            /// When this flag is present, the higest mip is used as an approximation
-            /// for diffuse indirect illumination.
-            /// Do not set this flag if you don't want this behavior (i.e. because
-            /// the diffuse GI is already gathered from another source of information)
-            EnvFeatures_DiffuseGiFromReflectionProbe = 1u << 0u,
+        protected:
+            /// Pass that was actually used at the grouping level
+            const Pass* mUsedPass;
+        public:
+            SceneMgrQueuedRenderableVisitor() 
+                :transparentShadowCastersMode(false) {}
+            ~SceneMgrQueuedRenderableVisitor() {}
+            void visit(Renderable* r);
+            bool visit(const Pass* p);
+            void visit(RenderablePass* rp);
+
+            /// Target SM to send renderables to
+            SceneManager* targetSceneMgr;
+            /// Are we in transparent shadow caster mode?
+            bool transparentShadowCastersMode;
+            /// Automatic light handling?
+            bool autoLights;
+            /// Scissoring if requested?
+            bool scissoring;
+
         };
+        /// Allow visitor helper to access protected methods
+        friend class SceneMgrQueuedRenderableVisitor;
 
     protected:
         /// Subclasses can override this to ensure their specialised SceneNode is used.
-        virtual SceneNode* createSceneNodeImpl( SceneNode *parent,
-                                                NodeMemoryManager *nodeMemoryManager );
-        virtual TagPoint* createTagPointImpl( SceneNode *parent,
-                                              NodeMemoryManager *nodeMemoryManager );
+        virtual SceneNode* createSceneNodeImpl( SceneNode *parent, SceneMemoryMgrTypes sceneType );
 
         typedef vector<NodeMemoryManager*>::type NodeMemoryManagerVec;
         typedef vector<ObjectMemoryManager*>::type ObjectMemoryManagerVec;
@@ -377,20 +472,13 @@ namespace Ogre {
         NodeMemoryManager       mNodeMemoryManager[NUM_SCENE_MEMORY_MANAGER_TYPES];
         ObjectMemoryManager     mEntityMemoryManager[NUM_SCENE_MEMORY_MANAGER_TYPES];
         ObjectMemoryManager     mLightMemoryManager;
-        ObjectMemoryManager     mForwardPlusMemoryManager[NUM_SCENE_MEMORY_MANAGER_TYPES];
         SkeletonAnimManager     mSkeletonAnimationManager;
-        NodeMemoryManager       mTagPointNodeMemoryManager;
         /// Filled and cleared every frame in HighLevelCull()
         NodeMemoryManagerVec    mNodeMemoryManagerUpdateList;
-        NodeMemoryManagerVec    mTagPointNodeMemoryManagerUpdateList;
         ObjectMemoryManagerVec  mEntitiesMemoryManagerCulledList;
         ObjectMemoryManagerVec  mEntitiesMemoryManagerUpdateList;
         ObjectMemoryManagerVec  mLightsMemoryManagerCulledList;
-        ObjectMemoryManagerVec  mForwardPlusMemoryManagerCullList;
         SkeletonAnimManagerVec  mSkeletonAnimManagerCulledList;
-
-        uint32                  mNumDecals;
-        uint32                  mNumCubemapProbes;
 
         /** Minimum depth level at which mNodeMemoryManager[SCENE_STATIC] is dirty.
         @remarks
@@ -405,30 +493,12 @@ namespace Ogre {
         */
         bool                    mStaticEntitiesDirty;
 
-        PrePassMode             mPrePassMode;
-        TextureGpuVec   mPrePassTextures;
-        TextureGpu      *mPrePassDepthTexture;
-        TextureGpu      *mSsrTexture;
-        TextureGpu      *mPassDepthTextureNoMsaa;
-        TextureGpu      *mRefractionsTexture;
-
-        /// See CompositorPassSceneDef::mUvBakingSet
-        uint8       mUvBakingSet;
-        Vector2     mUvBakingOffset;
-
         /// Instance name
         String mName;
 
         /// Queue of objects for rendering
         RenderQueue* mRenderQueue;
-
-        ForwardPlusBase *mForwardPlusSystem;
-        ForwardPlusBase *mForwardPlusImpl;
-        bool mBuildLegacyLightList;
-
-        TextureGpu *mDecalsDiffuseTex;
-        TextureGpu *mDecalsNormalsTex;
-        TextureGpu *mDecalsEmissiveTex;
+        bool mLastRenderQueueInvocationCustom;
 
         /// Updated every frame, has enough memory to hold all lights.
         /// The order is not deterministic, it depends on the number
@@ -439,12 +509,8 @@ namespace Ogre {
         LightArrayPerThread             mGlobalLightListPerThread;
         BuildLightListRequestPerThread  mBuildLightListRequestPerThread;
 
-        /// Current ambient light.
-        ColourValue mAmbientLight[2];
-        Vector3     mAmbientLightHemisphereDir;
-        uint32      mEnvFeatures;
-
-        float       mAmbientSphericalHarmonics[9u*3u];
+        /// Current ambient light, cached for RenderSystem
+        ColourValue mAmbientLight;
 
         /// The rendering system to send the scene to
         RenderSystem *mDestRenderSystem;
@@ -459,11 +525,13 @@ namespace Ogre {
         FrustumVec  mVisibleCameras;
         FrustumVec  mCubeMapCameras;
 
-        typedef vector<WireAabb*>::type WireAabbVec;
-        WireAabbVec mTrackingWireAabbs;
-
-        typedef map<String, v1::StaticGeometry* >::type StaticGeometryList;
+        typedef map<String, StaticGeometry* >::type StaticGeometryList;
         StaticGeometryList mStaticGeometryList;
+
+        typedef vector<InstanceManager*>::type      InstanceManagerVec;
+        InstanceManagerVec  mInstanceManagers;
+
+        typedef vector<SceneNode*>::type SceneNodeList;
 
         /** Central list of SceneNodes - for easy memory management.
             @note
@@ -474,18 +542,15 @@ namespace Ogre {
         SceneNodeList   mSceneNodes;
         SceneNodeList   mSceneNodesWithListeners;
 
-        /// Cameras in progress
-        CamerasInProgress mCamerasInProgress;
+        /// Camera in progress
+        Camera* mCameraInProgress;
         /// Current Viewport
-        Viewport *mCurrentViewport0;
+        Viewport* mCurrentViewport;
 
-        CompositorPass          *mCurrentPass;
-        CompositorShadowNode    *mCurrentShadowNode;
-        bool                    mShadowNodeIsReused;
+        CompositorShadowNode*   mCurrentShadowNode;
 
         /// Root scene node
         SceneNode* mSceneRoot[NUM_SCENE_MEMORY_MANAGER_TYPES];
-        SceneNode* mSceneDummy;
 
         /// Autotracking scene nodes
 		struct AutoTrackingSceneNode
@@ -506,21 +571,30 @@ namespace Ogre {
 		};
 
 		typedef vector<AutoTrackingSceneNode>::type AutoTrackingSceneNodeVec;
-        AutoTrackingSceneNodeVec mAutoTrackingSceneNodes;
+		AutoTrackingSceneNodeVec mAutoTrackingSceneNodes;
 
-    public:
-        enum SkyMethod
-        {
-            SkyCubemap,
-            SkyEquirectangular
-        };
-    protected:
-        SkyMethod mSkyMethod;
-        Rectangle2D *mSky;
-        MaterialPtr mSkyMaterial;
+        // Sky params
+        // Sky plane
+        Entity* mSkyPlaneEntity;
+        Entity* mSkyDomeEntity[5];
+        ManualObject* mSkyBoxObj;
 
-        /// For VR optimization
-        RadialDensityMask *mRadialDensityMask;
+        SceneNode* mSkyPlaneNode;
+        SceneNode* mSkyDomeNode;
+        SceneNode* mSkyBoxNode;
+
+        // Sky plane
+        bool mSkyPlaneEnabled;
+        Plane mSkyPlane;
+        SkyPlaneGenParameters mSkyPlaneGenParameters;
+        // Sky box
+        bool mSkyBoxEnabled;
+        Quaternion mSkyBoxOrientation;
+        SkyBoxGenParameters mSkyBoxGenParameters;
+        // Sky dome
+        bool mSkyDomeEnabled;
+        Quaternion mSkyDomeOrientation;
+        SkyDomeGenParameters mSkyDomeGenParameters;
 
         // Fog
         FogMode mFogMode;
@@ -528,12 +602,18 @@ namespace Ogre {
         Real mFogStart;
         Real mFogEnd;
         Real mFogDensity;
+
+        typedef set<uint8>::type SpecialCaseRenderQueueList;
+        SpecialCaseRenderQueueList mSpecialCaseQueueList;
+        SpecialCaseRenderQueueMode mSpecialCaseQueueMode;
+        uint8 mWorldGeometryRenderQueue;
         
         unsigned long mLastFrameNumber;
         OGRE_SIMD_ALIGNED_DECL( Matrix4, mTempXform[256] );
         bool mResetIdentityView;
         bool mResetIdentityProj;
 
+        bool mNormaliseNormalsOnScale;
         bool mFlipCullingOnNegativeScale;
         CullingMode mPassCullingMode;
 
@@ -564,6 +644,7 @@ namespace Ogre {
 
         typedef vector<LightInfo>::type LightInfoList;
 
+        typedef vector<MovableObject*>::type MovableObjectVec;
         /// Simple structure to hold MovableObject map and a mutex to go with it.
         struct MovableObjectCollection
         {
@@ -585,6 +666,11 @@ namespace Ogre {
         /// Mutex over the collection of MovableObject types
         OGRE_MUTEX(mMovableObjectCollectionMapMutex);
 
+        /** Internal method for initialising the render queue.
+        @remarks
+            Subclasses can use this to install their own RenderQueue implementation.
+        */
+        virtual void initRenderQueue(void);
         /// A pass designed to let us render shadow colour on white for texture shadows
         Pass* mShadowCasterPlainBlackPass;
         /** Internal method for turning a regular pass into a shadow caster pass.
@@ -616,14 +702,31 @@ namespace Ogre {
             BP_DOWN = 5
         };
 
+        /* Internal utility method for creating the planes of a skybox.
+        */
+        virtual MeshPtr createSkyboxPlane(
+            BoxPlane bp,
+            Real distance,
+            const Quaternion& orientation,
+            const String& groupName);
+
+        /* Internal utility method for creating the planes of a skydome.
+        */
+        virtual MeshPtr createSkydomePlane(
+            BoxPlane bp,
+            Real curvature, Real tiling, Real distance,
+            const Quaternion& orientation,
+            int xsegments, int ysegments, int ySegmentsToKeep, 
+            const String& groupName);
+
         /// Flag indicating whether SceneNodes will be rendered as a set of 3 axes
         bool mDisplayNodes;
 
         /// Storage of animations, lookup by name
-        typedef map<String, v1::Animation*>::type AnimationList;
+        typedef map<String, Animation*>::type AnimationList;
         AnimationList mAnimationsList;
         OGRE_MUTEX(mAnimationsListMutex);
-        v1::AnimationStateSet mAnimationStates;
+        AnimationStateSet mAnimationStates;
 
 
         /** Internal method used by _renderSingleObject to deal with renderables
@@ -641,6 +744,10 @@ namespace Ogre {
         RenderObjectListenerList mRenderObjectListeners;
         typedef vector<Listener*>::type ListenerList;
         ListenerList mListeners;
+        /// Internal method for firing the queue start event
+        virtual void firePreRenderQueues();
+        /// Internal method for firing the queue end event
+        virtual void firePostRenderQueues();
         /// Internal method for firing the queue start event, returns true if queue is to be skipped
         virtual bool fireRenderQueueStarted(uint8 id, const String& invocation);
         /// Internal method for firing the queue end event, returns true if queue is to be repeated
@@ -662,10 +769,18 @@ namespace Ogre {
         /// Internal method for firing destruction event
         virtual void fireSceneManagerDestroyed();
         /** Internal method for setting the destination viewport for the next render. */
-        virtual void setViewports( Viewport **vp, size_t numViewports );
+        virtual void setViewport(Viewport *vp);
 
         /** Flag that indicates if all of the scene node's bounding boxes should be shown as a wireframe. */
-        bool mShowBoundingBoxes;
+        bool mShowBoundingBoxes;      
+
+        /** Internal method for rendering all objects using the default queue sequence. */
+        virtual void renderVisibleObjectsDefaultSequence(void);
+        /** Internal method for rendering all objects using a custom queue sequence. */
+        virtual void renderVisibleObjectsCustomSequence(RenderQueueInvocationSequence* s);
+        /** Internal method for preparing the render queue for use with each render. */
+        virtual void prepareRenderQueue(void);
+
 
         /** Internal utility method for rendering a single object. 
         @remarks
@@ -694,11 +809,16 @@ namespace Ogre {
         /// Utility class for calculating automatic parameters for gpu programs
         AutoParamDataSource* mAutoParamDataSource;
 
+        CompositorChain* mActiveCompositorChain;
         bool mLateMaterialResolving;
 
         ColourValue mShadowColour;
+        HardwareIndexBufferSharedPtr mShadowIndexBuffer;
+        size_t mShadowIndexBufferUsedSize;
+        Rectangle2D* mFullScreenQuad;
         Real mShadowDirLightExtrudeDist;
         IlluminationRenderStage mIlluminationStage;
+        bool mShadowCasterRenderBackFaces;
         /// Struct for caching light clipping information for re-use in a frame
         struct LightClippingInfo
         {
@@ -728,6 +848,18 @@ namespace Ogre {
         void checkMovableObjectIntegrity( const typename vector<T*>::type &container,
                                             const T *mo ) const;
 
+#ifdef OGRE_LEGACY_ANIMATIONS
+        /// Updates all instance managers' animations
+        void updateInstanceManagerAnimations(void);
+#endif
+
+        /** Updates all instance managers with dirty instance batches from multiple threads.
+            @see updateInstanceManagers and @see InstanceBatch::_updateEntitiesBoundsThread */
+        void updateInstanceManagersThread( size_t threadIdx );
+
+        /** Updates all instance managers with dirty instance batches. @see _addDirtyInstanceManager */
+        void updateInstanceManagers(void);
+
         /** Culls the scene in a high level fashion (i.e. Octree, Portal, etc.) by taking into account all
             registered cameras. Produces a list of culled Entities & SceneNodes that must follow a very
             strict set of rules:
@@ -753,15 +885,30 @@ namespace Ogre {
         
     public:
 
-        AutoParamDataSource *_getAutoParamDataSource(void) const    { return mAutoParamDataSource; }
-
         //A render context, used to store internal data for pausing/resuming rendering
         struct RenderContext
         {
             RenderQueue* renderQueue;   
             Viewport* viewport;
-            CamerasInProgress camerasInProgress;
+            Camera* camera;
+            CompositorChain* activeChain;
             RenderSystem::RenderSystemContext* rsContext;
+        };
+
+        typedef vector<TexturePtr>::type TextureVec;
+
+        struct CompositorTexture
+        {
+            IdString            name;
+            TextureVec const    *textures;
+
+            CompositorTexture( IdString _name, const TextureVec *_textures ) :
+                    name( _name ), textures( _textures ) {}
+
+            bool operator == ( IdString right ) const
+            {
+                return name == right;
+            }
         };
 
         /** Pause rendering of the frame. This has to be called when inside a renderScene call
@@ -785,11 +932,11 @@ namespace Ogre {
         GpuProgramParametersSharedPtr mShadowTextureCustomCasterVPParams;
         GpuProgramParametersSharedPtr mShadowTextureCustomCasterFPParams;
 
+        typedef vector<CompositorTexture>::type CompositorTextureVec;
         CompositorTextureVec        mCompositorTextures;
 
         /// Visibility mask used to show / hide objects
         uint32 mVisibilityMask;
-        uint32 mLightMask;
         bool mFindVisibleObjects;
 
         enum RequestType
@@ -797,10 +944,10 @@ namespace Ogre {
             CULL_FRUSTUM,
             UPDATE_ALL_ANIMATIONS,
             UPDATE_ALL_TRANSFORMS,
-            UPDATE_ALL_BONE_TO_TAG_TRANSFORMS,
-            UPDATE_ALL_TAG_ON_TAG_TRANSFORMS,
             UPDATE_ALL_BOUNDS,
             UPDATE_ALL_LODS,
+            UPDATE_INSTANCE_MANAGERS,
+            CULL_FRUSTUM_INSTANCEDENTS,
             BUILD_LIGHT_LIST01,
             BUILD_LIGHT_LIST02,
             USER_UNIFORM_SCALABLE_TASK,
@@ -808,13 +955,14 @@ namespace Ogre {
             NUM_REQUESTS
         };
 
-        size_t  mNumWorkerThreads;
-        bool    mForceMainThread;
+        size_t mNumWorkerThreads;
 
         CullFrustumRequest              mCurrentCullFrustumRequest;
         UpdateLodRequest                mUpdateLodRequest;
         UpdateTransformRequest          mUpdateTransformRequest;
         ObjectMemoryManagerVec const    *mUpdateBoundsRequest;
+        InstancingThreadedCullingMethod mInstancingThreadedCullingMethod;
+        InstanceBatchCullRequest        mInstanceBatchCullRequest;
         UniformScalableTask *mUserTask;
         RequestType         mRequestType;
         Barrier             *mWorkerThreadsBarrier;
@@ -839,15 +987,43 @@ namespace Ogre {
         /// Suppress render state changes?
         bool mSuppressRenderStateChanges;
 
+        GpuProgramParametersSharedPtr mInfiniteExtrusionParams;
+        GpuProgramParametersSharedPtr mFiniteExtrusionParams;
+        /** Render a group in the ordinary way */
+        virtual_l1 void renderBasicQueueGroupObjects(RenderQueueGroup* pGroup, 
+            QueuedRenderableCollection::OrganisationMode om);
+        /** Render a group rendering only shadow casters. */
+        virtual_l1 void renderTextureShadowCasterQueueGroupObjects(RenderQueueGroup* group, 
+            QueuedRenderableCollection::OrganisationMode om);
+
+        /** Render a set of objects, see renderSingleObject for param definitions */
+        virtual_l1 void renderObjects(const QueuedRenderableCollection& objs, 
+            QueuedRenderableCollection::OrganisationMode om, bool lightScissoringClipping,
+            bool doLightIteration);
+        /** Render those objects in the transparent pass list which have shadow casting forced on
+        @remarks
+            This function is intended to be used to render the shadows of transparent objects which have
+            transparency_casts_shadows set to 'on' in their material
+        */
+        virtual_l1 void renderTransparentShadowCasterObjects(const QueuedRenderableCollection& objs, 
+            QueuedRenderableCollection::OrganisationMode om, bool lightScissoringClipping,
+            bool doLightIteration);
+
         /// Set up a scissor rectangle from a group of lights
         virtual ClipResult buildAndSetScissor(const LightList& ll, const Camera* cam);
         /// Update a scissor rectangle from a single light
         virtual void buildScissor(const Light* l, const Camera* cam, RealRect& rect);
+        virtual void resetScissor();
         /// Build a set of user clip planes from a single non-directional light
         virtual ClipResult buildAndSetLightClip(const LightList& ll);
         virtual void buildLightClip(const Light* l, PlaneList& planes);
         virtual void resetLightClip();
         virtual void checkCachedLightClippingInfo();
+
+        /// The active renderable visitor class - subclasses could override this
+        SceneMgrQueuedRenderableVisitor* mActiveQueuedRenderableVisitor;
+        /// Storage for default renderable visitor
+        SceneMgrQueuedRenderableVisitor mDefaultQueuedRenderableVisitor;
 
         /// Whether to use camera-relative rendering
         Matrix4 mCachedViewMatrix;
@@ -863,6 +1039,7 @@ namespace Ogre {
         virtual void useLights(const LightList& lights, unsigned short limit);
         virtual void setViewMatrix(const Matrix4& m);
         virtual void useLightsGpuProgram(const Pass* pass, const LightList* lights);
+        virtual void bindGpuProgram(GpuProgram* prog);
         virtual void updateGpuProgramParameters(const Pass* p);
 
 
@@ -905,14 +1082,6 @@ namespace Ogre {
         */
         void updateAllTransformsThread( const UpdateTransformRequest &request, size_t threadIdx );
 
-        /// @see TagPoint::updateAllTransformsBoneToTag
-        void updateAllTransformsBoneToTagThread( const UpdateTransformRequest &request,
-                                                 size_t threadIdx );
-
-        /// @see TagPoint::updateAllTransformsTagOnTag
-        void updateAllTransformsTagOnTagThread( const UpdateTransformRequest &request,
-                                                size_t threadIdx );
-
         /** Updates the world aabbs from the given request inside a thread. @See updateAllTransforms
         @param threadIdx
             Thread index so we know at which point we should start at.
@@ -926,6 +1095,14 @@ namespace Ogre {
             Must be unique for each worker thread
         */
         void updateAllLodsThread( const UpdateLodRequest &request, size_t threadIdx );
+
+        /** Traverses mVisibleObjects[threadIdx] from each thread to call
+            MovableObject::instanceBatchCullFrustumThreaded (which is supposed to cull objects)
+        @param threadIdx
+            Thread index so we know at which point we should start at.
+            Must be unique for each worker thread
+        */
+        void instanceBatchCullFrustumThread( const InstanceBatchCullRequest &request, size_t threadIdx );
 
         /** Low level culling, culls all objects against the given frustum active cameras. This
             includes checking visibility flags (both scene and viewport's)
@@ -953,7 +1130,8 @@ namespace Ogre {
     public:
         /** Constructor.
         */
-        SceneManager( const String& instanceName, size_t numWorkerThreads );
+        SceneManager(const String& instanceName, size_t numWorkerThreads,
+                    InstancingThreadedCullingMethod threadedCullingMethod);
 
         /** Default destructor.
         */
@@ -999,9 +1177,6 @@ namespace Ogre {
         virtual const String& getTypeName(void) const = 0;
 
         size_t getNumWorkerThreads() const                          { return mNumWorkerThreads; }
-
-        /// Finds all the movable objects with the type and name passed as parameters.
-        virtual MovableObjectVec findMovableObjects( const String& type, const String& name );
 
         /** Creates a camera to be managed by this scene manager.
             @remarks
@@ -1055,9 +1230,6 @@ namespace Ogre {
         */
         virtual void destroyAllCameras(void);
 
-        /// See Camera::setLightCullingVisibility
-        void _setLightCullingVisibility( Camera *camera, bool collectLights, bool isCubemap );
-
         /** Creates a light for use in the scene.
             @remarks
                 The direction and position of a light is managed via
@@ -1089,19 +1261,12 @@ namespace Ogre {
         */
         virtual void destroyAllLights(void);
 
-        /// Don't call this function directly. @see TagPoint::createChildTagPoint
-        virtual TagPoint* _createTagPoint( SceneNode *parent, NodeMemoryManager *nodeMemoryManager );
-
-        /// Creates a TagPoint that can be used like a SceneNode, or be used to be
-        /// attached to a Bone. @see Bone::addTagPoint
-        virtual TagPoint* createTagPoint(void);
-
         /** @see createSceneNode. This functions exists to satisfy @see SceneNode::createChildImpl
             Don't call this function directly
             @par
                 Parent to the scene node we're creating.
         */
-        virtual SceneNode* _createSceneNode( SceneNode *parent, NodeMemoryManager *nodeMemoryManager );
+        virtual SceneNode* _createSceneNode( SceneNode *parent, SceneMemoryMgrTypes sceneType );
 
         /** Creates an instance of a SceneNode.
             @remarks
@@ -1132,52 +1297,6 @@ namespace Ogre {
         */
         virtual void destroySceneNode(SceneNode* sn);
 
-        /** Sets a sky, to use a particular material based on SkyMethod
-        @remarks
-            You can control the order in which the sky appears (for best performance render
-            the sky LAST i.e. after all opaque objects, but before transparent objects).
-
-            You can control the order of the sky and its visibility flags by calling:
-            @code
-                Rectangle2D *sky = sceneManager->getSky()
-                sky->setRenderQueueGroup( rqId )
-                sky->setRenderQueueSubGroup( rqSubGroupId )
-                sky->setVisibilityFlags( mask )
-            @endcode
-        @param bEnabled
-        @param skyMethod
-        @param texture
-        */
-        void setSky( bool bEnabled, SkyMethod skyMethod, TextureGpu *texture );
-        void setSky( bool bEnabled, SkyMethod skyMethod, const String &texName,
-                     const String &resourceGroup );
-
-        Rectangle2D* getSky(void)                       { return mSky; }
-        bool isSkyEnabled(void) const                   { return mSky != 0; }
-        SkyMethod getSkyMethod(void) const              { return mSkyMethod; }
-        MaterialPtr getSkyMaterial(void)                { return mSkyMaterial; }
-
-        /** Draws a Radial Density Mask to lower the quality around the edges in VR
-        @remarks
-            You can control the order in which this RDM appears (to actually work as an optimization
-            it must be the first thing being rendered!) and its visibility flags by calling:
-            @code
-                RadialDensityMask *rdm = sceneManager->getRadialDensityMask()
-                rdm->getRectangle()->setRenderQueueGroup( rqId )
-                rdm->getRectangle()->setRenderQueueSubGroup( rqSubGroupId )
-                rdm->getRectangle()->setVisibilityFlags( mask )
-            @endcode
-        @param bEnabled
-        @param radius
-            Three sets of radiuses in clip space (i.e. in range [0; 1]) around each eye's center
-                All pixels inside radius[0] are rendered at full rate
-                All pixels between radius[0] & radius[1] are masked at half rate
-                All pixels between radius[1] & radius[2] are masked at quarter rate
-                All pixels beyond radius[2] are masked at 1/16th rate
-        */
-        void setRadialDensityMask( bool bEnabled, const float radius[3] );
-        RadialDensityMask* getRadialDensityMask(void) const     { return mRadialDensityMask; }
-
         /** Gets the SceneNode at the root of the scene hierarchy.
             @remarks
                 The entire scene is held as a hierarchy of nodes, which
@@ -1198,11 +1317,6 @@ namespace Ogre {
         */
         SceneNode* getRootSceneNode( SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
 
-        /// Unlike mNodeMemoryManager->_getDummyNode(), this dummy node is fully allocated,
-        /// which makes it possible to actually attach objects to this dummy, while
-        /// we guarantee the dummy won't change its transform.
-        SceneNode* getDummySceneNode(void) const        { return mSceneDummy; }
-
         /** Retrieves a SceneNode based on it's ID from the scene graph.
         @remarks
             @note Returns null if the ID does not exist
@@ -1211,9 +1325,6 @@ namespace Ogre {
         */
         virtual_l1 SceneNode* getSceneNode( IdType id );
         virtual_l1 const SceneNode* getSceneNode( IdType id ) const;
-
-        /// Finds all the scene nodes with the name passed as parameter.
-        virtual_l1 SceneNodeList findSceneNodes( const String& name ) const;
 
         /** Node listeners need to be registered with us so that they can be successfully called
             when calling updateAllTransforms. @See updateAllTransforms
@@ -1224,105 +1335,6 @@ namespace Ogre {
         */
         virtual void unregisterSceneNodeListener( SceneNode *sceneNode );
 
-        /// Returns the RenderQueue.
-        RenderQueue* getRenderQueue(void) const             { return mRenderQueue; }
-
-        /** Enables or disables the Forward3D implementation for using many non-shadowed
-            lights in the scene.
-            See the Forward3D sample for more information.
-        @remarks
-            The Hlms implementation must support this feature in order to work.
-            Calling this function can recreate resources (even if called multiple
-            times with the same exact paramters). Don't do it often.
-        @param bEnable
-            True to enable it. False to disable it.
-        @param width
-            The width of the view-space grid. Recommended value is 4 unless
-            numSlices is very small.
-        @param height
-            The height of the view-space grid. Recommended value is 4 unless
-            numSlices is very small.
-        @param numSlices
-            The number of slices. Each additional slice consumes much more memory.
-            The width and height is doubled on each slice. It's like mipmapping
-            but on reverse.
-        @param lightsPerCell
-            The maximum number of lights a cell in the grid can hold.
-        @param decalsPerCell
-            Maximum number of decals a cell in the grid can hold. 0 to disable decals.
-        @param minDistance
-            Bias towards the camera for grid.
-        @param maxDistance
-            How far the grid array can go.
-        */
-        void setForward3D( bool bEnable, uint32 width, uint32 height, uint32 numSlices,
-                           uint32 lightsPerCell, float minDistance, float maxDistance );
-
-        void setForwardClustered( bool bEnable, uint32 width, uint32 height, uint32 numSlices,
-                                  uint32 lightsPerCell, uint32 decalsPerCell, uint32 cubemapProbesPerCel,
-                                  float minDistance, float maxDistance );
-
-        /** Enables or disables the legace 1.9 way of building light lists which can be 
-            used by HlmsLowLevel materials.
-            This light list can be turned on regardless of any Forward* mode but it 
-            consumes a lot of performance and is only used by HlmsLowLevel materials 
-            that need ligting.
-        */
-        void setBuildLegacyLightList( bool bEnable );
-
-        ForwardPlusBase* getForwardPlus(void)                       { return mForwardPlusSystem; }
-        ForwardPlusBase* _getActivePassForwardPlus(void)            { return mForwardPlusImpl; }
-
-        /** Sets the decal texture for diffuse. Should be a RGBA8 or similar colour format.
-        @remarks
-            If the emissive texture (see SceneManager::setDecalsEmissive) is the same as
-            the diffuse, Hlms can perform a performance optimization and use fewer texture
-            slots.
-
-            You still need to enable a Forward+ solution that supports decals, such as
-            SceneManager::setForwardClusted; otherwise decals won't be rendered.
-        @param tex
-            Null pointer to disable diffuse texture for all decals, globablly.
-        */
-        void setDecalsDiffuse( TextureGpu *tex );
-        /** Sets the decal texture normal maps. Should be RG8_SNORM or BC5_SNORM.
-
-            @see    SceneManager::setDecalsDiffuse
-        @param tex
-            Null pointer to disable normal map textures for all decals, globally.
-        */
-        void setDecalsNormals( TextureGpu *tex );
-        /// See SceneManager::setDecalsDiffuse. Setting this texture to the same as diffuse
-        /// incurs in a performance optimization.
-        void setDecalsEmissive( TextureGpu *tex );
-
-        TextureGpu* getDecalsDiffuse(void) const                    { return mDecalsDiffuseTex; }
-        TextureGpu* getDecalsNormals(void) const                    { return mDecalsNormalsTex; }
-        TextureGpu* getDecalsEmissive(void) const                   { return mDecalsEmissiveTex; }
-        bool isDecalsDiffuseEmissiveMerged(void) const;
-
-        /// For internal use.
-        /// @see CompositorPassSceneDef::mEnableForwardPlus
-        void _setForwardPlusEnabledInPass( bool bEnable );
-
-        /// For internal use.
-        /// @see CompositorPassSceneDef::mPrePassMode
-        void _setPrePassMode( PrePassMode mode, const TextureGpuVec &prepassTextures,
-                              TextureGpu *prepassDepthTexture, TextureGpu *ssrTexture );
-        void _setRefractions( TextureGpu *depthTextureNoMsaa, TextureGpu *refractionsTexture );
-        PrePassMode getCurrentPrePassMode(void) const               { return mPrePassMode; }
-        const TextureGpuVec& getCurrentPrePassTextures(void) const  { return mPrePassTextures; }
-        TextureGpu* getCurrentPrePassDepthTexture(void) const       { return mPrePassDepthTexture; }
-        TextureGpu* getCurrentSsrTexture(void) const                { return mSsrTexture; }
-        TextureGpu* getCurrentPassDepthTextureNoMsaa(void) const	{ return mPassDepthTextureNoMsaa; }
-        TextureGpu* getCurrentRefractionsTexture(void) const        { return mRefractionsTexture; }
-
-
-
-        NodeMemoryManager& _getNodeMemoryManager(SceneMemoryMgrTypes sceneType)
-                                                                { return mNodeMemoryManager[sceneType]; }
-        NodeMemoryManager& _getTagPointNodeMemoryManager(void)  { return mTagPointNodeMemoryManager; }
-
         /** Retrieves the main entity memory manager.
         @remarks
             Some Scene Managers may have more than one memory manager (e.g. one per octant in an
@@ -1331,64 +1343,20 @@ namespace Ogre {
         */
         ObjectMemoryManager& _getEntityMemoryManager(SceneMemoryMgrTypes sceneType)
                                                             { return mEntityMemoryManager[sceneType]; }
-        ObjectMemoryManager& _getLightMemoryManager(void)
-                                                            { return mLightMemoryManager; }
-
-        /// @copydoc ArrayMemoryManager::defragment
-        void defragmentMemoryPools(void);
-
-        /// @copydoc ArrayMemoryManager::shrinkToFit
-        void shrinkToFitMemoryPools(void);
-
-        /** Create an Item (instance of a discrete mesh).
-            @param
-                meshName The name of the Mesh it is to be based on (e.g. 'knot.oof'). The
-                mesh will be loaded if it is not already.
-        */
-        virtual Item* createItem( const String& meshName,
-                                  const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
-                                  SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
-
-        /** Create an Item (instance of a discrete mesh).
-            @param
-                pMesh The pointer to the Mesh it is to be based on.
-        */
-        virtual Item* createItem( const MeshPtr& pMesh,
-                                  SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
-
-        /// Removes & destroys an Item from the SceneManager.
-        virtual void destroyItem( Item *item );
-
-        /// Removes & destroys all Items.
-        virtual void destroyAllItems(void);
-
-        /// Create an WireAabb
-        virtual WireAabb* createWireAabb(void);
-
-        /// Removes & destroys an WireAabb from the SceneManager.
-        virtual void destroyWireAabb( WireAabb *wireAabb );
-
-        /// Removes & destroys all WireAabbs.
-        virtual void destroyAllWireAabbs(void);
-
-        void _addWireAabb( WireAabb *wireAabb );
-        void _removeWireAabb( WireAabb *wireAabb );
 
         /** Create an Entity (instance of a discrete mesh).
             @param
                 meshName The name of the Mesh it is to be based on (e.g. 'knot.oof'). The
                 mesh will be loaded if it is not already.
         */
-        virtual v1::Entity* createEntity( const String& meshName,
-                                          const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
-                                          SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
+        virtual Entity* createEntity( const String& meshName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+                                        SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
 
         /** Create an Entity (instance of a discrete mesh).
             @param
                 pMesh The pointer to the Mesh it is to be based on.
         */
-        virtual v1::Entity* createEntity( const v1::MeshPtr& pMesh,
-                                          SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
+        virtual Entity* createEntity( const MeshPtr& pMesh, SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
 
         /** Prefab shapes available without loading a model.
             @note
@@ -1405,8 +1373,7 @@ namespace Ogre {
         /** Create an Entity (instance of a discrete mesh) from a range of prefab shapes
             @param ptype The prefab type.
         */
-        virtual v1::Entity* createEntity( PrefabType ptype,
-                                          SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
+        virtual Entity* createEntity( PrefabType ptype, SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
 
         /** Removes & destroys an Entity from the SceneManager.
             @warning
@@ -1416,7 +1383,7 @@ namespace Ogre {
             @see
                 SceneManager::clearScene
         */
-        virtual void destroyEntity(v1::Entity* ent);
+        virtual void destroyEntity(Entity* ent);
 
         /** Removes & destroys all Entities.
             @warning
@@ -1429,54 +1396,6 @@ namespace Ogre {
         */
         virtual void destroyAllEntities(void);
 
-        virtual Decal* createDecal( SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
-        virtual void destroyDecal( Decal *decal );
-        virtual void destroyAllDecals(void);
-
-        virtual InternalCubemapProbe* _createCubemapProbe( SceneMemoryMgrTypes sceneType );
-        virtual void _destroyCubemapProbe( InternalCubemapProbe *probe );
-        virtual void _destroyAllCubemapProbes(void);
-
-        /** Creates a 2D rectangle that can be displayed for screen space effects or
-            showing a basic GUI.
-            Notice that due to engine's requirements, you need to attach this object
-            to a scene node in order to be rendered correctly.
-        @par
-            You can use the Root scene node. However if you're planning on also using
-            setRelativeOrigin, beware that this would break the permanent setting and
-            you should then use a dummy scene node for your rectangles.
-        @remarks
-            The Rectangle2D will request to use identity view and projection matrices,
-            but only low level materials will honour that request. PBS shaders will
-            ignore it (thus the rectangle will be drawn in 3D space) and other Hlms
-            types may work differently and you'll have to check its documentation.
-        @param sceneType
-            Whether you will be moving the Rectangle2D's scene node around. Unless you're
-            planning to use this Rectangle2D for 3D purposes, it is highly recomended that
-            you use SCENE_STATIC (you can safely use SCENE_STATIC and change
-            Rectangle2D::setCorners and Rectangle2D::setNormal every frame).
-        @return
-            The Rectangle2D.
-        */
-        virtual Rectangle2D* createRectangle2D( SceneMemoryMgrTypes sceneType = SCENE_STATIC );
-
-        /** Removes & destroys an Entity from the SceneManager.
-        @warning
-            It may be safer to wait to clear the whole scene if you are unsure use clearScene.
-            @see SceneManager::clearScene
-        */
-        virtual void destroyRectangle2D( Rectangle2D *rect );
-
-        /** Removes & destroys all Rectangle2D.
-            @warning
-                Again, use caution since no Rectangle2D must be referred to
-                elsewhere otherwise a crash is likely. Use clearScene if you
-                are unsure (it clears SceneNode entries too.)
-            @see
-                SceneManager::clearScene
-        */
-        virtual void destroyAllRectangle2D(void);
-
         /** Used by Compositor, tells of which compositor textures active,
             so Materials can access them. If MRT, there could be more than one
         @param name
@@ -1485,11 +1404,7 @@ namespace Ogre {
         @param tex
             The actual texture(s) associated with that name
         */
-        void _addCompositorTexture( IdString name, TextureGpu *tex );
-
-        /// @see CompositorPassDef::mExposedTextures for the textures that are available
-        /// in the current compositor pass. The compositor script keyword is "expose".
-        const CompositorTextureVec& getCompositorTextures(void) const   { return mCompositorTextures; }
+        void _addCompositorTexture( IdString name, const TextureVec *texs );
 
         /// Gets the number of currently active compositor textures
         size_t getNumCompositorTextures(void) const         { return mCompositorTextures.size(); }
@@ -1501,8 +1416,6 @@ namespace Ogre {
         SkeletonInstance* createSkeletonInstance( const SkeletonDef *skeletonDef );
         /// Destroys an instance of a skeleton created with @createSkeletonInstance.
         void destroySkeletonInstance( SkeletonInstance *skeletonInstance );
-        /// Removes a skeleton definition from its memory manager.
-        void _removeSkeletonDef( const SkeletonDef *skeletonDef );
 
         /** Create a ManualObject, an object which you populate with geometry
             manually through a GL immediate-mode style interface.
@@ -1517,20 +1430,20 @@ namespace Ogre {
         /** Create a BillboardChain, an object which you can use to render
             a linked chain of billboards.
         */
-        virtual v1::BillboardChain* createBillboardChain();
+        virtual BillboardChain* createBillboardChain();
         /** Removes & destroys a BillboardChain from the SceneManager.
         */
-        virtual void destroyBillboardChain(v1::BillboardChain* obj);
+        virtual void destroyBillboardChain(BillboardChain* obj);
         /** Removes & destroys all BillboardChains from the SceneManager.
         */
         virtual void destroyAllBillboardChains(void);       
         /** Create a RibbonTrail, an object which you can use to render
             a linked chain of billboards which follows one or more nodes.
         */
-        virtual v1::RibbonTrail* createRibbonTrail();
+        virtual RibbonTrail* createRibbonTrail();
         /** Removes & destroys a RibbonTrail from the SceneManager.
         */
-        virtual void destroyRibbonTrail(v1::RibbonTrail* obj);
+        virtual void destroyRibbonTrail(RibbonTrail* obj);
         /** Removes & destroys all RibbonTrails from the SceneManager.
         */
         virtual void destroyAllRibbonTrails(void);      
@@ -1585,74 +1498,26 @@ namespace Ogre {
             BillboardSets etc. Cameras are not deleted at this stage since
             they are still referenced by viewports, which are not destroyed during
             this process.
-        @remarks
-            When an indestructible SceneNode has a destructible parent, the parent
-            will be destroyed and thus the former SceneNode will be parent-less,
-            i.e. be at the same level as root. Note that parent-less SceneNodes can
-            still render to the scene (this behavior is different from Ogre 1.x)
-        @param deleteIndestructibleToo
-            If a node is marked as indestructible, it won't be deleted unless
-            deleteIndestructibleToo is marked as true.
-            Note that some Ogre compoenents mark some of their objects as internal to
-            prevent them from becoming dangling pointers.
-
-            If you don't know what to put here, set it to false.
-        @param reattachCameras
-            When true, all Cameras that have no parent node after clearing
-            will be reattached to the root node.
         */
-        virtual void clearScene( bool deleteIndestructibleToo, bool reattachCameras=true );
+        virtual void clearScene(void);
 
         /** Sets the ambient light level to be used for the scene.
-        @remarks
-            Ambient lighting is a cheap fake to compensate the lack of global illumination.
-            Hemisphere ambient lighting will set the final ambient light to the following
-            formula:
-                float w = dot( objNormal, hemisphereDir ) * 0.5 + 0.5;
-                finalAmbient = lerp( lowerHemisphere, upperHemisphere, w );
-
-            Setting upperHemisphere = lowerHemisphere is effectively a traditional
-            fixed-colour ambient light.
-        @par
-            Tip: Set the upperHemisphere to a cold colour (e.g. blueish sky) and lowerHemisphere
-            to a warm colour (e.g. sun-yellowish, orange) and the hemisphereDir in the opposite
-            direction of your main directional light for a convincing look.
-        @par
-            By default the ambient light in the scene is ColourValue::Black, i.e. no ambient light.
-            This means that any objects rendered with a Material which has lighting enabled
-            (see Material::setLightingEnabled) will not be visible unless you have some dynamic
-            lights in your scene.
-        @par
-            For compatibility reasons with legacy (e.g. low level materials) upperHemisphere's
-            colour is the old ambient colour from 1.x
-
-        @param upperHemisphere
-            Ambient colour when the surface normal is close to hemisphereDir
-        @param lowerHemisphere
-            Ambient colour when the surface normal is pointing away from hemisphereDir
-        @param hemisphereDir
-            Hemisphere's direction reference to compare the surface normal to.
-            The internal vector will be normalized.
-        @param envmapScale
-            Global scale to apply to all environment maps (for relevant Hlms implementations,
-            like PBS). The value will be stored in upperHemisphere.a
-            Use 1.0 to disable.
-        @param envFeatures
-            Bitmask. See SceneManager::EnvFeatures
+            @remarks
+                This sets the colour and intensity of the ambient light in the scene, i.e. the
+                light which is 'sourceless' and illuminates all objects equally.
+                The colour of an object is affected by a combination of the light in the scene,
+                and the amount of light that object reflects (in this case based on the Material::ambient
+                property).
+            @remarks
+                By default the ambient light in the scene is ColourValue::Black, i.e. no ambient light. This
+                means that any objects rendered with a Material which has lighting enabled (see Material::setLightingEnabled)
+                will not be visible unless you have some dynamic lights in your scene.
         */
-        void setAmbientLight( const ColourValue& upperHemisphere, const ColourValue& lowerHemisphere,
-                              const Vector3 &hemisphereDir, Real envmapScale = 1.0f,
-                              uint32 envFeatures=0xffffffff );
-
-        void setSphericalHarmonics( Vector3 ambientSphericalHarmonics[9] );
+        void setAmbientLight(const ColourValue& colour);
 
         /** Returns the ambient light level to be used for the scene.
         */
-        const ColourValue& getAmbientLightUpperHemisphere(void) const   { return mAmbientLight[0]; }
-        const ColourValue& getAmbientLightLowerHemisphere(void) const   { return mAmbientLight[1]; }
-        const Vector3& getAmbientLightHemisphereDir(void) const { return mAmbientLightHemisphereDir; }
-        uint32 getEnvFeatures(void) const                       { return mEnvFeatures; }
-        const float* getSphericalHarmonics(void) const          { return mAmbientSphericalHarmonics; }
+        const ColourValue& getAmbientLight(void) const;
 
         /** Sets the source of the 'world' geometry, i.e. the large, mainly static geometry
             making up the world e.g. rooms, landscape etc.
@@ -1843,6 +1708,9 @@ namespace Ogre {
         /// @See mTmpVisibleObjects
         VisibleObjectsPerThreadArray& _getTmpVisibleObjectsList()           { return mTmpVisibleObjects; }
 
+        InstancingThreadedCullingMethod getInstancingThreadedCullingMethod() const
+                                                            { return mInstancingThreadedCullingMethod; }
+
         /** Notifies that the given MovableObject is dirty (i.e. the AABBs have changed).
             Note that the parent SceneNodes of this/these objects are not updated and you will
             have to call @see notifyStaticDirty on the SceneNode if the position/rotation/scale
@@ -1882,13 +1750,6 @@ namespace Ogre {
         */
         void updateAllTransforms();
 
-        /** Updates all TagPoints, both TagPoints that are children of bones, and TagPoints that
-            are children of other TagPoints.
-        @remarks
-            mTagPointNodeMemoryManagerUpdateList must be set. @see updateAllTransforms remarks
-        */
-        void updateAllTagPoints(void);
-
         /** Updates the world aabbs from all entities in the scene. Ought to be called right after
             updateAllTransforms. @See updateAllTransforms
         @remarks
@@ -1913,9 +1774,9 @@ namespace Ogre {
         */
         virtual void _applySceneAnimations(void);
 
-        /// Returns true if collection code was run. When false, you cannot
-        /// trust the contents of _getTmpVisibleObjectsList to be empty
-        bool _collectForwardPlusObjects( const Camera *camera );
+        /** Sends visible objects found during _cullPhase01 to the rendering engine.
+        */
+        virtual void _renderVisibleObjects(void);
 
         /** Performs the frustum culling that will later be needed by _renderPhase02
             @remarks
@@ -1926,8 +1787,8 @@ namespace Ogre {
             @param firstRq first render queue ID to render (gets clamped if too big)
             @param lastRq last render queue ID to render (gets clamped if too big)
         */
-        virtual void _cullPhase01( Camera *cullCamera, Camera *renderCamera, const Camera *lodCamera,
-                                   uint8 firstRq, uint8 lastRq, bool reuseCullData );
+        virtual void _cullPhase01(Camera* camera, const Camera *lodCamera,
+                                  Viewport* vp, uint8 firstRq, uint8 lastRq );
 
         /** Prompts the class to send its contents to the renderer.
             @remarks
@@ -1947,14 +1808,15 @@ namespace Ogre {
             @param lastRq last render queue ID to render (gets clamped if too big)
             @param includeOverlays Whether or not overlay objects should be rendered
         */
-        virtual void _renderPhase02( Camera* camera, const Camera* lodCamera,
+        virtual void _renderPhase02( Camera* camera, const Camera* lodCamera, Viewport* vp,
                                      uint8 firstRq, uint8 lastRq, bool includeOverlays );
 
-        void cullLights( Camera *camera, Light::LightTypes startType,
-                         Light::LightTypes endType, LightArray &outLights );
+        /** Internal method for queueing the sky objects with the params as 
+            previously set through setSkyBox, setSkyPlane and setSkyDome.
+        */
+        virtual void _queueSkiesForRendering(Camera* cam);
 
-        /// Called when the frame has fully ended (ALL passes have been executed to all RTTs)
-        void _frameEnded(void);
+
 
         /** Notifies the scene manager of its destination render system
             @remarks
@@ -1966,25 +1828,350 @@ namespace Ogre {
         */
         virtual void _setDestinationRenderSystem(RenderSystem* sys);
 
-        void _setCamerasInProgress(const CamerasInProgress& cameras)    { mCamerasInProgress = cameras; }
+        void _setViewport( Viewport *vp )                                   { setViewport( vp ); }
 
-        /** Notifies the scene manager that hardware resources were lost
+        /** Enables / disables a 'sky plane' i.e. a plane at constant
+            distance from the camera representing the sky.
             @remarks
-                Called automatically by RenderSystem if hardware resources
-                were lost and can not be restored using some internal mechanism.
-                Among affected resources are manual meshes without loaders, 
-                manual textures without loaders, ManualObjects, etc.
+                You can create sky planes yourself using the standard mesh and
+                entity methods, but this creates a plane which the camera can
+                never get closer or further away from - it moves with the camera.
+                (NB you could create this effect by creating a world plane which
+                was attached to the same SceneNode as the Camera too, but this
+                would only apply to a single camera whereas this plane applies to
+                any camera using this scene manager).
+            @note
+                To apply scaling, scrolls etc to the sky texture(s) you
+                should use the TextureUnitState class methods.
+            @param
+                enable True to enable the plane, false to disable it
+            @param
+                plane Details of the plane, i.e. it's normal and it's
+                distance from the camera.
+            @param
+                materialName The name of the material the plane will use
+            @param
+                scale The scaling applied to the sky plane - higher values
+                mean a bigger sky plane - you may want to tweak this
+                depending on the size of plane.d and the other
+                characteristics of your scene
+            @param
+                tiling How many times to tile the texture across the sky.
+                Applies to all texture layers. If you need finer control use
+                the TextureUnitState texture coordinate transformation methods.
+            @param
+                drawFirst If true, the plane is drawn before all other
+                geometry in the scene, without updating the depth buffer.
+                This is the safest rendering method since all other objects
+                will always appear in front of the sky. However this is not
+                the most efficient way if most of the sky is often occluded
+                by other objects. If this is the case, you can set this
+                parameter to false meaning it draws <em>after</em> all other
+                geometry which can be an optimisation - however you must
+                ensure that the plane.d value is large enough that no objects
+                will 'poke through' the sky plane when it is rendered.
+            @param
+                bow If zero, the plane will be completely flat (like previous
+                versions.  If above zero, the plane will be curved, allowing
+                the sky to appear below camera level.  Curved sky planes are 
+                simular to skydomes, but are more compatible with fog.
+            @param xsegments, ysegments
+                Determines the number of segments the plane will have to it. This
+                is most important when you are bowing the plane, but may also be useful
+                if you need tessellation on the plane to perform per-vertex effects.
+            @param groupName
+                The name of the resource group to which to assign the plane mesh.
         */
-        virtual void _releaseManualHardwareResources();
 
-        /** Notifies the scene manager that hardware resources should be restored
+        virtual void setSkyPlane(
+            bool enable,
+            const Plane& plane, const String& materialName, Real scale = 1000,
+            Real tiling = 10, bool drawFirst = true, Real bow = 0, 
+            int xsegments = 1, int ysegments = 1, 
+            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        /** Enables / disables a 'sky plane' i.e. a plane at constant
+            distance from the camera representing the sky.
             @remarks
-                Called automatically by RenderSystem if hardware resources
-                were lost and can not be restored using some internal mechanism.
-                Among affected resources are manual meshes without loaders, 
-                manual textures without loaders, ManualObjects, etc.
+                You can create sky planes yourself using the standard mesh and
+                entity methods, but this creates a plane which the camera can
+                never get closer or further away from - it moves with the camera.
+                (NB you could create this effect by creating a world plane which
+                was attached to the same SceneNode as the Camera too, but this
+                would only apply to a single camera whereas this plane applies to
+                any camera using this scene manager).
+            @note
+                To apply scaling, scrolls etc to the sky texture(s) you
+                should use the TextureUnitState class methods.
+            @param
+                enable True to enable the plane, false to disable it
+            @param
+                plane Details of the plane, i.e. it's normal and it's
+                distance from the camera.
+            @param
+                materialName The name of the material the plane will use
+            @param
+                scale The scaling applied to the sky plane - higher values
+                mean a bigger sky plane - you may want to tweak this
+                depending on the size of plane.d and the other
+                characteristics of your scene
+            @param
+                tiling How many times to tile the texture across the sky.
+                Applies to all texture layers. If you need finer control use
+                the TextureUnitState texture coordinate transformation methods.
+            @param
+                renderQueue The render queue to use when rendering this object
+            @param
+                bow If zero, the plane will be completely flat (like previous
+                versions.  If above zero, the plane will be curved, allowing
+                the sky to appear below camera level.  Curved sky planes are 
+                simular to skydomes, but are more compatible with fog.
+            @param xsegments, ysegments
+                Determines the number of segments the plane will have to it. This
+                is most important when you are bowing the plane, but may also be useful
+                if you need tessellation on the plane to perform per-vertex effects.
+            @param groupName
+                The name of the resource group to which to assign the plane mesh.
+        */        
+        virtual void _setSkyPlane(
+            bool enable,
+            const Plane& plane, const String& materialName, Real scale = 1000,
+            Real tiling = 10, uint8 renderQueue = RENDER_QUEUE_SKIES_EARLY, Real bow = 0, 
+            int xsegments = 1, int ysegments = 1, 
+            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+        /** Enables / disables a 'sky plane' */
+        virtual void setSkyPlaneEnabled(bool enable) { mSkyPlaneEnabled = enable; }
+
+        /** Return whether a key plane is enabled */
+        virtual bool isSkyPlaneEnabled(void) const { return mSkyPlaneEnabled; }
+
+        /** Get the sky plane node, if enabled. */
+        virtual SceneNode* getSkyPlaneNode(void) const { return mSkyPlaneNode; }
+
+        /** Get the parameters used to construct the SkyPlane, if any **/
+        virtual const SkyPlaneGenParameters& getSkyPlaneGenParameters(void) const { return mSkyPlaneGenParameters; }
+
+        /** Enables / disables a 'sky box' i.e. a 6-sided box at constant
+            distance from the camera representing the sky.
+            @remarks
+                You could create a sky box yourself using the standard mesh and
+                entity methods, but this creates a plane which the camera can
+                never get closer or further away from - it moves with the camera.
+                (NB you could create this effect by creating a world box which
+                was attached to the same SceneNode as the Camera too, but this
+                would only apply to a single camera whereas this skybox applies
+                to any camera using this scene manager).
+            @par
+                The material you use for the skybox can either contain layers
+                which are single textures, or they can be cubic textures, i.e.
+                made up of 6 images, one for each plane of the cube. See the
+                TextureUnitState class for more information.
+            @param
+                enable True to enable the skybox, false to disable it
+            @param
+                materialName The name of the material the box will use
+            @param
+                distance Distance in world coorinates from the camera to
+                each plane of the box. The default is normally OK.
+            @param
+                drawFirst If true, the box is drawn before all other
+                geometry in the scene, without updating the depth buffer.
+                This is the safest rendering method since all other objects
+                will always appear in front of the sky. However this is not
+                the most efficient way if most of the sky is often occluded
+                by other objects. If this is the case, you can set this
+                parameter to false meaning it draws <em>after</em> all other
+                geometry which can be an optimisation - however you must
+                ensure that the distance value is large enough that no
+                objects will 'poke through' the sky box when it is rendered.
+            @param
+                orientation Optional parameter to specify the orientation
+                of the box. By default the 'top' of the box is deemed to be
+                in the +y direction, and the 'front' at the -z direction.
+                You can use this parameter to rotate the sky if you want.
+            @param groupName
+                The name of the resource group to which to assign the plane mesh.
         */
-        virtual void _restoreManualHardwareResources();
+        virtual void setSkyBox(
+            bool enable, const String& materialName, Real distance = 5000,
+            bool drawFirst = true, const Quaternion& orientation = Quaternion::IDENTITY,
+            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+        /** Enables / disables a 'sky box' i.e. a 6-sided box at constant
+            distance from the camera representing the sky.
+            @remarks
+                You could create a sky box yourself using the standard mesh and
+                entity methods, but this creates a plane which the camera can
+                never get closer or further away from - it moves with the camera.
+                (NB you could create this effect by creating a world box which
+                was attached to the same SceneNode as the Camera too, but this
+                would only apply to a single camera whereas this skybox applies
+                to any camera using this scene manager).
+            @par
+                The material you use for the skybox can either contain layers
+                which are single textures, or they can be cubic textures, i.e.
+                made up of 6 images, one for each plane of the cube. See the
+                TextureUnitState class for more information.
+            @param
+                enable True to enable the skybox, false to disable it
+            @param
+                materialName The name of the material the box will use
+            @param
+                distance Distance in world coorinates from the camera to
+                each plane of the box. The default is normally OK.
+            @param
+                renderQueue The render queue to use when rendering this object
+            @param
+                orientation Optional parameter to specify the orientation
+                of the box. By default the 'top' of the box is deemed to be
+                in the +y direction, and the 'front' at the -z direction.
+                You can use this parameter to rotate the sky if you want.
+            @param groupName
+                The name of the resource group to which to assign the plane mesh.
+        */
+        virtual void _setSkyBox(
+            bool enable, const String& materialName, Real distance = 5000,
+            uint8 renderQueue = RENDER_QUEUE_SKIES_EARLY, const Quaternion& orientation = Quaternion::IDENTITY,
+            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+        /** Enables / disables a 'sky box' */
+        virtual void setSkyBoxEnabled(bool enable) { mSkyBoxEnabled = enable; }
+
+        /** Return whether a skybox is enabled */
+        virtual bool isSkyBoxEnabled(void) const { return mSkyBoxEnabled; }
+
+        /** Get the skybox node, if enabled. */
+        virtual SceneNode* getSkyBoxNode(void) const { return mSkyBoxNode; }
+
+        /** Get the parameters used to generate the current SkyBox, if any */
+        virtual const SkyBoxGenParameters& getSkyBoxGenParameters(void) const { return mSkyBoxGenParameters; }
+
+        /** Enables / disables a 'sky dome' i.e. an illusion of a curved sky.
+            @remarks
+                A sky dome is actually formed by 5 sides of a cube, but with
+                texture coordinates generated such that the surface appears
+                curved like a dome. Sky domes are appropriate where you need a
+                realistic looking sky where the scene is not going to be
+                'fogged', and there is always a 'floor' of some sort to prevent
+                the viewer looking below the horizon (the distortion effect below
+                the horizon can be pretty horrible, and there is never anyhting
+                directly below the viewer). If you need a complete wrap-around
+                background, use the setSkyBox method instead. You can actually
+                combine a sky box and a sky dome if you want, to give a positional
+                backdrop with an overlayed curved cloud layer.
+            @par
+                Sky domes work well with 2D repeating textures like clouds. You
+                can change the apparent 'curvature' of the sky depending on how
+                your scene is viewed - lower curvatures are better for 'open'
+                scenes like landscapes, whilst higher curvatures are better for
+                say FPS levels where you don't see a lot of the sky at once and
+                the exaggerated curve looks good.
+            @param
+                enable True to enable the skydome, false to disable it
+            @param
+                materialName The name of the material the dome will use
+            @param
+                curvature The curvature of the dome. Good values are
+                between 2 and 65. Higher values are more curved leading to
+                a smoother effect, lower values are less curved meaning
+                more distortion at the horizons but a better distance effect.
+            @param
+                tiling How many times to tile the texture(s) across the
+                dome.
+            @param
+                distance Distance in world coorinates from the camera to
+                each plane of the box the dome is rendered on. The default
+                is normally OK.
+            @param
+                drawFirst If true, the dome is drawn before all other
+                geometry in the scene, without updating the depth buffer.
+                This is the safest rendering method since all other objects
+                will always appear in front of the sky. However this is not
+                the most efficient way if most of the sky is often occluded
+                by other objects. If this is the case, you can set this
+                parameter to false meaning it draws <em>after</em> all other
+                geometry which can be an optimisation - however you must
+                ensure that the distance value is large enough that no
+                objects will 'poke through' the sky when it is rendered.
+            @param
+                orientation Optional parameter to specify the orientation
+                of the dome. By default the 'top' of the dome is deemed to
+                be in the +y direction, and the 'front' at the -z direction.
+                You can use this parameter to rotate the sky if you want.
+            @param groupName
+                The name of the resource group to which to assign the plane mesh.
+                */
+        virtual void setSkyDome(
+            bool enable, const String& materialName, Real curvature = 10,
+            Real tiling = 8, Real distance = 4000, bool drawFirst = true,
+            const Quaternion& orientation = Quaternion::IDENTITY,
+            int xsegments = 16, int ysegments = 16, int ysegments_keep = -1,
+            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+        /** Enables / disables a 'sky dome' i.e. an illusion of a curved sky.
+            @remarks
+                A sky dome is actually formed by 5 sides of a cube, but with
+                texture coordinates generated such that the surface appears
+                curved like a dome. Sky domes are appropriate where you need a
+                realistic looking sky where the scene is not going to be
+                'fogged', and there is always a 'floor' of some sort to prevent
+                the viewer looking below the horizon (the distortion effect below
+                the horizon can be pretty horrible, and there is never anyhting
+                directly below the viewer). If you need a complete wrap-around
+                background, use the setSkyBox method instead. You can actually
+                combine a sky box and a sky dome if you want, to give a positional
+                backdrop with an overlayed curved cloud layer.
+            @par
+                Sky domes work well with 2D repeating textures like clouds. You
+                can change the apparent 'curvature' of the sky depending on how
+                your scene is viewed - lower curvatures are better for 'open'
+                scenes like landscapes, whilst higher curvatures are better for
+                say FPS levels where you don't see a lot of the sky at once and
+                the exaggerated curve looks good.
+            @param
+                enable True to enable the skydome, false to disable it
+            @param
+                materialName The name of the material the dome will use
+            @param
+                curvature The curvature of the dome. Good values are
+                between 2 and 65. Higher values are more curved leading to
+                a smoother effect, lower values are less curved meaning
+                more distortion at the horizons but a better distance effect.
+            @param
+                tiling How many times to tile the texture(s) across the
+                dome.
+            @param
+                distance Distance in world coorinates from the camera to
+                each plane of the box the dome is rendered on. The default
+                is normally OK.
+            @param
+                renderQueue The render queue to use when rendering this object
+            @param
+                orientation Optional parameter to specify the orientation
+                of the dome. By default the 'top' of the dome is deemed to
+                be in the +y direction, and the 'front' at the -z direction.
+                You can use this parameter to rotate the sky if you want.
+            @param groupName
+                The name of the resource group to which to assign the plane mesh.
+                */        
+        virtual void _setSkyDome(
+            bool enable, const String& materialName, Real curvature = 10,
+            Real tiling = 8, Real distance = 4000, uint8 renderQueue = RENDER_QUEUE_SKIES_EARLY,
+            const Quaternion& orientation = Quaternion::IDENTITY,
+            int xsegments = 16, int ysegments = 16, int ysegments_keep = -1,
+            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+        /** Enables / disables a 'sky dome' */
+        virtual void setSkyDomeEnabled(bool enable) { mSkyDomeEnabled = enable; }
+
+        /** Return whether a skydome is enabled */
+        virtual bool isSkyDomeEnabled(void) const { return mSkyDomeEnabled; }
+
+        /** Get the sky dome node, if enabled. */
+        virtual SceneNode* getSkyDomeNode(void) const { return mSkyDomeNode; }
+
+        /** Get the parameters used to generate the current SkyDome, if any */
+        virtual const SkyDomeGenParameters& getSkyDomeGenParameters(void) const { return mSkyDomeGenParameters; }
 
         /** Sets the fogging mode applied to the scene.
             @remarks
@@ -2050,7 +2237,7 @@ namespace Ogre {
             @see
                 BillboardSet
         */
-        virtual v1::BillboardSet* createBillboardSet(unsigned int poolSize = 20);
+        virtual BillboardSet* createBillboardSet(unsigned int poolSize = 20);
 
         /** Removes & destroys an BillboardSet from the SceneManager.
             @warning
@@ -2058,7 +2245,7 @@ namespace Ogre {
                 to a SceneNode. It may be safer to wait to clear the whole
                 scene. If you are unsure, use clearScene.
         */
-        virtual void destroyBillboardSet(v1::BillboardSet* set);
+        virtual void destroyBillboardSet(BillboardSet* set);
 
         /** Removes & destroys all BillboardSets.
         @warning
@@ -2102,12 +2289,12 @@ namespace Ogre {
         @param name The name of the animation, must be unique within this SceneManager.
         @param length The total length of the animation.
         */
-        virtual v1::Animation* createAnimation(const String& name, Real length);
+        virtual Animation* createAnimation(const String& name, Real length);
 
         /** Looks up an Animation object previously created with createAnimation. 
         @note Throws an exception if the named instance does not exist
         */
-        virtual v1::Animation* getAnimation(const String& name) const;
+        virtual Animation* getAnimation(const String& name) const;
         /** Returns whether an animation with the given name exists.
         */
         virtual bool hasAnimation(const String& name) const;
@@ -2149,12 +2336,12 @@ namespace Ogre {
             default). @see AnimableValue::setAsBaseValue.
         @param animName The name of an animation created already with createAnimation.
         */
-        virtual v1::AnimationState* createAnimationState(const String& animName);
+        virtual AnimationState* createAnimationState(const String& animName);
 
         /** Retrieves animation state as previously created using createAnimationState. 
         @note Throws an exception if the named instance does not exist
         */
-        virtual v1::AnimationState* getAnimationState(const String& animName) const;
+        virtual AnimationState* getAnimationState(const String& animName) const;
         /** Returns whether an animation state with the given name exists.
         */
         virtual bool hasAnimationState(const String& name) const;
@@ -2169,6 +2356,68 @@ namespace Ogre {
         /** Removes all animation states created using this SceneManager. */
         virtual void destroyAllAnimationStates(void);
 
+        /** Manual rendering method, for advanced users only.
+        @remarks
+            This method allows you to send rendering commands through the pipeline on
+            demand, bypassing OGRE's normal world processing. You should only use this if you
+            really know what you're doing; OGRE does lots of things for you that you really should
+            let it do. However, there are times where it may be useful to have this manual interface,
+            for example overlaying something on top of the scene rendered by OGRE.
+        @par
+            Because this is an instant rendering method, timing is important. The best 
+            time to call it is from a RenderTargetListener event handler.
+        @par
+            Don't call this method a lot, it's designed for rare (1 or 2 times per frame) use. 
+            Calling it regularly per frame will cause frame rate drops!
+        @param rend A RenderOperation object describing the rendering op
+        @param pass The Pass to use for this render
+        @param vp Pointer to the viewport to render to, or 0 to use the current viewport
+        @param worldMatrix The transform to apply from object to world space
+        @param viewMatrix The transform to apply from world to view space
+        @param projMatrix The transform to apply from view to screen space
+        @param doBeginEndFrame If true, beginFrame() and endFrame() are called, 
+            otherwise not. You should leave this as false if you are calling
+            this within the main render loop.
+        */
+        virtual void manualRender(RenderOperation* rend, Pass* pass, Viewport* vp, 
+            const Matrix4& worldMatrix, const Matrix4& viewMatrix, const Matrix4& projMatrix, 
+            bool doBeginEndFrame = false) ;
+
+        /** Manual rendering method for rendering a single object. 
+        @param rend The renderable to issue to the pipeline
+        @param pass The pass to use
+        @param vp Pointer to the viewport to render to, or 0 to use the existing viewport
+        @param doBeginEndFrame If true, beginFrame() and endFrame() are called, 
+        otherwise not. You should leave this as false if you are calling
+        this within the main render loop.
+        @param viewMatrix The transform to apply from world to view space
+        @param projMatrix The transform to apply from view to screen space
+        @param lightScissoringClipping If true, passes that have the getLightScissorEnabled
+        and/or getLightClipPlanesEnabled flags will cause calculation and setting of 
+        scissor rectangle and user clip planes. 
+        @param doLightIteration If true, this method will issue the renderable to
+        the pipeline possibly multiple times, if the pass indicates it should be
+        done once per light
+        @param manualLightList Only applicable if doLightIteration is false, this
+        method allows you to pass in a previously determined set of lights
+        which will be used for a single render of this object.
+        */
+        virtual void manualRender(Renderable* rend, const Pass* pass, Viewport* vp, 
+            const Matrix4& viewMatrix, const Matrix4& projMatrix, bool doBeginEndFrame = false,
+            bool lightScissoringClipping = true, bool doLightIteration = true);
+
+        /** Retrieves the internal render queue, for advanced users only.
+        @remarks
+            The render queue is mainly used internally to manage the scene object 
+            rendering queue, it also exports some methods to allow advanced users 
+            to configure the behavior of rendering process.
+            Most methods provided by RenderQueue are supposed to be used 
+            internally only, you should reference to the RenderQueue API for 
+            more information. Do not access this directly unless you know what 
+            you are doing.
+        */
+        virtual RenderQueue* getRenderQueue(void);
+
         /** Registers a new RenderQueueListener which will be notified when render queues
             are processed.
         */
@@ -2182,6 +2431,73 @@ namespace Ogre {
         virtual void addRenderObjectListener(RenderObjectListener* newListener);
         /** Removes a listener previously added with addRenderObjectListener. */
         virtual void removeRenderObjectListener(RenderObjectListener* delListener);
+
+        /** Adds an item to the 'special case' render queue list.
+        @remarks
+            Normally all render queues are rendered, in their usual sequence, 
+            only varying if a RenderQueueListener nominates for the queue to be 
+            repeated or skipped. This method allows you to add a render queue to 
+            a 'special case' list, which varies the behaviour. The effect of this
+            list depends on the 'mode' in which this list is in, which might be
+            to exclude these render queues, or to include them alone (excluding
+            all other queues). This allows you to perform broad selective
+            rendering without requiring a RenderQueueListener.
+        @param qid The identifier of the queue which should be added to the
+            special case list. Nothing happens if the queue is already in the list.
+        */
+        virtual void addSpecialCaseRenderQueue(uint8 qid);
+        /** Removes an item to the 'special case' render queue list.
+        @see SceneManager::addSpecialCaseRenderQueue
+        @param qid The identifier of the queue which should be removed from the
+            special case list. Nothing happens if the queue is not in the list.
+        */
+        virtual void removeSpecialCaseRenderQueue(uint8 qid);
+        /** Clears the 'special case' render queue list.
+        @see SceneManager::addSpecialCaseRenderQueue
+        */
+        virtual void clearSpecialCaseRenderQueues(void);
+        /** Sets the way the special case render queue list is processed.
+        @see SceneManager::addSpecialCaseRenderQueue
+        @param mode The mode of processing
+        */
+        virtual void setSpecialCaseRenderQueueMode(SpecialCaseRenderQueueMode mode);
+        /** Gets the way the special case render queue list is processed. */
+        virtual SpecialCaseRenderQueueMode getSpecialCaseRenderQueueMode(void);
+        /** Returns whether or not the named queue will be rendered based on the
+            current 'special case' render queue list and mode.
+        @see SceneManager::addSpecialCaseRenderQueue
+        @param qid The identifier of the queue which should be tested
+        @return true if the queue will be rendered, false otherwise
+        */
+        virtual bool isRenderQueueToBeProcessed(uint8 qid);
+
+        /** Sets the render queue that the world geometry (if any) this SceneManager
+            renders will be associated with.
+        @remarks
+            SceneManagers which provide 'world geometry' should place it in a 
+            specialised render queue in order to make it possible to enable / 
+            disable it easily using the addSpecialCaseRenderQueue method. Even 
+            if the SceneManager does not use the render queues to render the 
+            world geometry, it should still pick a queue to represent it's manual
+            rendering, and check isRenderQueueToBeProcessed before rendering.
+        @note
+            Setting this may not affect the actual ordering of rendering the
+            world geometry, if the world geometry is being rendered manually
+            by the SceneManager. If the SceneManager feeds world geometry into
+            the queues, however, the ordering will be affected. 
+        */
+        virtual void setWorldGeometryRenderQueue(uint8 qid);
+        /** Gets the render queue that the world geometry (if any) this SceneManager
+            renders will be associated with.
+        @remarks
+            SceneManagers which provide 'world geometry' should place it in a 
+            specialised render queue in order to make it possible to enable / 
+            disable it easily using the addSpecialCaseRenderQueue method. Even 
+            if the SceneManager does not use the render queues to render the 
+            world geometry, it should still pick a queue to represent it's manual
+            rendering, and check isRenderQueueToBeProcessed before rendering.
+        */
+        virtual uint8 getWorldGeometryRenderQueue(void);
 
         /** Allows all bounding boxes of scene nodes to be displayed. */
         virtual void showBoundingBoxes(bool bShow);
@@ -2288,7 +2604,7 @@ namespace Ogre {
         */
         const AnimationList& getAnimations() const { return mAnimationsList; }
         /** Returns a specialised MapIterator over all animation states in the scene. */
-        v1::AnimationStateIterator getAnimationStateIterator(void) {
+        AnimationStateIterator getAnimationStateIterator(void) {
             return mAnimationStates.getAnimationStateIterator();
         }
 
@@ -2406,15 +2722,29 @@ namespace Ogre {
         */
         virtual void setShadowTextureCasterMaterial(const String& name);
 
-        void _setCurrentCompositorPass( CompositorPass *pass );
-        /// Note: May be null.
-        const CompositorPass* getCurrentCompositorPass(void) const      { return mCurrentPass; }
+        /** Sets whether or not shadow casters should be rendered into shadow
+            textures using their back faces rather than their front faces. 
+        @remarks
+            Rendering back faces rather than front faces into a shadow texture
+            can help minimise depth comparison issues, if you're using depth
+            shadowmapping. You will probably still need some biasing but you
+            won't need as much. For solid objects the result is the same anyway,
+            if you have objects with holes you may want to turn this option off.
+            The default is to enable this option.
+        */
+        virtual void setShadowCasterRenderBackFaces(bool bf) { mShadowCasterRenderBackFaces = bf; }
 
-        void _setCurrentShadowNode( CompositorShadowNode *shadowNode, bool isReused );
-        const CompositorShadowNode* getCurrentShadowNode(void) const    { return mCurrentShadowNode; }
-        bool isCurrentShadowNodeReused(void) const                      { return mShadowNodeIsReused; }
+        /** Gets whether or not shadow casters should be rendered into shadow
+            textures using their back faces rather than their front faces. 
+        */
+        virtual bool getShadowCasterRenderBackFaces() const { return mShadowCasterRenderBackFaces; }
 
-        bool isUsingInstancedStereo(void) const;
+        void _setCurrentShadowNode( CompositorShadowNode *shadowNode );
+
+        /** Sets the active compositor chain of the current scene being rendered.
+            @note CompositorChain does this automatically, no need to call manually.
+        */
+        virtual void _setActiveCompositorChain(CompositorChain* chain) { mActiveCompositorChain = chain; }
 
         /** Sets whether to use late material resolving or not. If set, materials will be resolved
             from the materials at the pass-setting stage and not at the render queue building stage.
@@ -2426,6 +2756,9 @@ namespace Ogre {
         /** Gets whether using late material resolving or not.
             @see setLateMaterialResolving */
         virtual bool isLateMaterialResolving() const { return mLateMaterialResolving; }
+
+        /** Gets the active compositor chain of the current scene being rendered */
+        virtual CompositorChain* _getActiveCompositorChain() const { return mActiveCompositorChain; }
 
         /** Add a listener which will get called back on scene manager events.
         */
@@ -2443,19 +2776,100 @@ namespace Ogre {
         @param name The name to give the new object
         @return The new StaticGeometry instance
         */
-        virtual v1::StaticGeometry* createStaticGeometry(const String& name);
+        virtual StaticGeometry* createStaticGeometry(const String& name);
         /** Retrieve a previously created StaticGeometry instance. 
         @note Throws an exception if the named instance does not exist
         */
-        virtual v1::StaticGeometry* getStaticGeometry(const String& name) const;
+        virtual StaticGeometry* getStaticGeometry(const String& name) const;
         /** Returns whether a static geometry instance with the given name exists. */
         virtual bool hasStaticGeometry(const String& name) const;
         /** Remove & destroy a StaticGeometry instance. */
-        virtual void destroyStaticGeometry(v1::StaticGeometry* geom);
+        virtual void destroyStaticGeometry(StaticGeometry* geom);
         /** Remove & destroy a StaticGeometry instance. */
         virtual void destroyStaticGeometry(const String& name);
         /** Remove & destroy all StaticGeometry instances. */
         virtual void destroyAllStaticGeometry(void);
+
+        /** Creates an InstanceManager interface to create & manipulate instanced entities
+            You need to call this function at least once before start calling createInstancedEntity
+            to build up an instance based on the given mesh.
+        @remarks
+            Instancing is a way of batching up geometry into a much more 
+            efficient form, but with some limitations, and still be able to move & animate it.
+            Please @see InstanceManager class documentation for full information.
+        @param customName Custom name for referencing. Must be unique
+        @param meshName The mesh name the instances will be based upon
+        @param groupName The resource name where the mesh lives
+        @param technique Technique to use, which may be shader based, or hardware based.
+        @param numInstancesPerBatch Suggested number of instances per batch. The actual number
+        may end up being lower if the technique doesn't support having so many. It can't be zero
+        @param flags @see InstanceManagerFlags
+        @param subMeshIdx InstanceManager only supports using one submesh from the base mesh. This parameter
+        says which submesh to pick (must be <= Mesh::getNumSubMeshes())
+        @return The new InstanceManager instance
+        */
+        virtual InstanceManager* createInstanceManager( const String &customName, const String &meshName,
+                                                        const String &groupName,
+                                                        InstanceManager::InstancingTechnique technique,
+                                                        size_t numInstancesPerBatch, uint16 flags=0,
+                                                        unsigned short subMeshIdx=0 );
+
+        /** Retrieves an existing InstanceManager by it's name.
+        @note Throws an exception if the named InstanceManager does not exist
+        */
+        virtual InstanceManager* getInstanceManager( IdString name ) const;
+
+    /** Returns whether an InstanceManager with the given name exists. */
+    virtual bool hasInstanceManager( IdString managerName ) const;
+
+        /** Destroys an InstanceManager <b>if</b> it was created with createInstanceManager()
+        @remarks
+            Be sure you don't have any InstancedEntity referenced somewhere which was created with
+            this manager, since it will become a dangling pointer.
+        @param name Name of the manager to remove
+        */
+        virtual void destroyInstanceManager( IdString name );
+        virtual void destroyInstanceManager( InstanceManager *instanceManager );
+
+        virtual void destroyAllInstanceManagers(void);
+
+        /** @see InstanceManager::getMaxOrBestNumInstancesPerBatch
+        @remarks
+            If you've already created an InstanceManager, you can call it's
+            getMaxOrBestNumInstancesPerBatch() function directly.
+            Another (not recommended) way to know if the technique is unsupported is by creating
+            an InstanceManager and use createInstancedEntity, which will return null pointer.
+            The input parameter "numInstancesPerBatch" is a suggested value when using IM_VTFBESTFIT
+            flag (in that case it should be non-zero)
+        @return
+            The ideal (or maximum, depending on flags) number of instances per batch for
+            the given technique. Zero if technique is unsupported or errors were spotted
+        */
+        virtual size_t getNumInstancesPerBatch( const String &meshName, const String &groupName,
+                                                const String &materialName,
+                                                InstanceManager::InstancingTechnique technique,
+                                                size_t numInstancesPerBatch, uint16 flags=0,
+                                                unsigned short subMeshIdx=0 );
+
+        /** Creates an InstancedEntity based on an existing InstanceManager (@see createInstanceManager)
+        @remarks
+            * Return value may be null if the InstanceManger technique isn't supported
+            * Try to keep the number of entities with different materials <b>to a minimum</b>
+            * For more information @see InstancedManager @see InstancedBatch, @see InstancedEntity
+            * Alternatively you can call InstancedManager::createInstanceEntity using the returned
+            pointer from createInstanceManager
+        @param materialName Material name 
+        @param managerName Name of the instance manager
+        @return An InstancedEntity ready to be attached to a SceneNode
+        */
+        virtual InstancedEntity* createInstancedEntity( const String &materialName,
+                                                        const String &managerName );
+
+        /** Removes an InstancedEntity, @see SceneManager::createInstancedEntity &
+            @see InstanceBatch::removeInstancedEntity
+        @param instancedEntity Instance to remove
+        */
+        virtual void destroyInstancedEntity( InstancedEntity *instancedEntity );
 
         /** Create a movable object of the type specified without a name.
         @remarks
@@ -2543,22 +2957,6 @@ namespace Ogre {
         */
         uint32 _getCombinedVisibilityMask(void) const;
 
-        /** Sets a mask which is bitwise 'and'ed with lights' own light masks
-            to determine if the light should be casting light.
-        @remarks
-            Note that this is combined with any per-pass light mask
-            through an 'and' operation.
-
-            @see    CompositorPassSceneDef::mLightVisibilityMask
-            @see    Viewport::getLightVisibilityMask
-        */
-        virtual_l2 void setLightMask(uint32 mask)   { mLightMask = mask; }
-
-        /** Gets a mask which is bitwise 'and'ed with lights' own light masks
-            to determine if the light should be casting light.
-        */
-        virtual_l2 uint32 getLightMask(void) const  { return mLightMask; }
-
         /** Sets whether the SceneManager should search for visible objects, or
             whether they are being manually handled.
         @remarks
@@ -2571,6 +2969,21 @@ namespace Ogre {
             whether they are being manually handled.
         */
         virtual bool getFindVisibleObjects(void) { return mFindVisibleObjects; }
+
+        /** Set whether to automatically normalise normals on objects whenever they
+            are scaled.
+        @remarks
+            Scaling can distort normals so the default behaviour is to compensate
+            for this, but it has a cost. If you would prefer to manually manage 
+            this, set this option to 'false' and use Pass::setNormaliseNormals
+            only when needed.
+        */
+        virtual void setNormaliseNormalsOnScale(bool n) { mNormaliseNormalsOnScale = n; }
+
+        /** Get whether to automatically normalise normals on objects whenever they
+            are scaled.
+        */
+        virtual bool getNormaliseNormalsOnScale() const { return mNormaliseNormalsOnScale; }
 
         /** Set whether to automatically flip the culling mode on objects whenever they
             are negatively scaled.
@@ -2587,8 +3000,17 @@ namespace Ogre {
         */
         virtual bool getFlipCullingOnNegativeScale() const { return mFlipCullingOnNegativeScale; }
 
-        virtual void _renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,
-                                          bool casterPass, bool dualParaboloid );
+        /** Render something as if it came from the current queue.
+            @param pass     Material pass to use for setting up this quad.
+            @param rend     Renderable to render
+            @param activeCamera When not null, it will override the current camera & viewport
+            settings. Won't restore them back after the call is finished. When null, uses
+            the old camera & viewport settings.
+            @param shadowDerivation Whether passes should be replaced with shadow caster passes
+         */
+        virtual void _injectRenderWithPass( Pass *pass, Renderable *rend, Camera *activeCamera=0,
+                                            bool shadowDerivation = true,
+                                            bool doLightIteration = false );
 
         /** Indicates to the SceneManager whether it should suppress changing
             the RenderSystem states when rendering objects.
@@ -2615,6 +3037,21 @@ namespace Ogre {
         */
         virtual bool _areRenderStateChangesSuppressed(void) const
         { return mSuppressRenderStateChanges; }
+
+        /** Internal method for setting up the renderstate for a rendering pass.
+            @param pass The Pass details to set.
+            @param evenIfSuppressed Sets the pass details even if render state
+                changes are suppressed; if you are using this to manually set state
+                when render state changes are suppressed, you should set this to 
+                true.
+            @param shadowDerivation If false, disables the derivation of shadow
+                passes from original passes
+            @return
+                A Pass object that was used instead of the one passed in, can
+                happen when rendering shadow passes
+        */
+        virtual const Pass* _setPass(const Pass* pass, 
+            bool evenIfSuppressed = false, bool shadowDerivation = true);
         
         /** Method to allow you to mark gpu parameters as dirty, causing them to 
             be updated according to the mask that you set when updateGpuProgramParameters is
@@ -2625,6 +3062,33 @@ namespace Ogre {
         */
         virtual void _markGpuParamsDirty(uint16 mask);
 
+        /** Render the objects in a given queue group 
+        @remarks You should only call this from a RenderQueueInvocation implementation
+        */
+        virtual void _renderQueueGroupObjects(RenderQueueGroup* group, 
+            QueuedRenderableCollection::OrganisationMode om);
+
+        /** Advanced method for supplying an alternative visitor, used for parsing the
+            render queues and sending the results to the renderer.
+        @remarks
+            You can use this method to insert your own implementation of the 
+            QueuedRenderableVisitor interface, which receives calls as the queued
+            renderables are parsed in a given order (determined by RenderQueueInvocationSequence)
+            and are sent to the renderer. If you provide your own implementation of
+            this visitor, you are responsible for either calling the rendersystem, 
+            or passing the calls on to the base class implementation.
+        @note
+            Ownership is not taken of this pointer, you are still required to 
+            delete it yourself once you're finished.
+        @param visitor Your implementation of SceneMgrQueuedRenderableVisitor. 
+            If you pass 0, the default implementation will be used.
+        */
+        void setQueuedRenderableVisitor(SceneMgrQueuedRenderableVisitor* visitor);
+
+        /** Gets the current visitor object which processes queued renderables. */
+        SceneMgrQueuedRenderableVisitor* getQueuedRenderableVisitor(void) const;
+
+
         /** Get the rendersystem subclass to which the output of this Scene Manager
             gets sent
         */
@@ -2632,11 +3096,11 @@ namespace Ogre {
 
         /** Gets the current viewport being rendered (advanced use only, only 
             valid during viewport update. */
-        Viewport* getCurrentViewport0(void) const { return mCurrentViewport0; }
+        Viewport* getCurrentViewport(void) const { return mCurrentViewport; }
 
         /** Gets the current camera being rendered (advanced use only, only 
             valid during viewport update. */
-        CamerasInProgress getCamerasInProgress(void) const     { return mCamerasInProgress; }
+        Camera* getCameraInProgress(void) const     { return mCameraInProgress; }
 
         AxisAlignedBox _calculateCurrentCastersBox( uint32 viewportVisibilityMask,
                                                     uint8 firstRq, uint8 lastRq ) const;
@@ -2690,6 +3154,18 @@ namespace Ogre {
         /// Returns the current relative origin. (Only when non-permanent)
         Vector3 getRelativeOrigin(void) const;
 
+        //Derived from ArrayMemoryManager::RebaseListener
+        /*virtual void buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
+                                    const MemoryPoolVec &basePtrs,
+                                    ArrayMemoryManager::PtrdiffVec &outDiffsList );
+        virtual void applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
+                                    const MemoryPoolVec &newBasePtrs,
+                                    const ArrayMemoryManager::PtrdiffVec &diffsList );
+        virtual void performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
+                                     const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
+                                     size_t startInstance, size_t diffInstances );*/
+
+
         /** Add a level of detail listener. */
         void addLodListener(LodListener *listener);
 
@@ -2716,14 +3192,12 @@ namespace Ogre {
         IlluminationRenderStage _getCurrentRenderStage() const {return mIlluminationStage;}
 
     protected:
-
-        void fireWorkerThreadsAndWait(void);
-
         /** Launches cullFrustum on all worker threads with the requested parameters
         @remarks
             Will block until all threads are done.
         */
         void fireCullFrustumThreads( const CullFrustumRequest &request );
+        void fireCullFrustumInstanceBatchThreads( const InstanceBatchCullRequest &request );
         void startWorkerThreads();
         void stopWorkerThreads();
 
@@ -2754,8 +3228,6 @@ namespace Ogre {
             requests when a sync is performed
         */
         unsigned long _updateWorkerThread( ThreadHandle *threadHandle );
-    protected:
-        inline bool updateWorkerThreadImpl( size_t threadIdx );
     };
 
     /** Default implementation of IntersectionSceneQuery. */
@@ -2780,9 +3252,6 @@ namespace Ogre {
         /** See RayScenQuery. */
         virtual void execute(RaySceneQueryListener* listener);
         bool execute( ObjectData objData, size_t numNodes, RaySceneQueryListener* listener );
-
-    private:
-        using RaySceneQuery::execute;  // Shut up compiler warnings
     };
     /** Default implementation of SphereSceneQuery. */
     class _OgreExport DefaultSphereSceneQuery : public SphereSceneQuery
@@ -2794,9 +3263,6 @@ namespace Ogre {
         /** See SceneQuery. */
         virtual void execute(SceneQueryListener* listener);
         bool execute( ObjectData objData, size_t numNodes, SceneQueryListener* listener );
-
-    private:
-        using SphereSceneQuery::execute;  // Shut up compiler warnings
     };
     /** Default implementation of PlaneBoundedVolumeListSceneQuery. */
     class _OgreExport DefaultPlaneBoundedVolumeListSceneQuery : public PlaneBoundedVolumeListSceneQuery
@@ -2808,10 +3274,7 @@ namespace Ogre {
         /** See SceneQuery. */
         void execute(SceneQueryListener* listener);
         bool execute(ObjectData objData, size_t numNodes, SceneQueryListener* listener);
-
     private:
-        using PlaneBoundedVolumeListSceneQuery::execute;  // Shut up compiler warnings
-
         //SIMD friendly version of a plane
         struct ArrayPlane
         {
@@ -2833,9 +3296,6 @@ namespace Ogre {
         /** See RayScenQuery. */
         virtual void execute(SceneQueryListener* listener);
         bool execute( ObjectData objData, size_t numNodes, SceneQueryListener* listener );
-
-    private:
-        using AxisAlignedBoxSceneQuery::execute;  // Shut up compiler warnings
     };
     
 
@@ -2879,7 +3339,7 @@ namespace Ogre {
         virtual void initMetaData(void) const = 0;
     public:
         SceneManagerFactory() : mMetaDataInit(true) {}
-        virtual ~SceneManagerFactory();
+        virtual ~SceneManagerFactory() {}
         /** Get information about the SceneManager type created by this factory. */
         virtual const SceneManagerMetaData& getMetaData(void) const 
         {
@@ -2894,7 +3354,8 @@ namespace Ogre {
         @remarks
         Don't call directly, use SceneManagerEnumerator::createSceneManager.
         */
-        virtual SceneManager* createInstance(const String& instanceName, size_t numWorkerThreads) = 0;
+        virtual SceneManager* createInstance(const String& instanceName, size_t numWorkerThreads,
+                                            InstancingThreadedCullingMethod threadedCullingMethod) = 0;
         /** Destroy an instance of a SceneManager. */
         virtual void destroyInstance(SceneManager* instance) = 0;
 

@@ -37,10 +37,6 @@ THE SOFTWARE.
 
 #include "OgrePlatform.h"
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_LINUX && \
-    OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN && \
-    OGRE_PLATFORM != OGRE_PLATFORM_FREEBSD
-
 #include "OgreCommon.h"
 #include "OgreArchive.h"
 #include "OgreAxisAlignedBox.h"
@@ -78,8 +74,6 @@ THE SOFTWARE.
 #include "OgreWireBoundingBox.h"
 #if OGRE_NO_ZIP_ARCHIVE == 0
 #   include "OgreZip.h"
-#endif
-
 #endif
 
 #endif 

@@ -29,30 +29,17 @@ THE SOFTWARE.
 #ifndef __CompositorManager2_H__
 #define __CompositorManager2_H__
 
-#include "OgrePrerequisites.h"
-
-#include "OgreCompositorCommon.h"
-
-#include "OgreIdString.h"
-#include "OgreResourceTransition.h"
-#include "OgreVector4.h"
-#include "OgrePixelFormatGpu.h"
-#include "Compositor/OgreCompositorChannel.h"
-
-#include "ogrestd/map.h"
-
 #include "OgreHeaderPrefix.h"
+#include "OgreCompositorCommon.h"
+#include "OgreIdString.h"
+
+#include "OgreTexture.h"
 
 namespace Ogre
 {
-    namespace v1
-    {
-        class Rectangle2D;
-    }
+    class Rectangle2D;
     class CompositorPassProvider;
-
-    typedef vector<TextureGpu*>::type TextureGpuVec;
-    typedef vector<UavBufferPacked*>::type UavBufferPackedVec;
+    typedef vector<TexturePtr>::type TextureVec;
 
     /** \addtogroup Core
     *  @{
@@ -137,36 +124,23 @@ namespace Ogre
         /// case we happen to be adding a workspace while inside the
         /// workspace's update loop (i.e. in a listener)
         QueuedWorkspaceVec      mQueuedWorkspaces;
-        /// Listeners to call CompositorWorkspaceListener::allWorkspacesBeginUpdate
-        CompositorWorkspaceListenerVec mListeners;
 
         size_t                  mFrameCount;
 
         RenderSystem            *mRenderSystem;
 
-        TextureGpuVec           mNullTextureList;
-        v1::Rectangle2D         *mSharedTriangleFS;
-        v1::Rectangle2D         *mSharedQuadFS;
-        ObjectMemoryManager     *mDummyObjectMemoryManager;
+        TextureVec              mNullTextureList;
+        Rectangle2D             *mSharedTriangleFS;
+        Rectangle2D             *mSharedQuadFS;
 
         /// For custom passes.
         CompositorPassProvider  *mCompositorPassProvider;
 
-        BarrierSolver &mBarrierSolver;
-        ResourceTransitionArray mFinalResourceTransition;
-
-        bool mRenderWindowsPresentBarrierDirty;
-
         void addQueuedWorkspaces(void);
-
-        void prepareRenderWindowsForPresent( void );
 
     public:
         CompositorManager2( RenderSystem *renderSystem );
         ~CompositorManager2();
-
-        void _releaseManualHardwareResources();
-        void _restoreManualHardwareResources();
 
         /** The final rendering is done by passing the RenderWindow to one of the input
             channels. This functions does exactly that.
@@ -191,43 +165,24 @@ namespace Ogre
         /// Returns a new node definition. The name must be unique, throws otherwise.
         CompositorNodeDef* addNodeDefinition( const String &name );
 
-        /// Removes the node definition with the given name. Throws if not found
-        void removeNodeDefinition( IdString nodeDefName );
-
-        /// Returns true if a shadow node definition with the given name exists
-        bool hasShadowNodeDefinition( IdString nodeDefName ) const;
-
         /// Returns the node definition with the given name. Throws if not found
         const CompositorShadowNodeDef* getShadowNodeDefinition( IdString nodeDefName ) const;
 
-        /// @See getShadowNodeDefinition. Returns a non-const pointer. Use this only if you
-        /// know what you're doing. Modifying a ShadowNodeDef while it's being used by
-        /// CompositorShadowNode instances is undefined. It's safe if you're sure it's not
-        /// being used.
-        CompositorShadowNodeDef* getShadowNodeDefinitionNonConst( IdString nodeDefName ) const;
-
         /// Returns a new node definition. The name must be unique, throws otherwise.
         CompositorShadowNodeDef* addShadowNodeDefinition( const String &name );
-
-        /// Removes the node definition with the given name. Throws if not found
-        void removeShadowNodeDefinition( IdString nodeDefName );
 
         /// Returns true if a workspace definition with the given name exists
         bool hasWorkspaceDefinition( IdString name ) const;
 
         /// Returns the workspace definition with the given name. Throws if not found
         CompositorWorkspaceDef* getWorkspaceDefinition( IdString name ) const;
-        CompositorWorkspaceDef* getWorkspaceDefinitionNoThrow( IdString name ) const;
 
         /** Returns a new workspace definition. The name must be unique, throws otherwise.
         @remarks
             Setting workspace def's connections must be done *after* all node
             definitions have been created
         */
-        CompositorWorkspaceDef* addWorkspaceDefinition( const String& name );
-
-        /// Removes the workspace definition with the given name. Throws if not found
-        void removeWorkspaceDefinition( IdString name );
+        CompositorWorkspaceDef* addWorkspaceDefinition( IdString name );
 
         /// Returns how many times _update has been called.
         size_t getFrameCount(void) const                    { return mFrameCount; }
@@ -235,62 +190,18 @@ namespace Ogre
         /** Get an appropriately defined 'null' texture, i.e. one which will always
             result in no shadows.
         */
-        TextureGpu* getNullShadowTexture( PixelFormatGpu format );
+        TexturePtr getNullShadowTexture( PixelFormat format );
 
         /** Returns a shared fullscreen rectangle/triangle useful for PASS_QUAD passes
         @remarks
             Pointer is valid throughout the lifetime of this CompositorManager2
         */
-        v1::Rectangle2D* getSharedFullscreenTriangle(void) const    { return mSharedTriangleFS; }
+        Rectangle2D* getSharedFullscreenTriangle(void) const        { return mSharedTriangleFS; }
         /// @copydoc getSharedFullscreenTriangle
-        v1::Rectangle2D* getSharedFullscreenQuad(void) const        { return mSharedQuadFS; }
+        Rectangle2D* getSharedFullscreenQuad(void) const            { return mSharedQuadFS; }
 
         /** Main function to start rendering. Creates a workspace instance based on a
             workspace definition.
-        @remarks
-            When rendering in stereo using split screen (or when the screen is split
-            to support multiplayer) you can use viewportModifier, vpModifierMask and
-            executionMask parameters to control how the entire workspace renders to
-            a portion of the screen while using two (or more) workspaces without
-            having to duplicate the nodes just to alter their viewport parameters.
-
-            viewportModifier controls how to stretch the viewport in each pass,
-            vpModifierMask controls which passes will ignore the stretching, and
-            executionMask controls which passes get skipped.
-
-            All passes have a default executionMask = 0xFF vpModifierMask = 0xFF
-            except for clear passes which default to
-            executionMask = 0x01 vpModifierMask = 0x00
-
-            The reasoning behind this is that often you want to clear the whole renderTarget
-            the first time (it's GPU-friendly to discard the entire buffer; aka
-            vpModifierMask = 0), but the second time you don't want the clear to be executed
-            at all to prevent overwritting the contents from the first pass (executionMask = 1).
-        @par
-
-            Example, stereo (split screen):
-            //Render Eye0 to the left side of the screen
-            m_workspaceEye0 = mgr->addWorkspace( sceneManager, renderTarget,
-                                                 eyeCamera0, "MainWorkspace", true,
-                                                 -1, Vector4( 0, 0, 0.5f, 1 ),
-                                                 0x01, 0x01 );
-            //Render Eye1 to the right side of the screen
-            m_workspaceEye1 = mgr->addWorkspace( sceneManager, renderTarget,
-                                                 eyeCamera1, "MainWorkspace", true,
-                                                 -1, Vector4( 0.5f, 0, 0.5f, 1 ),
-                                                 0x02, 0x02 );
-        @par
-
-            Example, split screen, multiplayer, 4 players (e.g. Mario Kart (R)-like games)
-            for( int i=0; i<4; ++i )
-            {
-                Vector4 vpModifier( (i % 2) * 0.5f, (i >> 1) * 0.5f, 0.25f, 0.25f );
-                m_workspace[i] = mgr->addWorkspace( sceneManager, renderTarget,
-                                                    playerCam[i], "MainWorkspace", true,
-                                                    -1, vpModifier,
-                                                    (1 << i), (1 << i) );
-            }
-
         @param sceneManager
             The SceneManager this workspace will be associated with. You can have multiple
             scene managers, each with multiple workspaces. Those workspaces can be set to
@@ -321,48 +232,15 @@ namespace Ogre
             last (depending on what you do with RTs, some OSes, like OS X, may not like
             it).
             Defaults to -1; which means update last.
-        @param uavBuffers
-            Array of UAV Buffers that will be exposed to compositors, via the
-            'connect_buffer_external' script keyword, or the call
-            CompositorWorkspaceDef::connectExternalBuffer
-        @param vpOffsetScale
-            The viewport of every pass from every node will be offseted and scaled by
-            the following formula:
-                left    += vpOffsetScale.x;
-                top     += vpOffsetScale.y;
-                width   *= vpOffsetScale.z;
-                height  *= vpOffsetScale.w;
-            This affects both the viewport dimensions as well as the scissor rect.
-        @param vpModifierMask
-            An 8-bit mask that will be AND'ed with the viewport modifier mask of each pass
-            from every node. When the result is zero, the previous parameter "viewportModifier"
-            isn't applied to that pass.
-
-            This is useful when you want to apply a pass (like Clear) to the whole render
-            target and not just to the scaled region.
-        @param executionMask
-            An 8-bit mask that will be AND'ed with the execution mask of each pass from
-            every node. When the result is zero, the pass isn't executed. See remarks
-            on how to use this for efficient Stereo or split screen.
-
-            This is useful when you want to skip a pass (like Clear) when rendering the second
-            eye (or the second split from the second player).
         */
-        CompositorWorkspace *addWorkspace( SceneManager *sceneManager, TextureGpu *finalRenderTarget,
-                                           Camera *defaultCam, IdString definitionName, bool bEnabled,
-                                           int position = -1, const UavBufferPackedVec *uavBuffers = 0,
-                                           const ResourceStatusMap *initialLayouts = 0,
-                                           const Vector4 &vpOffsetScale = Vector4::ZERO,
-                                           uint8 vpModifierMask = 0x00, uint8 executionMask = 0xFF );
+        CompositorWorkspace* addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
+                                            Camera *defaultCam, IdString definitionName, bool bEnabled,
+                                            int position=-1 );
 
-        /// Overload that allows having multiple external input/outputs
-        CompositorWorkspace *addWorkspace( SceneManager *sceneManager,
-                                           const CompositorChannelVec &externalRenderTargets,
-                                           Camera *defaultCam, IdString definitionName, bool bEnabled,
-                                           int position = -1, const UavBufferPackedVec *uavBuffers = 0,
-                                           const ResourceStatusMap *initialLayouts = 0,
-                                           const Vector4 &vpOffsetScale = Vector4::ZERO,
-                                           uint8 vpModifierMask = 0x00, uint8 executionMask = 0xFF );
+        /// Overload that allows a full RenderTexture to be used as render target (see CubeMapping demo)
+        CompositorWorkspace* addWorkspace( SceneManager *sceneManager, const CompositorChannel &finalRenderTarget,
+                                            Camera *defaultCam, IdString definitionName, bool bEnabled,
+                                            int position=-1 );
 
         /// Removes the given workspace. Pointer is no longer valid after this call
         void removeWorkspace( CompositorWorkspace *workspace );
@@ -388,16 +266,7 @@ namespace Ogre
         /// Calls @see CompositorNode::_validateAndFinish on all objects who aren't yet validated
         void validateAllNodes();
 
-        BarrierSolver &getBarrierSolver( void ) { return mBarrierSolver; }
-
-        /// Will call the renderSystem which in turns calls _updateImplementation
-        void _update( void );
-        
-        /// This should be called by the render system to
-        /// perform the actual compositor manager update.
-        /// DO NOT CALL THIS DIRECTLY.
-        void _updateImplementation( void );
-
+        void _update(void);
         void _swapAllFinalTargets(void);
 
         /** Utility helper to create a basic workspace to get you out of the rush. Advanced users will
@@ -411,7 +280,7 @@ namespace Ogre
             Name of the shadow node. Leave blank if no shadows.
             Caller is supposed to have set the shadow node correctly
         */
-        void createBasicWorkspaceDef( const String &workspaceDefName,
+        void createBasicWorkspaceDef( const IdString &workspaceDefName,
                                         const ColourValue &backgroundColour,
                                         IdString shadowNodeName=IdString() );
 
@@ -419,13 +288,6 @@ namespace Ogre
         /// your nodes. @see CompositorPassProvider
         void setCompositorPassProvider( CompositorPassProvider *passProvider );
         CompositorPassProvider* getCompositorPassProvider(void) const;
-
-        void addListener( CompositorWorkspaceListener *listener );
-        void removeListener( CompositorWorkspaceListener *listener );
-
-        void _notifyBarriersDirty( void );
-
-        RenderSystem* getRenderSystem(void) const;
     };
 
     /** @} */

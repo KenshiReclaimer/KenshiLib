@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 
 namespace Ogre {
-namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -109,7 +108,7 @@ namespace v1 {
 
     /** @} */
     /** @} */
-}
+
 }
 
 

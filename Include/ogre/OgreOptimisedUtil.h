@@ -30,8 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreEdgeListBuilder.h"
-
-#include "stddef.h"
+#include <cstddef>
 
 namespace Ogre {
 
@@ -158,7 +157,7 @@ namespace Ogre {
         */
         virtual void calculateFaceNormals(
             const float *positions,
-            const v1::EdgeData::Triangle *triangles,
+            const EdgeData::Triangle *triangles,
             Vector4 *faceNormals,
             size_t numTriangles) = 0;
 

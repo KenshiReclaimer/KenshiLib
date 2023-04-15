@@ -295,12 +295,6 @@ namespace Ogre
             return _mm_set1_epi32( val );
         }
 
-        static inline void Set( ArrayReal &_dst, Real val, size_t index )
-        {
-            float *dst = reinterpret_cast<float*>( &_dst );
-            dst[index] = val;
-        }
-
         /** Returns the result of "a == std::numeric_limits<float>::infinity()"
         @return
             r[i] = a[i] == Inf ? 0xffffffff : 0;
@@ -516,7 +510,7 @@ namespace Ogre
     };
 
 #if OGRE_COMPILER != OGRE_COMPILER_CLANG && OGRE_COMPILER != OGRE_COMPILER_GNUC
-    inline ArrayReal operator - ( ArrayReal l )                 { return _mm_xor_ps( l, MathlibSSE2::SIGN_MASK ); }
+//  inline ArrayReal operator - ( ArrayReal l )                 { return _mm_xor_ps( l, MathlibSSE2::SIGN_MASK ); }
 //  inline ArrayReal operator + ( ArrayReal l, Real r )         { return _mm_add_ps( l, _mm_set1_ps( r ) ); }
 //  inline ArrayReal operator + ( Real l, ArrayReal r )         { return _mm_add_ps( _mm_set1_ps( l ), r ); }
     inline ArrayReal operator + ( ArrayReal l, ArrayReal r )    { return _mm_add_ps( l, r ); }

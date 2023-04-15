@@ -33,15 +33,9 @@ THE SOFTWARE.
 #include "OgreHardwareBuffer.h"
 #include "OgreSharedPtr.h"
 #include "OgreColourValue.h"
-#include "OgreHlmsPso.h"
-#include "Vao/OgreVertexBufferPacked.h"
-
-#include "ogrestd/list.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-namespace v1 {
     class HardwareBufferManagerBase;
 
     /** \addtogroup Core
@@ -99,10 +93,68 @@ namespace v1 {
     };
 
     /** Locking helper. */    
-    typedef HardwareBufferLockGuard HardwareVertexBufferLockGuard; // deprecated, use HardwareBufferLockGuard directly
-}
+    typedef HardwareBufferLockGuard<HardwareVertexBufferSharedPtr> HardwareVertexBufferLockGuard;
 
-namespace v1 {
+    /// Vertex element semantics, used to identify the meaning of vertex buffer contents
+    enum VertexElementSemantic {
+        /// Position, 3 reals per vertex
+        VES_POSITION = 1,
+        /// Blending weights
+        VES_BLEND_WEIGHTS = 2,
+        /// Blending indices
+        VES_BLEND_INDICES = 3,
+        /// Normal, 3 reals per vertex
+        VES_NORMAL = 4,
+        /// Diffuse colours
+        VES_DIFFUSE = 5,
+        /// Specular colours
+        VES_SPECULAR = 6,
+        /// Texture coordinates
+        VES_TEXTURE_COORDINATES = 7,
+        /// Binormal (Y axis if normal is Z)
+        VES_BINORMAL = 8,
+        /// Tangent (X axis if normal is Z)
+        VES_TANGENT = 9,
+        /// The  number of VertexElementSemantic elements (note - the first value VES_POSITION is 1) 
+        VES_COUNT = 9
+    };
+
+    /// Vertex element type, used to identify the base types of the vertex contents
+    enum VertexElementType
+    {
+        VET_FLOAT1 = 0,
+        VET_FLOAT2 = 1,
+        VET_FLOAT3 = 2,
+        VET_FLOAT4 = 3,
+        /// alias to more specific colour type - use the current rendersystem's colour packing
+        VET_COLOUR = 4,
+        VET_SHORT1 = 5,
+        VET_SHORT2 = 6,
+        VET_SHORT3 = 7,
+        VET_SHORT4 = 8,
+        VET_UBYTE4 = 9,
+        /// D3D style compact colour
+        VET_COLOUR_ARGB = 10,
+        /// GL style compact colour
+        VET_COLOUR_ABGR = 11,
+        VET_DOUBLE1 = 12,
+        VET_DOUBLE2 = 13,
+        VET_DOUBLE3 = 14,
+        VET_DOUBLE4 = 15,
+        VET_USHORT1 = 16,
+        VET_USHORT2 = 17,
+        VET_USHORT3 = 18,
+        VET_USHORT4 = 19,      
+        VET_INT1 = 20,
+        VET_INT2 = 21,
+        VET_INT3 = 22,
+        VET_INT4 = 23,
+        VET_UINT1 = 24,
+        VET_UINT2 = 25,
+        VET_UINT3 = 26,
+        VET_UINT4 = 27
+    };
+
     /** This class declares the usage of a single vertex buffer as a component
         of a complete VertexDeclaration.
         @remarks
@@ -147,8 +199,6 @@ namespace v1 {
         static size_t getTypeSize(VertexElementType etype);
         /// Utility method which returns the count of values in a given type
         static unsigned short getTypeCount(VertexElementType etype);
-        /// Utility method which returns true if the type is SNORM or NORM
-        static bool isTypeNormalized(VertexElementType etype);
         /** Simple converter function which will turn a single-value type into a
             multi-value type based on a parameter.
         */
@@ -291,34 +341,12 @@ namespace v1 {
         typedef list<VertexElement>::type VertexElementList;
         /// Sort routine for vertex elements
         static bool vertexElementLess(const VertexElement& e1, const VertexElement& e2);
-        static bool vertexElementLessForV2(const VertexElement& e1, const VertexElement& e2);
     protected:
-        HardwareBufferManagerBase *mCreator;
-
         VertexElementList mElementList;
-        /// See VertexArrayObject::mInputLayoutId
-        /// This value does not contain the OperationType in the last 6 bits, thus it needs
-        /// to be added later
-        uint16 mBaseInputLayoutId;
-        bool mInputLayoutDirty;
-
-        void vertexLayoutDirty(void);
     public:
         /// Standard constructor, not you should use HardwareBufferManager::createVertexDeclaration
-        VertexDeclaration( HardwareBufferManagerBase *creator );
+        VertexDeclaration();
         virtual ~VertexDeclaration();
-
-        /** VertexDeclaration do not store OperationType, which is why we cache just the base 10 bits
-
-            This function is not const as it will modify mBaseInputLayoutId if the layout is dirty
-
-            @see    HlmsManager::_getInputLayoutId
-            @see    VertexDeclaration::mBaseInputLayoutId
-        @param hlmsManager
-        @param opType
-        @return
-        */
-        uint16 _getInputLayoutId( HlmsManager *hlmsManager, OperationType opType );
 
         /** Get the number of elements in the declaration. */
         size_t getElementCount(void) const { return mElementList.size(); }
@@ -336,8 +364,6 @@ namespace v1 {
             declaration must list all the elements for each source in turn.
         */
         void sort(void);
-
-        void sortForV2(void);
 
         /** Remove any gaps in the source buffer list used by this declaration.
         @remarks
@@ -455,12 +481,6 @@ namespace v1 {
         */
         virtual VertexDeclaration* clone(HardwareBufferManagerBase* mgr = 0) const;
 
-        bool isSortedForV2(void) const;
-
-        VertexElement2VecVec convertToV2(void);
-        void convertFromV2( const VertexElement2Vec &v2Decl );
-        void convertFromV2( const VertexElement2VecVec &v2Decl );
-
         inline bool operator== (const VertexDeclaration& rhs) const
         {
             if (mElementList.size() != rhs.mElementList.size())
@@ -575,7 +595,7 @@ namespace v1 {
     /** @} */
 
 
-}
+
 }
 
 #include "OgreHeaderSuffix.h"

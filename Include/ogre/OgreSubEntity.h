@@ -36,7 +36,6 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -79,6 +78,9 @@ namespace v1 {
         /// Pointer to parent.
         Entity* mParentEntity;
 
+        /// Cached pointer to material.
+        MaterialPtr mMaterialPtr;
+
         /// Pointer to the SubMesh defining geometry.
         SubMesh* mSubMesh;
 
@@ -111,21 +113,25 @@ namespace v1 {
         void prepareTempBlendBuffers(void);
 
     public:
+        /** Gets the name of the Material in use by this instance.
+        */
+        const String& getMaterialName() const;
+
+        /** Sets the name of the Material to be used.
+            @remarks
+                By default a SubEntity uses the default Material that the SubMesh
+                uses. This call can alter that so that the Material is different
+                for this instance.
+        */
+        void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+
         /** Sets a Material to be used.
             @remarks
                 By default a SubEntity uses the default Material that the SubMesh
                 uses. This call can alter that so that the Material is different
                 for this instance.
         */
-        virtual void setMaterial( const MaterialPtr& material );
-
-        /** Make every setDatablock method from Renderable available.
-            See http://www.research.att.com/~bs/bs_faq2.html#overloadderived
-        */
-        using Renderable::setDatablock;
-
-        virtual void setDatablock( HlmsDatablock *datablock );
-        virtual void _setNullDatablock(void);
+        void setMaterial( const MaterialPtr& material );
 
         /** Accessor method to read mesh data.
         */
@@ -136,7 +142,15 @@ namespace v1 {
 
         /** Overridden - see Renderable.
         */
-        void getRenderOperation(RenderOperation& op, bool casterPass);
+        const MaterialPtr& getMaterial(void) const;
+
+        /** Overridden - see Renderable.
+        */
+        Technique* getTechnique(void) const;
+
+        /** Overridden - see Renderable.
+        */
+        void getRenderOperation(RenderOperation& op);
 
         /** Tells this SubEntity to draw a subset of the SubMesh by adjusting the index buffer extents.
          * Default value is zero so that the entire index buffer is used when drawing.
@@ -209,7 +223,7 @@ namespace v1 {
         TempBlendedBufferInfo* _getVertexAnimTempBufferInfo(void);
         const TempBlendedBufferInfo* _getVertexAnimTempBufferInfo(void) const;
         /// Retrieve the VertexData which should be used for GPU binding
-        VertexData* getVertexDataForBinding( bool casterPass );
+        VertexData* getVertexDataForBinding(void);
 
         /** Mark all vertex data as so far unanimated. 
         */
@@ -225,13 +239,13 @@ namespace v1 {
         void _restoreBuffersForUnusedAnimation(bool hardwareAnimation);
 
         /** Overridden from Renderable to provide some custom behaviour. */
-        void _updateCustomGpuParameter( const GpuProgramParameters_AutoConstantEntry &constantEntry,
-                                        GpuProgramParameters *params ) const;
+        void _updateCustomGpuParameter(
+            const GpuProgramParameters::AutoConstantEntry& constantEntry,
+            GpuProgramParameters* params) const;
     };
     /** @} */
     /** @} */
 
-}
 }
 
 #include "OgreHeaderSuffix.h"

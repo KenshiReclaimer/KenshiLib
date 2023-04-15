@@ -43,15 +43,17 @@ namespace Ogre
                 owner->mCurrentMeshLod = std::max<int>( it - owner->mLodMesh->begin() - 1, 0 );
             }
 
-            RenderableArray::iterator itor = owner->mRenderables.begin();
-            RenderableArray::iterator end  = owner->mRenderables.end();
+            FastArray< FastArray<Real> const * >::const_iterator itor = owner->mLodMaterial.begin();
+            FastArray< FastArray<Real> const * >::const_iterator end  = owner->mLodMaterial.end();
+
+            FastArray<unsigned char>::iterator itMatLodLevel = owner->mCurrentMaterialLod.begin();
 
             while( itor != end )
             {
-                const FastArray<Real> *lodVec = (*itor)->mLodMaterial;
+                const FastArray<Real> *lodVec = *itor;
                 FastArray<Real>::const_iterator it = std::lower_bound( lodVec->begin(), lodVec->end(),
                                                                        lodValues[j] );
-                (*itor)->mCurrentMaterialLod = (uint8)std::max<int>( it - lodVec->begin() - 1, 0 );
+                *itMatLodLevel++ = (unsigned char)std::max<int>( it - lodVec->begin() - 1, 0 );
                 ++itor;
             }
         }

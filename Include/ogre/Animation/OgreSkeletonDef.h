@@ -36,9 +36,6 @@ THE SOFTWARE.
 
 #include "Math/Array/OgreArrayMatrixAf4x3.h"
 
-#include "ogrestd/list.h"
-#include "ogrestd/vector.h"
-
 namespace Ogre
 {
     class _OgreExport SkeletonDef : public MovableAlloc
@@ -139,9 +136,9 @@ namespace Ogre
         @remarks
             If the framerate information has been lost, set it to 1.
         */
-        SkeletonDef( const v1::Skeleton *originalSkeleton, Real frameRate );
+        SkeletonDef( const Skeleton *originalSkeleton, Real frameRate );
 
-        const String& getNameStr(void) const                            { return mName; }
+        const String& getName(void) const                               { return mName; }
 
         const BoneDataVec& getBones(void) const                         { return mBones; }
         const SkeletonAnimationDefVec& getAnimationDefs(void) const     { return mAnimationDefs; }

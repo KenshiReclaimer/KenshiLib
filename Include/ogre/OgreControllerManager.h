@@ -34,9 +34,6 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 #include "OgreTextureUnitState.h"
 #include "OgreSharedPtr.h"
-
-#include "ogrestd/set.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

@@ -40,11 +40,6 @@ THE SOFTWARE.
 #define OGRE_PROFILING 0
 #endif
 
-#define OGRE_PROFILING_NONE             0
-#define OGRE_PROFILING_INTERNAL         1
-#define OGRE_PROFILING_REMOTERY         2
-#define OGRE_PROFILING_INTERNAL_OFFLINE 3
-
 /** There are three modes for handling asserts in OGRE:
 0 - STANDARD - Standard asserts in debug builds, nothing in release builds
 1 - RELEASE_EXCEPTIONS - Standard asserts in debug builds, exceptions in release builds
@@ -74,7 +69,7 @@ THE SOFTWARE.
 
 /** Define max number of texture layers allowed per pass on any card.
 */
-#define OGRE_MAX_TEXTURE_LAYERS 128
+#define OGRE_MAX_TEXTURE_LAYERS 16
 
 /** Define max number of lights allowed per pass.
 */
@@ -83,10 +78,6 @@ THE SOFTWARE.
 /** Define max number of blending weights allowed per vertex.
 */
 #define OGRE_MAX_BLEND_WEIGHTS 4
-
-/** Define max number of poses per item.
-*/
-#define OGRE_MAX_POSES 16
 
 // define the memory allocator configuration to use
 #define OGRE_MEMORY_ALLOCATOR_STD 1
@@ -161,8 +152,6 @@ OGRE_THREAD_PROVIDER = 2
     Poco libraries provide threading functionality.
 OGRE_THREAD_PROVIDER = 3
     TBB library provides threading functionality.
-OGRE_THREAD_PROVIDER = 4
-    Standard library provides threading functionality. (requires compiler support)
 */
 #ifndef OGRE_THREAD_PROVIDER
 #define OGRE_THREAD_PROVIDER 0

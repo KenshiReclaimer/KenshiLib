@@ -40,7 +40,6 @@ namespace Ogre {
     /** \addtogroup RenderSystem
     *  @{
     */
-
     /** An abstraction of a viewport, i.e. a rendering region on a render
         target.
         @remarks
@@ -76,9 +75,9 @@ namespace Ogre {
                 the front.
         */
         Viewport(
+            RenderTarget* target,
             Real left, Real top,
             Real width, Real height );
-        Viewport();
 
         /** Default destructor.
         */
@@ -95,10 +94,29 @@ namespace Ogre {
 
         /** Instructs the viewport to updates its contents.
         */
-        void _updateCullPhase01( Camera* renderCamera, Camera *cullCamera, const Camera *lodCamera,
-                                 uint8 firstRq, uint8 lastRq, bool reuseCullData );
+        void _updateCullPhase01(Camera* camera, const Camera *lodCamera, uint8 firstRq, uint8 lastRq );
         void _updateRenderPhase02( Camera* camera, const Camera *lodCamera,
                                    uint8 firstRq, uint8 lastRq );
+        
+        /** Instructs the viewport to clear itself, without performing an update.
+         @remarks
+            You would not normally call this method when updating the viewport, 
+            since the viewport usually clears itself when updating anyway (@see 
+            Viewport::setClearEveryFrame). However, if you wish you have the
+            option of manually clearing the frame buffer (or elements of it)
+            using this method.
+         @param buffers Bitmask identifying which buffer elements to clear
+         @param colour The colour value to clear to, if FBT_COLOUR is included
+         @param depth The depth value to clear to, if FBT_DEPTH is included
+         @param stencil The stencil value to clear to, if FBT_STENCIL is included
+        */
+        void clear(unsigned int buffers = FBT_COLOUR | FBT_DEPTH,
+                   const ColourValue& colour = ColourValue::Black, 
+                   Real depth = 1.0f, unsigned short stencil = 0);
+
+        /** Retrieves a pointer to the render target for this viewport.
+        */
+        RenderTarget* getTarget(void) const;
 
         /** Gets one of the relative dimensions of the viewport,
             a value between 0.0 and 1.0.
@@ -137,52 +155,39 @@ namespace Ogre {
         /** Gets one of the actual dimensions of the viewport, a value in
             pixels.
         */
+
         int getActualHeight(void) const;
 
-        Real getScissorLeft(void) const                 { return mScissorRelLeft; }
-        Real getScissorTop(void) const                  { return mScissorRelTop; }
-        Real getScissorWidth(void) const                { return mScissorRelWidth; }
-        Real getScissorHeight(void) const               { return mScissorRelHeight; }
-
-        int getScissorActualLeft(void) const            { return mScissorActLeft; }
-        int getScissorActualTop(void) const             { return mScissorActTop; }
-        int getScissorActualWidth(void) const           { return mScissorActWidth; }
-        int getScissorActualHeight(void) const          { return mScissorActHeight; }
-
-        bool coversEntireTarget(void) const;
-        bool scissorsMatchViewport(void) const;
-
         /** Sets the dimensions (after creation).
-        @param left
-            Left point of viewport.
-        @param top
-            Top point of the viewport.
-        @param width
-            Width of the viewport.
-        @param height
-            Height of the viewport.
-        @param overrideScissors
-            When true, the scissor dimensions will be the same as the viewport's
-            @See setScissors
-        @note
-            Dimensions relative to the size of the target, represented as real values
-            between 0 and 1. i.e. the full target area is 0, 0, 1, 1.
+            @param
+                left Left point of viewport.
+            @param
+                top Top point of the viewport.
+            @param
+                width Width of the viewport.
+            @param
+                height Height of the viewport.
+            @note Dimensions relative to the size of the target,
+                represented as real values between 0 and 1. i.e. the full
+                target area is 0, 0, 1, 1.
         */
-        void setDimensions( TextureGpu *newTarget, const Vector4 &relativeVp,
-                            const Vector4 &scissors, uint8 mipLevel );
+        void setDimensions(Real left, Real top, Real width, Real height);
 
-        TextureGpu* getCurrentTarget(void) const        { return mCurrentTarget; }
-
-        /** Only sets the scissor regions. The scissor rectangle must be fully inside
-            the viewport rectangle. @See setDimensions for param description
-        @remarks
-            Only the scissor rect is set here; but the HLMS macroblock controls whether
-            scissor testing is enabled or not (@See HlmsMacroblock). On some RenderSystem
-            implementations (i.e. OpenGL), scissor testing needs to be enabled when
-            clearing a region of the screen. In those cases, if scissor testing is disabled at
-            the time of the clear, scissor testing will be temporarily enabled and then disabled.
+        /** Set the orientation mode of the viewport.
         */
-        void setScissors( Real left, Real top, Real width, Real height );
+        void setOrientationMode(OrientationMode orientationMode, bool setDefault = true);
+
+        /** Get the orientation mode of the viewport.
+        */
+        OrientationMode getOrientationMode() const;
+
+        /** Set the initial orientation mode of viewports.
+        */
+        static void setDefaultOrientationMode(OrientationMode orientationMode);
+
+        /** Get the initial orientation mode of viewports.
+        */
+        static OrientationMode getDefaultOrientationMode();
 
         /** Set the material scheme which the viewport should use.
         @remarks
@@ -223,6 +228,22 @@ namespace Ogre {
             viewport. */
         bool getOverlaysEnabled(void) const;
 
+        /** Tells this viewport whether it should display skies.
+        @remarks
+            Skies are layers which appear on background of the scene. They are created via
+            SceneManager::setSkyBox, SceneManager::setSkyPlane and SceneManager::setSkyDome and
+            every viewport displays these by default. However, you probably don't want this if
+            you're using multiple viewports, because one of them is probably a picture-in-picture
+            which is not supposed to have skies of it's own. In this case you can turn off skies
+            on this viewport by calling this method.
+        @param enabled If true, any skies are displayed, if false they are not.
+        */
+        void setSkiesEnabled(bool enabled);
+
+        /** Returns whether or not skies (created in the SceneManager) are displayed in this
+            viewport. */
+        bool getSkiesEnabled(void) const;
+
         /** Sets a per-viewport visibility mask.
         @remarks
             The visibility mask is a way to exclude objects from rendering for
@@ -234,13 +255,30 @@ namespace Ogre {
             Viewport's visibility mask assumes the user knows what he's doing
             with the reserved flags!
         */
-        void _setVisibilityMask( uint32 mask, uint32 lightMask );
+        void _setVisibilityMask(uint32 mask) { mVisibilityMask = mask; }
 
         /** Gets a per-viewport visibility mask.
         @see Viewport::setVisibilityMask
         */
-        uint32 getVisibilityMask(void) const        { return mVisibilityMask; }
-        uint32 getLightVisibilityMask(void) const   { return mLightVisibilityMask; }
+        uint getVisibilityMask(void) const { return mVisibilityMask; }
+
+        /** Sets the use of a custom RenderQueueInvocationSequence for
+            rendering this target.
+        @remarks
+            RenderQueueInvocationSequence instances are managed through Root. By
+            setting this, you are indicating that you wish this RenderTarget to
+            be updated using a custom sequence of render queue invocations, with
+            potentially customised ordering and render state options. You should
+            create the named sequence through Root first, then set the name here.
+        @param sequenceName The name of the RenderQueueInvocationSequence to use. If you
+            specify a blank string, behaviour will return to the default render
+            queue management.
+        */
+        virtual void setRenderQueueInvocationSequenceName(const String& sequenceName);
+        /** Gets the name of the render queue invocation sequence for this target. */
+        virtual const String& getRenderQueueInvocationSequenceName(void) const;
+        /// Get the invocation sequence - will return null if using standard
+        RenderQueueInvocationSequence* _getRenderQueueInvocationSequence(void);
 
         /** Convert oriented input point coordinates to screen coordinates. */
         void pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv);
@@ -264,30 +302,27 @@ namespace Ogre {
         ColourBufferType getDrawBuffer() const;
 
     protected:
+
+        RenderTarget* mTarget;
         /// Relative dimensions, irrespective of target dimensions (0..1)
         float mRelLeft, mRelTop, mRelWidth, mRelHeight;
         /// Actual dimensions, based on target dimensions
         int mActLeft, mActTop, mActWidth, mActHeight;
-
-        TextureGpu *mCurrentTarget;
-        uint8       mCurrentMip;
-
-        /// Relative dimensions, irrespective of target dimensions (0..1), scissor rect
-        float mScissorRelLeft, mScissorRelTop, mScissorRelWidth, mScissorRelHeight;
-        /// Actual dimensions, based on target dimensions, scissor rect
-        int mScissorActLeft, mScissorActTop, mScissorActWidth, mScissorActHeight;
-        bool mCoversEntireTarget;
-        bool mScissorsMatchViewport;
-
         /// Z-order
         int mZOrder;
         /// Background options
         bool mUpdated;
         bool mShowOverlays;
+        bool mShowSkies;
         uint32 mVisibilityMask;
-        uint32 mLightVisibilityMask;
+        // Render queue invocation sequence name
+        String mRQSequenceName;
+        RenderQueueInvocationSequence* mRQSequence;
         /// Material scheme
         String mMaterialSchemeName;
+        /// Viewport orientation mode
+        OrientationMode mOrientationMode;
+        static OrientationMode mDefaultOrientationMode;
         ColourBufferType mColourBuffer;
     };
     /** @} */

@@ -30,13 +30,10 @@ THE SOFTWARE.
 
 // Precompiler options
 #include "OgrePrerequisites.h"
-#include "OgreCommon.h"
 #include "OgreHardwareBuffer.h"
 #include "OgreSharedPtr.h"
 
 namespace Ogre {
-namespace v1 {
-
     class HardwareBufferManagerBase;
 
     /** \addtogroup Core
@@ -49,9 +46,10 @@ namespace v1 {
     class _OgreExport HardwareIndexBuffer : public HardwareBuffer
     {
         public:
-            typedef Ogre::IndexType IndexType;
-            static const IndexType IT_16BIT = Ogre::IT_16BIT;
-            static const IndexType IT_32BIT = Ogre::IT_32BIT;
+            enum IndexType {
+                IT_16BIT,
+                IT_32BIT
+            };
 
         protected:
             HardwareBufferManagerBase* mMgr;
@@ -86,11 +84,10 @@ namespace v1 {
     };
     
     /** Locking helper. */    
-    typedef HardwareBufferLockGuard HardwareIndexBufferLockGuard; // deprecated, use HardwareBufferLockGuard directly
+    typedef HardwareBufferLockGuard<HardwareIndexBufferSharedPtr> HardwareIndexBufferLockGuard;
 
     /** @} */
     /** @} */
-}
 }
 #endif
 

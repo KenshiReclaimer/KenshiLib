@@ -60,12 +60,10 @@ namespace Ogre
     protected:
         RenderSystem *mRenderSystem;
 
-        virtual void postRenderPassDescriptorSetup( RenderPassDescriptor *renderPassDesc );
-
     public:
         CompositorPassStencil( const CompositorPassStencilDef *definition,
-                               const RenderTargetViewDef *rtv, CompositorNode *parentNode,
-                               RenderSystem *renderSystem );
+                                const CompositorChannel &target, CompositorNode *parentNode,
+                                RenderSystem *renderSystem );
 
         virtual void execute( const Camera *lodCamera );
     };

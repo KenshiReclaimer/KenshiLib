@@ -1,0 +1,12 @@
+Ogre:
+	Commit is either 9bc4de5b68c8ffe6a303b494af01e733ea52926d or 174ab3f81f0301a345ae9a276a770d33c67a236a
+	Reasoning:
+		Newer than this (no _swapVisibleObjectsForShadowMapping): d742911b5e50efdcfc7c439834e1d20fb60500e5
+		Older than this (doesn't have this fix): 1e128dacd101e76bafaa827a5cd85daff3527de0
+		Only commit in that range that effects x64 SSE2 D3D11 builds is 174ab3f81f0301a345ae9a276a770d33c67a236a
+	Other notes:
+		Appears to use nedmalloc with pooling
+		Probably boost as thread provider
+		CMAKE_SHARED_LIBRARY_SUFFIX doesn't seem to work for me, so I manually add `_x64` to the generated VC++ projects after CMake generation
+OgreNextDeps:
+	before this (FreeImage version 1.13.1): 43ef63a6424925b38cea6205433d6e0942fff350

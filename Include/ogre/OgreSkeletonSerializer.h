@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreSerializer.h"
 
 namespace Ogre {
-namespace v1 {
 
     struct LinkedSkeletonAnimationSource;
 
@@ -146,7 +145,7 @@ namespace v1 {
     };
     /** @} */
     /** @} */
-}
+
 }
 
 

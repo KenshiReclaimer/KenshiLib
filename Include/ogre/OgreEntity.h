@@ -41,7 +41,6 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-namespace v1 {
     /** \addtogroup Core
     *  @{
     */
@@ -93,11 +92,10 @@ namespace v1 {
 
         /** Private constructor (instances cannot be created directly).
         */
-        Entity( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager );
+        Entity( IdType id, ObjectMemoryManager *objectMemoryManager );
         /** Private constructor.
         */
-        Entity( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager,
-                const MeshPtr& mesh );
+        Entity( IdType id, ObjectMemoryManager *objectMemoryManager, const MeshPtr& mesh );
 
         /** The Mesh that this Entity is based on.
         */
@@ -226,7 +224,7 @@ namespace v1 {
         bool mSkipAnimStateUpdates;
         /// Flag indicating whether to update the main entity skeleton even when an LOD is displayed.
         bool mAlwaysUpdateMainSkeleton;
-        /// Flag indicating whether to update the bounding box from the bones of the skeleton.
+		/// Flag indicating whether to update the bounding box from the bones of the skeleton.
         bool mUpdateBoundingBoxFromSkeleton;
 
         /** List of LOD Entity instances (for manual LODs).
@@ -251,7 +249,13 @@ namespace v1 {
         size_t mMeshStateCount;
 
         /** Builds a list of SubEntities based on the SubMeshes contained in the Mesh. */
-        void buildSubEntityList(MeshPtr& mesh, SubEntityList* sublist, vector<String>::type* materialsList = 0);
+        void buildSubEntityList(MeshPtr& mesh, SubEntityList* sublist);
+
+        /// Internal implementation of attaching a 'child' object to this entity and assign the parent node to the child entity.
+        void attachObjectImpl(MovableObject *pMovable, TagPoint *pAttachingPoint);
+
+        /// Internal implementation of detaching a 'child' object of this entity and clear the parent node of the child entity.
+        void detachObjectImpl(MovableObject* pObject);
 
         /// Ensures reevaluation of the vertex processing usage.
         void reevaluateVertexProcessing(void);
@@ -278,11 +282,6 @@ namespace v1 {
         */
         ~Entity();
 
-        /** @copydoc MovableObject::_releaseManualHardwareResources */
-        void _releaseManualHardwareResources();
-        /** @copydoc MovableObject::_restoreManualHardwareResources */
-        void _restoreManualHardwareResources();
-
         /** Gets the Mesh that this Entity is based on.
         */
         const MeshPtr& getMesh(void) const;
@@ -303,12 +302,6 @@ namespace v1 {
         */
         size_t getNumSubEntities(void) const;
 
-        /// Sets the given HLMS datablock to all SubEntities
-        void setDatablock( HlmsDatablock *datablock );
-
-        /// Sets the given HLMS datablock to all SubEntities
-        void setDatablock( IdString datablockName );
-
         /** Clones this entity and returns a pointer to the clone.
         @remarks
             Useful method for duplicating an entity. The new entity must be
@@ -319,17 +312,6 @@ namespace v1 {
             Name for the new entity.
         */
         Entity* clone(void) const;
-
-        /** Sets the material to use for the whole of this Item.
-        @remarks
-            This is a shortcut method to set all the materials for all
-            subentities of this Item. Only use this method is you want to
-            set the same material for all subentities or if you know there
-            is only one. Otherwise call getSubItem() and call the same
-            method on the individual SubItem.
-        */
-        void setDatablockOrMaterialName( const String& name,
-                                         const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
         /** Sets the material to use for the whole of this entity.
         @remarks
@@ -352,18 +334,15 @@ namespace v1 {
         */
         void setMaterial(const MaterialPtr& material);
 
-        /** Sets the RenderQueue subgroup ID for the whole of this entity.
-        @remarks
-            This is a shortcut method to set all the subgroups for all
-            subentities of this entity. Only use this method is you want to
-            set the same subgroup for all subentities or if you know there
-            is only one. Otherwise call getSubEntity() and call the same
-            method on the individual SubEntity.
+        /** @copydoc MovableObject::_notifyCurrentCamera.
         */
-        void setRenderQueueSubGroup( uint8 subGroup );
+        void _notifyCurrentCamera(Camera* cam);
 
         /// @copydoc MovableObject::setRenderQueueGroup.
         void setRenderQueueGroup(uint8 queueID);
+
+        /// @copydoc MovableObject::setRenderQueueGroupAndPriority.
+        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
 
         /** @copydoc MovableObject::_updateRenderQueue.
         */
@@ -400,7 +379,7 @@ namespace v1 {
         */
         bool getDisplaySkeleton(void) const;
 
-        /** Gets a pointer to the entity representing the numbered manual level of detail.
+		/** Gets a pointer to the entity representing the numbered manual level of detail.
         @remarks
             The zero-based index never includes the original entity, unlike
             Mesh::getLodLevel.
@@ -418,7 +397,55 @@ namespace v1 {
             overridden by the camera detail settings.
         */
         void setPolygonModeOverrideable(bool PolygonModeOverrideable);
+        /** Attaches another object to a certain bone of the skeleton which this entity uses.
+        @remarks
+            This method can be used to attach another object to an animated part of this entity,
+            by attaching it to a bone in the skeleton (with an offset if required). As this entity
+            is animated, the attached object will move relative to the bone to which it is attached.
+        @par
+            An exception is thrown if the movable object is already attached to the bone, another bone or scenenode.
+            If the entity has no skeleton or the bone name cannot be found then an exception is thrown.
+        @param boneName
+            The name of the bone (in the skeleton) to attach this object
+        @param pMovable
+            Pointer to the object to attach
+        @param offsetOrientation
+            An adjustment to the orientation of the attached object, relative to the bone.
+        @param offsetPosition
+            An adjustment to the position of the attached object, relative to the bone.
+        @return
+            The TagPoint to which the object has been attached
+        */
+        TagPoint* attachObjectToBone(const String &boneName,
+            MovableObject *pMovable,
+            const Quaternion &offsetOrientation = Quaternion::IDENTITY,
+            const Vector3 &offsetPosition = Vector3::ZERO);
 
+        /** Detach a MovableObject previously attached using attachObjectToBone.
+            If the movable object name is not found then an exception is raised.
+        @param movableName
+            The name of the movable object to be detached.
+        */
+        MovableObject* detachObjectFromBone(const String &movableName);
+
+        /** Detaches an object by pointer.
+        @remarks
+            Use this method to destroy a MovableObject which is attached to a bone of belonging this entity.
+            But sometimes the object may be not in the child object list because it is a LOD entity,
+            this method can safely detect and ignore in this case and won't raise an exception.
+        */
+        void detachObjectFromBone(MovableObject* obj);
+
+        /// Detach all MovableObjects previously attached using attachObjectToBone
+        void detachAllObjectsFromBone(void);
+
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
+        /// Contains the child objects (attached to bones) indexed by name.
+        typedef map<String, MovableObject*>::type ChildObjectList;
+        typedef MapIterator<ChildObjectList> ChildObjectListIterator;
+        /** Gets an iterator to the list of objects attached to bones on this entity. */
+        ChildObjectListIterator getAttachedObjectIterator(void);
+#endif
         /** @copydoc ShadowCaster::getEdgeList. */
         EdgeData* getEdgeList(void);
         /** @copydoc ShadowCaster::hasEdgeList. */
@@ -589,7 +616,7 @@ namespace v1 {
         /// Override to return specific type flag.
         uint32 getTypeFlags(void) const;
         /// Retrieve the VertexData which should be used for GPU binding.
-        VertexData* getVertexDataForBinding( bool casterPass );
+        VertexData* getVertexDataForBinding(void);
 
         /// Identify which vertex data we should be sending to the renderer.
         enum VertexDataBindChoice
@@ -632,6 +659,10 @@ namespace v1 {
         void _initialise(bool forceReinitialise = false);
         /** Tear down the internal structures of this Entity, rendering it uninitialised. */
         void _deinitialise(void);
+
+        /// @copydoc MovableObject::visitRenderables
+        void visitRenderables(Renderable::Visitor* visitor, 
+            bool debugRenderables = false);
 
         /** Entity's skeleton's AnimationState will not be automatically updated when set to true.
             Useful if you wish to handle AnimationState updates manually.
@@ -689,8 +720,7 @@ namespace v1 {
     {
     protected:
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                                   SceneManager *manager,
-                                                   const NameValuePairList* params = 0 );
+                                                    const NameValuePairList* params = 0 );
     public:
         EntityFactory() {}
         ~EntityFactory() {}
@@ -704,7 +734,6 @@ namespace v1 {
     /** @} */
     /** @} */
 
-}
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"

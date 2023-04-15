@@ -28,7 +28,7 @@ THE SOFTWARE.
 #ifndef __NameGenerator_H__
 #define __NameGenerator_H__
 
-#include "OgrePrerequisites.h"
+#include "OgreString.h"
 
 #if defined ( OGRE_GCC_VISIBILITY )
 #   pragma GCC visibility push(default)

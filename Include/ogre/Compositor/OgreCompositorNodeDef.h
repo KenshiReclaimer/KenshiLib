@@ -29,12 +29,9 @@ THE SOFTWARE.
 #ifndef __CompositorNodeDef_H__
 #define __CompositorNodeDef_H__
 
-#include "OgrePrerequisites.h"
-
-#include "Compositor/Pass/OgreCompositorPassDef.h"
-#include "Compositor/OgreTextureDefinition.h"
-
 #include "OgreHeaderPrefix.h"
+#include "Compositor/OgreTextureDefinition.h"
+#include "Compositor/Pass/OgreCompositorPassDef.h"
 
 namespace Ogre
 {
@@ -91,7 +88,6 @@ namespace Ogre
             it is global.
         */
         ChannelMappings         mOutChannelMapping;
-        IdStringVec             mOutBufferChannelMapping;
         CompositorTargetDefVec  mTargetPasses;
 
         bool        mStartEnabled;
@@ -129,13 +125,6 @@ namespace Ogre
         */
         void getTextureSource( size_t outputChannel, size_t &index, TextureSource &textureSource ) const;
 
-        /** Called right after we create a pass definition. Derived
-            classes may want to do something with it
-        @param passDef
-            Newly created pass to toy with.
-        */
-        virtual void postInitializePassDef( CompositorPassDef *passDef ) {}
-
         /** Reserves enough memory for all passes
         @remarks
             Calling this function is obligatory, otherwise unexpected crashes may occur.
@@ -160,11 +149,8 @@ namespace Ogre
         /// Retrieves an existing pass by it's given index.
         CompositorTargetDef* getTargetPass( size_t passIndex )  { return &mTargetPasses[passIndex]; }
 
-        /// Gets the number of target passes in this node.
+        /// Gets the number of passes in this node.
         size_t getNumTargetPasses(void) const                   { return mTargetPasses.size(); }
-
-        /// Calculates the total number of passes in this node.
-        size_t calculateNumPasses( void ) const;
 
         /** Reserves enough memory for all output channel mappings (efficient allocation, better than
             using linked lists or other containers with two level of indirections)
@@ -197,42 +183,6 @@ namespace Ogre
 
         /// @copydoc TextureDefinitionBase::removeTexture
         virtual void removeTexture( IdString name );
-
-        /** Reserves enough memory for all output channel mappings (efficient allocation, better
-            than using linked lists or other containers with two level of indirections)
-        @remarks
-            Calling this function is not obligatory, but recommended
-        @param numPasses
-            The number of output buffer channels expected to contain.
-        */
-        void setNumOutputBufferChannels( size_t numOuts )
-                                                { mOutBufferChannelMapping.reserve( numOuts ); }
-
-        /** Maps the output channel to the given buffer name which can be either a
-            local buffer or a reference to an input channel. Global buffers can't
-            be used as output.
-        @remarks
-            Don't leave gaps. (i.e. set channel 0 & 2, without setting channel 1)
-            It's ok to map them out of order (i.e. set channel 2, then 0, then 1)
-            Prefer calling @see setNumOutputChannels beforehand
-            Will throw if the local texture hasn't been declared yet or the input
-            channel name hasn't been set yet (declaration order is important!).
-        @param outChannel
-            Output channel # to map
-        @param textureName
-            Name of the buffer
-        */
-        void mapOutputBufferChannel( size_t outChannel, IdString bufferName );
-
-        /** Returns the pass # of the given pass definition in this node.
-            This operation is O(N). Useful for debug output.
-        @param passDef
-            The pass definition to look for
-        @return
-            Value in range [0; total_numer_of_passes_in_this_node)
-            -1 if not found (pass doesn't belong to this node)
-        */
-        size_t getPassNumber( const CompositorPassDef *passDef ) const;
 
         CompositorManager2* getCompositorManager(void) const { return mCompositorManager; }
     };

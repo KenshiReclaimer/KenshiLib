@@ -49,7 +49,7 @@ namespace Ogre
     {
     protected:
         /// We overload to set all mParentTransform to point to a dummy matrix
-        virtual void initializeEmptySlots( size_t prevNumSlots );
+        virtual void slotsRecreated( size_t prevNumSlots );
 
     public:
         enum MemoryTypes
@@ -68,7 +68,6 @@ namespace Ogre
         };
 
         static const size_t ElementsMemSize[NumMemoryTypes];
-        static const CleanupRoutines BoneInitRoutines[NumMemoryTypes];
         static const CleanupRoutines BoneCleanupRoutines[NumMemoryTypes];
 
         /// @copydoc ArrayMemoryManager::ArrayMemoryManager

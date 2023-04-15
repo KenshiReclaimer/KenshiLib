@@ -25,12 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreDepthBuffer_H_
-#define _OgreDepthBuffer_H_
+#ifndef __DepthBuffer_H__
+#define __DepthBuffer_H__
 
 #include "OgrePrerequisites.h"
-#include "OgrePixelFormatGpu.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -81,18 +79,77 @@ namespace Ogre
         @version
             1.0
      */
-    struct _OgreExport DepthBuffer
+    class _OgreExport DepthBuffer : public RenderSysAlloc
     {
+    public:
         enum PoolId
         {
             POOL_NO_DEPTH       = 0,
             POOL_MANUAL_USAGE   = 0,
-            POOL_DEFAULT        = 1,
-            POOL_NON_SHAREABLE  = 65534,
-            POOL_INVALID        = 65535
+            POOL_DEFAULT        = 1
         };
 
-        static PixelFormatGpu DefaultDepthBufferFormat;
+        DepthBuffer( uint16 poolId, uint16 bitDepth, uint32 width, uint32 height,
+                     uint32 fsaa, const String &fsaaHint, bool manual );
+        virtual ~DepthBuffer();
+
+        /** Sets the pool id in which this DepthBuffer lives.
+            Note this will detach any render target from this depth buffer */
+        void _setPoolId( uint16 poolId );
+
+        /// Gets the pool id in which this DepthBuffer lives
+        virtual uint16 getPoolId() const;
+        virtual uint16 getBitDepth() const;
+        virtual uint32 getWidth() const;
+        virtual uint32 getHeight() const;
+        virtual uint32 getFsaa() const;
+        virtual const String& getFsaaHint() const;
+
+        /** Manual DepthBuffers are cleared in RenderSystem's destructor. Non-manual ones are released
+            with it's render target (aka, a backbuffer or similar) */
+        bool isManual() const;
+
+        /** Returns whether the specified RenderTarget is compatible with this DepthBuffer
+            That is, this DepthBuffer can be attached to that RenderTarget
+            @remarks
+                Most APIs impose the following restrictions:
+                Width & height must be equal or higher than the render target's
+                They must be of the same bit depth.
+                They need to have the same FSAA setting
+            @param renderTarget The render target to test against
+        */
+        virtual bool isCompatible( RenderTarget *renderTarget ) const;
+
+        /** Called when a RenderTarget is attaches this DepthBuffer
+            @remarks
+                This function doesn't actually attach. It merely informs the DepthBuffer
+                which RenderTarget did attach. The real attachment happens in
+                RenderTarget::attachDepthBuffer()
+            @param renderTarget The RenderTarget that has just been attached
+        */
+        virtual void _notifyRenderTargetAttached( RenderTarget *renderTarget );
+
+        /** Called when a RenderTarget is detaches from this DepthBuffer
+            @remarks
+                Same as DepthBuffer::_notifyRenderTargetAttached()
+            @param renderTarget The RenderTarget that has just been detached
+        */
+        virtual void _notifyRenderTargetDetached( RenderTarget *renderTarget );
+
+    protected:
+        typedef set<RenderTarget*>::type RenderTargetSet;
+
+        uint16                      mPoolId;
+        uint16                      mBitDepth;
+        uint32                      mWidth;
+        uint32                      mHeight;
+        uint32                      mFsaa;
+        String                      mFsaaHint;
+
+        bool                        mManual; //We don't Release manual surfaces on destruction
+        RenderTargetSet             mAttachedRenderTargets;
+
+        void detachFromAllRenderTargets();
     };
 
     /** @} */

@@ -42,9 +42,7 @@ THE SOFTWARE.
 #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
 // We need to define a hash function for void*
 // For gcc 4.3 see http://gcc.gnu.org/gcc-4.3/changes.html
-#   if __cplusplus >= 201103L
-#       include <unordered_map>
-#   elif OGRE_COMP_VER >= 430
+#   if OGRE_COMP_VER >= 430
 #       include <tr1/unordered_map>
 #   else
 #       include <ext/hash_map>
@@ -63,32 +61,7 @@ namespace __gnu_cxx
 #endif
 
 #if OGRE_MEMORY_TRACKER
-#    include "Threading/OgreThreadHeaders.h"
-
-#    if( OGRE_COMPILER == OGRE_COMPILER_GNUC ) && !defined( STLPORT )
-#        if __cplusplus >= 201103L
-#            include <unordered_map>
-#        elif OGRE_COMP_VER >= 430
-#            include <tr1/unordered_map>
-#        else
-#            include <ext/hash_map>
-#        endif
-#    elif( OGRE_COMPILER == OGRE_COMPILER_CLANG )
-#        if defined( _LIBCPP_VERSION ) || __cplusplus >= 201103L
-#            include <unordered_map>
-#        else
-#            include <tr1/unordered_map>
-#        endif
-#    elif !defined( STLPORT )
-#        if( OGRE_COMPILER == OGRE_COMPILER_MSVC ) && _MSC_FULL_VER >= 150030729  // VC++ 9.0 SP1+
-#            include <unordered_map>
-#        elif OGRE_THREAD_PROVIDER == 1
-#            include <boost/unordered_map.hpp>
-#        else
-#            error \
-                "Your compiler doesn't support unordered_map. Try to compile Ogre with Boost or STLPort."
-#        endif
-#    endif
+#   include "Threading/OgreThreadHeaders.h"
 #endif
 
 namespace Ogre
@@ -134,8 +107,7 @@ namespace Ogre
 
         std::string mLeakFileName;
         bool mDumpToStdOut;
-        // typedef std::unordered_map<void*, Alloc> AllocationMap;
-        typedef OGRE_HASH_NAMESPACE::OGRE_HASHMAP_NAME<void*, Alloc> AllocationMap;
+        typedef OGRE_HashMap<void*, Alloc> AllocationMap;
         AllocationMap mAllocations;
 
         size_t mTotalAllocations;

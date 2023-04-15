@@ -29,12 +29,27 @@ THE SOFTWARE.
 #define __Common_H__
 // Common stuff
 
-#include "OgrePrerequisites.h"
+#include "OgrePlatformInformation.h"
+
+#if OGRE_CPU == OGRE_CPU_X86
+    #include <xmmintrin.h>
+    #include <emmintrin.h>
+#elif OGRE_CPU == OGRE_CPU_ARM && OGRE_USE_SIMD
+    #include <arm_neon.h>
+#endif
+
+#if defined ( OGRE_GCC_VISIBILITY )
+#   pragma GCC visibility push(default)
+#endif
+
+#if defined ( OGRE_GCC_VISIBILITY )
+#   pragma GCC visibility pop
+#endif
 
 #include "OgreHeaderPrefix.h"
-#include "Hash/MurmurHash3.h"
 
 namespace Ogre {
+
     typedef _StringBase String;
 
     /** \addtogroup Core
@@ -45,11 +60,7 @@ namespace Ogre {
     */
 
     /// Fast general hashing algorithm
-    inline uint32 FastHash (const char * data, int len, uint32 hashSoFar = 0) {
-        uint32 ret;
-        MurmurHash3_x86_32(data, len, hashSoFar, &ret);
-        return ret;
-    }
+    uint32 _OgreExport FastHash (const char * data, int len, uint32 hashSoFar = 0);
     /// Combine hashes with same style as boost::hash_combine
     template <typename T>
     uint32 HashCombine (uint32 hashSoFar, const T& data)
@@ -57,29 +68,6 @@ namespace Ogre {
         return FastHash((const char*)&data, sizeof(T), hashSoFar);
     }
 
-    enum VertexPass
-    {
-        VpNormal,
-        VpShadow,
-        NumVertexPass
-    };
-
-    enum PrePassMode
-    {
-        /// This is a normal pass.
-        PrePassNone,
-        /// This is a depth pre-pass. Note: Implementations may write
-        /// to colour too for hybrid deferred & forward rendering.
-        PrePassCreate,
-        /// This pass will be using the results of a previous pre-pass
-        PrePassUse
-    };
-
-    enum IndexType
-    {
-        IT_16BIT,
-        IT_32BIT
-    };
 
     /** Comparison functions used for the depth/stencil buffer operations and 
         others. */
@@ -92,8 +80,7 @@ namespace Ogre {
         CMPF_EQUAL,
         CMPF_NOT_EQUAL,
         CMPF_GREATER_EQUAL,
-        CMPF_GREATER,
-        NUM_COMPARE_FUNCTIONS,
+        CMPF_GREATER
     };
 
     /// Enum describing the various actions which can be taken on the stencil buffer
@@ -115,78 +102,6 @@ namespace Ogre {
         SOP_DECREMENT_WRAP,
         /// Invert the bits of the stencil buffer
         SOP_INVERT
-    };
-
-    struct StencilStateOp
-    {
-        StencilOperation stencilFailOp;
-        StencilOperation stencilPassOp;
-        StencilOperation stencilDepthFailOp;
-        CompareFunction compareOp;
-
-        StencilStateOp() :
-            stencilFailOp( SOP_KEEP ),
-            stencilPassOp( SOP_KEEP ),
-            stencilDepthFailOp( SOP_KEEP ),
-            compareOp( CMPF_ALWAYS_FAIL ) {}
-
-        bool operator < ( const StencilStateOp &other ) const
-        {
-            if( this->stencilFailOp != other.stencilFailOp )
-                return this->stencilFailOp < other.stencilFailOp;
-            if( this->stencilPassOp != other.stencilPassOp )
-                return this->stencilPassOp < other.stencilPassOp;
-            if( this->stencilDepthFailOp != other.stencilDepthFailOp )
-                return this->stencilDepthFailOp < other.stencilDepthFailOp;
-
-            return this->compareOp < other.compareOp;
-        }
-
-        bool operator != ( const StencilStateOp &other ) const
-        {
-            return this->stencilFailOp != other.stencilFailOp ||
-                   this->stencilPassOp != other.stencilPassOp ||
-                   this->stencilDepthFailOp != other.stencilDepthFailOp ||
-                   this->compareOp != other.compareOp;
-        }
-    };
-
-    ///@see HlmsPso regarding padding.
-    struct StencilParams
-    {
-        uint8           enabled;
-        uint8           readMask;
-        uint8           writeMask;
-        uint8           padding;
-        StencilStateOp  stencilFront;
-        StencilStateOp  stencilBack;
-
-        StencilParams() :
-            enabled( false ),
-            readMask( 0xFF ),
-            writeMask( 0xFF ),
-            padding( 0 ) {}
-
-        bool operator < ( const StencilParams &other ) const
-        {
-            if( this->enabled != other.enabled )
-                return this->enabled < other.enabled;
-            if( this->readMask != other.readMask )
-                return this->readMask < other.readMask;
-            if( this->stencilFront != other.stencilFront )
-                return this->stencilFront < other.stencilFront;
-
-            return this->stencilBack < other.stencilBack;
-        }
-
-        bool operator != ( const StencilParams &other ) const
-        {
-            return this->enabled != other.enabled ||
-                   this->readMask != other.readMask ||
-                   this->writeMask != other.writeMask ||
-                   this->stencilFront != other.stencilFront ||
-                   this->stencilBack != other.stencilBack;
-        }
     };
 
     /** High-level filtering options providing shortcuts to settings the
@@ -225,7 +140,7 @@ namespace Ogre {
         FO_ANISOTROPIC
     };
 
-    /** Light shading modes. DEPRECATED */
+    /** Light shading modes. */
     enum ShadeOptions
     {
         SO_FLAT,
@@ -247,19 +162,7 @@ namespace Ogre {
     };
 
     /** Hardware culling modes based on vertex winding.
-        This setting applies to how the hardware API culls triangles it is sent.
-    @par
-        A typical way for the rendering engine to cull triangles is based on the 'vertex winding' of
-        triangles. Vertex winding refers to the direction in which the vertices are passed or indexed
-        to in the rendering operation as viewed from the camera, and will wither be clockwise or
-        anticlockwise (that's 'counterclockwise' for you Americans out there ;) The default is
-        CULL_CLOCKWISE i.e. that only triangles whose vertices are passed/indexed in anticlockwise order
-        are rendered - this is a common approach and is used in 3D studio models for example. You can
-        alter this culling mode if you wish but it is not advised unless you know what you are doing.
-    @par
-        You may wish to use the CULL_NONE option for mesh data that you cull yourself where the vertex
-        winding is uncertain.
-    */
+        This setting applies to how the hardware API culls triangles it is sent. */
     enum CullingMode
     {
         /// Hardware never culls triangles and renders everything it receives.
@@ -268,6 +171,21 @@ namespace Ogre {
         CULL_CLOCKWISE = 2,
         /// Hardware culls triangles whose vertices are listed anticlockwise in the view.
         CULL_ANTICLOCKWISE = 3
+    };
+
+    /** Manual culling modes based on vertex normals.
+        This setting applies to how the software culls triangles before sending them to the 
+        hardware API. This culling mode is used by scene managers which choose to implement it -
+        normally those which deal with large amounts of fixed world geometry which is often 
+        planar (software culling movable variable geometry is expensive). */
+    enum ManualCullingMode
+    {
+        /// No culling so everything is sent to the hardware.
+        MANUAL_CULL_NONE = 1,
+        /// Cull triangles whose normal is pointing away from the camera (default).
+        MANUAL_CULL_BACK = 2,
+        /// Cull triangles whose normal is pointing towards the camera.
+        MANUAL_CULL_FRONT = 3
     };
 
     /** Enumerates the wave types usable with the Ogre engine. */
@@ -339,22 +257,6 @@ namespace Ogre {
       SMT_NONE = 0x0,
       SMT_FRAME_SEQUENTIAL
     };
-
-    enum ShaderType
-    {
-        VertexShader,
-        PixelShader,
-        GeometryShader,
-        HullShader,
-        DomainShader,
-        NumShaderTypes
-    };
-
-    static const uint8 c_allGraphicStagesMask = ( 1u << VertexShader ) | ( 1u << PixelShader ) |
-                                                ( 1u << GeometryShader ) | ( 1u << HullShader ) |
-                                                ( 1u << DomainShader );
-    // NumShaderTypes == GPT_COMPUTE_PROGRAM
-    static const uint8 c_computeStageMask = 1u << NumShaderTypes;
 
     /** Flags for the Instance Manager when calculating ideal number of instances per batch */
     enum InstanceManagerFlags
@@ -653,38 +555,16 @@ namespace Ogre {
     /// Used as the light list, sorted
     struct LightClosest
     {
-        Light       *light;
-        /// Index to SceneManager::mGlobalLightList.
-        /// globalIndex may be == SceneManager::mGlobalLightList.size() if
-        /// it holds a static light (see CompositorShadowNode::setLightFixedToShadowMap)
-        /// that is not currently in camera.
+        Light const *light;
         size_t      globalIndex; //Index to SceneManager::mGlobalLightList
         Real        distance;
-        bool        isStatic;
-        bool        isDirty;
 
-        LightClosest() :
-            light( 0 ),globalIndex( 0 ),distance( 0.0f ),
-            isStatic( false ), isDirty( false ) {}
+        LightClosest() : light( 0 ),globalIndex(0),distance( 0.0f ) {}
         LightClosest( Light *_light, size_t _globalIndex, Real _distance ) :
-            light( _light ), globalIndex( _globalIndex ), distance( _distance ),
-            isStatic( false ), isDirty( false ) {}
+            light( _light ), globalIndex( _globalIndex ),
+            distance( _distance ) {}
 
-        inline bool operator < ( const LightClosest &right ) const
-        {
-            /*Shouldn't be necessary. distance is insanely low (big negative number)
-            if( light->getType() == Light::LT_DIRECTIONAL &&
-                right.light->getType() != Light::LT_DIRECTIONAL )
-            {
-                return true;
-            }
-            else if( light->getType() != Light::LT_DIRECTIONAL &&
-                     right.light->getType() == Light::LT_DIRECTIONAL )
-            {
-                return false;
-            }*/
-            return distance < right.distance;
-        }
+        inline bool operator < ( const LightClosest &right ) const;
     };
     /// Holds all lights in SoA after being culled over all frustums
     struct LightListInfo
@@ -702,19 +582,20 @@ namespace Ogre {
         }
     };
     typedef HashedVector<LightClosest> LightList;
+    typedef vector<LightClosest>::type LightClosestVec;
     typedef FastArray<LightClosest> LightClosestArray;
 
     /// Constant blank string, useful for returning by ref where local does not exist
     const String BLANKSTRING;
 
-    typedef StdMap<String, bool> UnaryOptionList;
-    typedef StdMap<String, String> BinaryOptionList;
+    typedef map<String, bool>::type UnaryOptionList;
+    typedef map<String, String>::type BinaryOptionList;
 
     /// Name / value parameter pair (first = name, second = value)
-    typedef StdMap<String, String> NameValuePairList;
+    typedef map<String, String>::type NameValuePairList;
 
     /// Alias / Texture name pair (first = alias, second = texture name)
-    typedef StdMap<String, String> AliasTextureNamePairList;
+    typedef map<String, String>::type AliasTextureNamePairList;
 
         template< typename T > struct TRect
         {
@@ -796,12 +677,12 @@ namespace Ogre {
           }
 
         };
-        /*template<typename T>
+        template<typename T>
         std::ostream& operator<<(std::ostream& o, const TRect<T>& r)
         {
             o << "TRect<>(l:" << r.left << ", t:" << r.top << ", r:" << r.right << ", b:" << r.bottom << ")";
             return o;
-        }*/
+        }
 
         /** Structure used to define a rectangle in a 2-D floating point space.
         */
@@ -911,164 +792,21 @@ namespace Ogre {
         CLIPPED_ALL = 2
     };
 
-    /** Specifies orientation mode.
-    */
-    enum OrientationMode
+    /// Render window creation parameters.
+    struct RenderWindowDescription
     {
-        OR_DEGREE_0       = 0,
-        /// Causes internal resolution to swap width and height
-        OR_DEGREE_90      = 1,
-        OR_DEGREE_180     = 2,
-        /// Causes internal resolution to swap width and height
-        OR_DEGREE_270     = 3,
-
-        OR_PORTRAIT       = OR_DEGREE_0,
-        OR_LANDSCAPERIGHT = OR_DEGREE_90,
-        OR_LANDSCAPELEFT  = OR_DEGREE_270
+        String              name;
+        unsigned int        width;
+        unsigned int        height;
+        bool                useFullScreen;
+        NameValuePairList   miscParams;
     };
 
-    namespace MsaaPatterns
-    {
-        enum MsaaPatterns
-        {
-            /// Let the GPU decide.
-            Undefined,
-            /// The subsample locations follow a fixed known mPattern.
-            /// Call TextureGpu::getSubsampleLocations to get them.
-            Standard,
-            /// The subsample locations are centered in a grid.
-            /// May not be supported by the GPU/API, in which case Standard will be used instead
-            /// Call TextureGpu::isMsaaPatternSupported to check whether it will be honoured.
-            Center,
-            /// All subsamples are at 0, 0; effectively "disabling" msaa.
-            CenterZero
-        };
-    }
-
-    /// Opaque struct that holds effective FSAA (MSAA, CSAA, etc.) mode.
-    ///
-    /// Note that you can request a SampleDescription, but you may get the closest
-    /// quality if that particular setting is not supported by the GPU.
-    ///
-    /// Additionally, device lost events can cause FSAA settings to be degraded on the fly
-    /// Listen for TextureGpuListener::FsaaSettingAlteredByApi events to be notified of
-    /// this
-    struct _OgreExport SampleDescription
-    {
-    protected:
-        uint8 mColourSamples;
-        uint8 mCoverageSamples;
-        uint8 mPattern; /// See MsaaPatterns::MsaaPatterns
-        uint8 mPadding;
-
-    public:
-        SampleDescription( uint8 msaa = 1u,
-                           MsaaPatterns::MsaaPatterns pattern = MsaaPatterns::Undefined ) :
-            mColourSamples( msaa ),
-            mCoverageSamples( 0 ),
-            mPattern( pattern ),
-            mPadding( 0u )
-        {
-        }
-        explicit SampleDescription( const String &fsaaSetting )
-        {
-            parseString( fsaaSetting );
-        }
-
-        bool operator==( const SampleDescription &rhs ) const
-        {
-            return mColourSamples == rhs.mColourSamples && mCoverageSamples == rhs.mCoverageSamples &&
-                   mPattern == rhs.mPattern;
-        }
-
-        bool operator!=( const SampleDescription &rhs ) const
-        {
-            return mColourSamples != rhs.mColourSamples || mCoverageSamples != rhs.mCoverageSamples ||
-                   mPattern != rhs.mPattern;
-        }
-
-        bool operator<( const SampleDescription &other ) const
-        {
-            if( this->mColourSamples != other.mColourSamples )
-                return this->mColourSamples < other.mColourSamples;
-            if( this->mCoverageSamples != other.mCoverageSamples )
-                return this->mCoverageSamples < other.mCoverageSamples;
-
-            return this->mPattern < other.mPattern;
-        }
-
-        bool isMultisample( void ) const { return mColourSamples > 1u; }
-
-        /// For internal use
-        void _set( uint8 colourSamples, uint8 coverageSamples, MsaaPatterns::MsaaPatterns pattern );
-
-        uint8 getColourSamples( void ) const { return mColourSamples; }
-        uint8 getCoverageSamples( void ) const { return mCoverageSamples; }
-        uint8 getMaxSamples( void ) const { return std::max( mCoverageSamples, mColourSamples ); }
-        MsaaPatterns::MsaaPatterns getMsaaPattern( void ) const
-        {
-            return static_cast<MsaaPatterns::MsaaPatterns>( mPattern );
-        }
-
-        void setMsaa( uint8 msaa, MsaaPatterns::MsaaPatterns pattern = MsaaPatterns::Undefined );
-
-        bool isMsaa( void ) const;
-
-        /** Set CSAA by NVIDIA's marketing names e.g.
-                8x CSAA call setCsaa( 8u, false )
-                8x CSAA (Quality) then call setCsaa( 8u, true )
-                16x CSAA call setCsaa( 16u, false )
-                16x CSAA (Quality) then call setCsaa( 16u, true )
-        @param samples
-            Marketing value. Can be 8 or 16
-        @param bQuality
-            True to use the 'quality' variation, false otherwise
-        */
-        void setCsaa( uint8 samples, bool bQuality );
-
-        /** Returns true if this is CSAA, whether it's quality or not
-        @remark
-            There is some overlap between CSAA and EQAA modes, hence this
-            function may return true even if setEqaa was called
-        */
-        bool isCsaa( void ) const;
-
-        /** Returns true if this is CSAA in quality mode
-        @remark
-            There is some overlap between CSAA and EQAA modes, hence this
-            function may return true even if setEqaa was called
-        */
-        bool isCsaaQuality( void ) const;
-
-        /** Set EQAA by its marketing number (which coincides with its technical spec) e.g.
-                2f4x EQAA call setEqaa( 2u, 4u )
-                4f8x EQAA call setEqaa( 4u, 8u )
-                8f16x EQAA call setEqaa( 8u, 16u )
-        @param mColourSamples
-        @param coverageSample
-        */
-        void setEqaa( uint8 colourSamples, uint8 coverageSamples );
-
-        void parseString( const String &fsaaSetting );
-        /// Appends the FSAA description to the string
-        void getFsaaDesc( LwString &outFsaaSetting ) const;
-        /// Appends the FSAA description to the string
-        void getFsaaDesc( String &outFsaaSetting ) const;
-    };
-
-    struct _OgreExport RenderingMetrics
-    {
-        bool mIsRecordingMetrics;
-        size_t mBatchCount;
-        size_t mFaceCount;
-        size_t mVertexCount;
-        size_t mDrawCount;
-        size_t mInstanceCount;
-        RenderingMetrics();
-    };
+    /// Render window creation parameters container.
+    typedef vector<RenderWindowDescription>::type RenderWindowDescriptionList;
 
     /// Render window container.
-    typedef StdVector<Window*> WindowList;
+    typedef vector<RenderWindow*>::type RenderWindowList;
 
     /** @} */
     /** @} */
@@ -1090,28 +828,56 @@ namespace Ogre {
         return container.begin() + idx;
     }
 
-    /// Aligns the input 'offset' to the next multiple of 'alignment'.
-    /// Alignment can be any value except 0. Some examples:
-    ///
-    /// alignToNextMultiple( 0, 4 ) = 0;
-    /// alignToNextMultiple( 1, 4 ) = 4;
-    /// alignToNextMultiple( 2, 4 ) = 4;
-    /// alignToNextMultiple( 3, 4 ) = 4;
-    /// alignToNextMultiple( 4, 4 ) = 4;
-    /// alignToNextMultiple( 5, 4 ) = 8;
-    ///
-    /// alignToNextMultiple( 0, 3 ) = 0;
-    /// alignToNextMultiple( 1, 3 ) = 3;
-    inline size_t alignToNextMultiple( size_t offset, size_t alignment )
+#if OGRE_CPU == OGRE_CPU_X86
+    //VS 2012 translates this to a single maxss/maxpd instruction! :)
+    //(plus some memory loading if arguments weren't loaded)
+    inline float min( const float &left, const float &right )
     {
-        return ( (offset + alignment - 1u) / alignment ) * alignment;
+        float retVal;
+        _mm_store_ss( &retVal, _mm_min_ss( _mm_set_ss( left ), _mm_set_ss( right ) ) );
+        return retVal;
     }
-    /// This function has been purposedly not been named 'alignToPrevMultiple'
-    /// to avoid easily confusing it with alignToNextMultiple
-    inline size_t alignToPreviousMult( size_t offset, size_t alignment )
+    inline float max( const float &left, const float &right )
     {
-        return (offset / alignment) * alignment;
+        float retVal;
+        _mm_store_ss( &retVal, _mm_max_ss( _mm_set_ss( left ), _mm_set_ss( right ) ) );
+        return retVal;
     }
+    inline double min( const double &left, const double &right )
+    {
+        double retVal;
+        _mm_store_sd( &retVal, _mm_min_sd( _mm_set_sd( left ), _mm_set_sd( right ) ) );
+        return retVal;
+    }
+    inline double max( const double &left, const double &right )
+    {
+        double retVal;
+        _mm_store_sd( &retVal, _mm_max_sd( _mm_set_sd( left ), _mm_set_sd( right ) ) );
+        return retVal;
+    }
+#else
+    //At least VS 2012 translates this to conditional moves. Using
+    //"const float" instead of "const float&" and becomes a jump
+    inline const float& min( const float &a, const float &b )
+    {
+        return a < b ? a : b;
+    }
+
+    inline const float& max( const float &a, const float &b )
+    {
+        return a > b ? a : b;
+    }
+
+    inline const double& min( const double &a, const double &b )
+    {
+        return a < b ? a : b;
+    }
+
+    inline const double& max( const double &a, const double &b )
+    {
+        return a > b ? a : b;
+    }
+#endif
 }
 
 #include "OgreHeaderSuffix.h"

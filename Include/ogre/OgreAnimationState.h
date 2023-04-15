@@ -31,18 +31,13 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
+#include "OgreCommon.h"
 #include "OgreController.h"
 #include "OgreIteratorWrappers.h"
 #include "Threading/OgreThreadHeaders.h"
-
-#include "ogrestd/list.h"
-#include "ogrestd/map.h"
-#include "ogrestd/vector.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -296,7 +291,6 @@ namespace v1 {
 
     /** @} */   
     /** @} */
-}
 }
 
 #include "OgreHeaderSuffix.h"

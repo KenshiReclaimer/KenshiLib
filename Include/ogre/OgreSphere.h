@@ -35,6 +35,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+
     /** \addtogroup Core
     *  @{
     */

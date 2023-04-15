@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class _OgreExport BooleanMask4
+    class BooleanMask4
     {
     public:
         enum
@@ -63,12 +63,10 @@ namespace Ogre
             NUM_MASKS           =16
         };
     private:
-        static const uint32x4_ct mMasks[NUM_MASKS];
+        static const ArrayMaskR mMasks[NUM_MASKS];
     public:
         inline static ArrayMaskR getMask( bool x, bool y, bool z, bool w );
         inline static ArrayMaskR getMask( bool booleans[4] );
-
-        inline static ArrayMaskR getAllSetMask(void);
 
         /// Returns true if alls bit in mask0[i] and mask1[i] are set.
         inline static bool allBitsSet( bool mask0[4], bool mask1[4] );
@@ -80,9 +78,7 @@ namespace Ogre
         */
         inline static uint32 getScalarMask( ArrayMaskR mask );
 
-#ifndef _MSC_VER // everything is __n128 on MSVC, so extra overloads are not allowed
         inline static uint32 getScalarMask( ArrayInt mask );
-#endif
     };
 }
 

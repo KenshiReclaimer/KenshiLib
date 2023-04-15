@@ -29,12 +29,9 @@ THE SOFTWARE.
 #ifndef _OgreCompositorWorkspace_H_
 #define _OgreCompositorWorkspace_H_
 
+#include "OgreHeaderPrefix.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
 #include "Compositor/OgreCompositorChannel.h"
-#include "OgreVector4.h"
-#include "OgreResourceTransition.h"
-
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -44,10 +41,6 @@ namespace Ogre
     /** \addtogroup Effects
     *  @{
     */
-
-    struct BoundUav;
-    typedef vector<UavBufferPacked *>::type UavBufferPackedVec;
-    typedef map<TextureGpu *, FastArray<CompositorPass *> >::type PassesByRenderWindowMap;
 
     /** A compositor workspace is the main interface to render into an RT, be it a RenderWindow or an
         RTT (Render Texture Target). Whereas Ogre 1.x needed you to set a Viewport in order to render
@@ -89,30 +82,20 @@ namespace Ogre
 
         bool                    mValid;
         bool                    mEnabled;
-        bool                    mAmalgamatedProfiling;
 
-        CompositorWorkspaceListenerVec mListeners;
+        CompositorWorkspaceListener *mListener;
 
         /// Main sequence in the order they should be executed
         CompositorNodeVec       mNodeSequence;
         CompositorShadowNodeVec mShadowNodes;
         CompositorChannelVec    mGlobalTextures;
-        CompositorNamedBufferVec mGlobalBuffers;
         Camera                  *mDefaultCamera; /// Could be null. @See CompositorManager2::addWorkspace
         SceneManager            *mSceneManager;
         RenderSystem            *mRenderSys;
 
-        CompositorChannelVec    mExternalRenderTargets;
+        CompositorChannel       mRenderWindow;
         uint                    mCurrentWidth;
         uint                    mCurrentHeight;
-
-        uint8                   mExecutionMask;
-        uint8                   mViewportModifierMask;
-        Vector4                 mViewportModifier;
-
-        UavBufferPackedVec      mExternalBuffers;
-
-        ResourceStatusMap       mInitialLayouts;
 
         /// Creates all the node instances from our definition
         void createAllNodes(void);
@@ -140,22 +123,13 @@ namespace Ogre
         */
         void setupPassesShadowNodes(void);
 
-        CompositorNode* getLastEnabledNode(void);
-
     public:
         CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
-                             const CompositorChannelVec &externalRenderTargets,
-                             SceneManager *sceneManager, Camera *defaultCam,
-                             RenderSystem *renderSys, bool bEnabled,
-                             uint8 executionMask, uint8 viewportModifierMask,
-                             const Vector4 &vpOffsetScale,
-                             const UavBufferPackedVec *uavBuffers,
-                             const ResourceStatusMap* initialLayouts );
+                                const CompositorChannel &finalRenderTarget, SceneManager *sceneManager,
+                                Camera *defaultCam, RenderSystem *renderSys, bool bEnabled );
         virtual ~CompositorWorkspace();
 
         const CompositorChannel& getGlobalTexture( IdString name ) const;
-
-        const CompositorNamedBufferVec& getGlobalBuffers(void) const    { return mGlobalBuffers; }
 
         /// Only valid workspaces can update without crashing
         bool isValid(void) const                            { return mValid; }
@@ -163,35 +137,8 @@ namespace Ogre
         void setEnabled( bool bEnabled )                    { mEnabled = bEnabled; }
         bool getEnabled() const                             { return mEnabled; }
 
-        /** When building with OGRE_PROFILING enabled, setting this option to true
-            will cause the profiler to collapse all per-pass profiling information
-            into one group.
-            This is useful if you want to know how much (e.g.) frustum culling
-            is taking overall (all passes combined) rather than knowing how
-            much frustum culling is taking for each pass.
-        @param bEnabled
-            True to collapse all per-pass info into a global one. Default is false.
-        */
-        void setAmalgamatedProfiling( bool bEnabled )       { mAmalgamatedProfiling = bEnabled; }
-        bool getAmalgamatedProfiling(void) const            { return mAmalgamatedProfiling; }
-
-        /// @deprecated use addListener and removeListener instead
-        void setListener( CompositorWorkspaceListener *listener );
-        /// @deprecated use getListeners instead
-        CompositorWorkspaceListener* getListener(void) const;
-
-        void addListener( CompositorWorkspaceListener *listener );
-        void removeListener( CompositorWorkspaceListener *listener );
-
-        const CompositorWorkspaceListenerVec& getListeners(void) const { return mListeners; }
-
-        /** Fills the input map + vector with all the passes that use a window,
-            classified per window.
-        @remarks
-            We do not support passes that write to more than one render window at once
-            (this should not be supported by APIs anyway)
-        */
-        void fillPassesUsingRenderWindows( PassesByRenderWindowMap &passesUsingRenderWindows );
+        void setListener( CompositorWorkspaceListener *listener )   { mListener = listener; }
+        CompositorWorkspaceListener* getListener(void) const        { return mListener; }
 
         /** Finds a node instance with the given aliased name
         @remarks
@@ -203,11 +150,9 @@ namespace Ogre
             it will not be created (default: false). @See findShadowNode
             When a Node has the same name of a Shadow Node, the Node takes precedence.
         @return
-            Regular version: Valid pointer. Throws exception if not found.
-            NoThrow version: Null if not found. Valid pointer otherwise.
+            Null if not found. Valid pointer otherwise.
         */
         CompositorNode* findNode( IdString aliasName, bool includeShadowNodes=false ) const;
-        CompositorNode* findNodeNoThrow( IdString aliasName, bool includeShadowNodes=false ) const;
 
         /** Destroys and recreates all nodes. TODO: Only revalidate nodes adjacent to those that
             were invalidated, to avoid recreating so many D3D/GL resources (local textures)
@@ -223,11 +168,6 @@ namespace Ogre
         */
         void reconnectAllNodes(void);
 
-        /** Resets the number of passes left for every pass (@see CompositorPassDef::mNumInitialPasses)
-            Useful when you have a few starting 'initialization' passes and you want to reset them.
-        */
-        void resetAllNumPassesLeft(void);
-
         /** Call before _update unless the final render target is not a render window
         @param forceBeginFrame
             Forces a beginFrame call to the D3D9 API, even if the final render target is not
@@ -237,13 +177,7 @@ namespace Ogre
         */
         void _beginUpdate( bool forceBeginFrame );
 
-        /** Updates the workspace's nodes.
-        @remarks
-            If you're calling this manually, it may be possible you first need to call
-            RenderSystem::_beginFrameOnce if it wasn't called by OGRE already.
-            You might also need to enclose the _update calls with _beginUpdate( true )
-            and _endUpdate( true ) if you're having issues.
-        */
+        /// Updates the workspace's nodes.
         void _update(void);
 
         /** Call after _update unless the final render target is not a render window
@@ -262,7 +196,7 @@ namespace Ogre
         @remarks
             Call this after _endUpdate
         */
-        void _swapFinalTarget( vector<TextureGpu*>::type &swappedTargets );
+        void _swapFinalTarget(void);
 
         /** For compatibility with D3D9, forces a device lost check
             on the RenderWindow, so that BeginScene doesn't fail.
@@ -309,29 +243,14 @@ namespace Ogre
 
         SceneManager* getSceneManager() const               { return mSceneManager; }
 
-        /// Usually by convention the RenderTarget[0] is the one we're rendering to. May be empty.
-        const CompositorChannelVec& getExternalRenderTargets(void) const
-															{ return mExternalRenderTargets; }
         /// Returns the RenderTarget we're rendering to. May be null.
-        /// @see getExternalRenderTargets
-        TextureGpu* getFinalTarget(void) const;
-
-        uint8 getViewportModifierMask(void) const           { return mViewportModifierMask; }
-        void setViewportModifierMask(uint8 mask)            { mViewportModifierMask = mask; }
-        const Vector4& getViewportModifier(void) const      { return mViewportModifier; }
-        void setViewportModifier(const Vector4& modifier)   { mViewportModifier = modifier; }
-
-        uint8 getExecutionMask(void) const                  { return mExecutionMask; }
-
-        void _notifyBarriersDirty( void );
+        RenderTarget* getFinalTarget(void) const            { return mRenderWindow.target; }
 
         /// Gets the compositor manager (non const)
         CompositorManager2* getCompositorManager();
 
         /// Gets the compositor manager (const version)
         const CompositorManager2* getCompositorManager() const;
-
-        const CompositorWorkspaceDef *getDefinition( void ) { return mDefinition; }
 
         size_t getFrameCount(void) const;
     };

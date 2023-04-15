@@ -288,10 +288,10 @@ namespace Ogre
     inline ArrayReal ArrayVector3::length() const
     {
         return
-        MathlibNEON::Sqrt( vaddq_f32( vaddq_f32(                //sqrt(
-                vmulq_f32( mChunkBase[0], mChunkBase[0] ),		//(x * x +
+        vrsqrteq_f32( vaddq_f32( vaddq_f32(                 //sqrt(
+                vmulq_f32( mChunkBase[0], mChunkBase[0] ),  //(x * x +
                 vmulq_f32( mChunkBase[1], mChunkBase[1] ) ),    //y * y) +
-                vmulq_f32( mChunkBase[2], mChunkBase[2] ) ) );  //z * z )
+            vmulq_f32( mChunkBase[2], mChunkBase[2] ) ) );  //z * z )
     }
     //-----------------------------------------------------------------------------------
     inline ArrayReal ArrayVector3::squaredLength() const
@@ -530,7 +530,7 @@ namespace Ogre
         Real min1 = MathlibNEON::CollapseMin(mChunkBase[1]);
         Real min2 = MathlibNEON::CollapseMin(mChunkBase[2]);
 
-        float32x4_ct minArray = { min0, min1, min2, std::numeric_limits<Real>::infinity() };
+        ArrayReal minArray = { min0, min1, min2, std::numeric_limits<Real>::infinity() };
         Real min = MathlibNEON::CollapseMin(minArray);
 //        min = vminq_f32(mChunkBase[0], mChunkBase[1]);
 //        min = vminq_f32(min, mChunkBase[2]);
@@ -571,7 +571,7 @@ namespace Ogre
         Real max1 = MathlibNEON::CollapseMax(mChunkBase[1]);
         Real max2 = MathlibNEON::CollapseMax(mChunkBase[2]);
 
-        float32x4_ct maxArray = { max0, max1, max2, -std::numeric_limits<Real>::infinity() };
+        ArrayReal maxArray = { max0, max1, max2, -std::numeric_limits<Real>::infinity() };
         Real max = MathlibNEON::CollapseMax(maxArray);
 //        ArrayReal max;
 //        max = vmaxq_f32(mChunkBase[0], mChunkBase[1]);

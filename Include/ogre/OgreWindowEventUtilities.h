@@ -31,9 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgrePlatform.h"
 #include "OgreCommon.h"
-
-#include "ogrestd/map.h"
-
 #include "OgreHeaderPrefix.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -71,50 +68,50 @@ namespace Ogre
         @remarks
             Window has moved position
         @param rw
-            The Window which created this events
+            The RenderWindow which created this events
         */
-        virtual void windowMoved(Window* rw)
+        virtual void windowMoved(RenderWindow* rw)
                 { (void)rw; }
 
         /**
         @remarks
             Window has resized
         @param rw
-            The Window which created this events
+            The RenderWindow which created this events
         */
-        virtual void windowResized(Window* rw)
+        virtual void windowResized(RenderWindow* rw)
                 { (void)rw; }
 
         /**
         @remarks
             Window is closing (Only triggered if user pressed the [X] button)
         @param rw
-            The Window which created this events
+            The RenderWindow which created this events
         @return True will close the window(default).
         */
-        virtual bool windowClosing(Window* rw)
+        virtual bool windowClosing(RenderWindow* rw)
         { (void)rw; return true; }
 
         /**
         @remarks
             Window has been closed (Only triggered if user pressed the [X] button)
         @param rw
-            The Window which created this events
+            The RenderWindow which created this events
         @note
             The window has not actually close yet when this event triggers. It's only closed after
             all windowClosed events are triggered. This allows apps to deinitialise properly if they
             have services that needs the window to exist when deinitialising.
         */
-        virtual void windowClosed(Window* rw)
+        virtual void windowClosed(RenderWindow* rw)
                 { (void)rw; }
 
         /**
         @remarks
             Window has lost/gained focus
         @param rw
-            The Window which created this events
+            The RenderWindow which created this events
         */
-        virtual void windowFocusChange(Window* rw)
+        virtual void windowFocusChange(RenderWindow* rw)
                 { (void)rw; }
     };
 
@@ -142,7 +139,7 @@ namespace Ogre
         @param listener
             Your callback listener
         */
-        static void addWindowEventListener( Window* window, WindowEventListener* listener );
+        static void addWindowEventListener( RenderWindow* window, WindowEventListener* listener );
 
         /**
         @remarks
@@ -152,7 +149,7 @@ namespace Ogre
         @param listener
             The listener registered
         */
-        static void removeWindowEventListener( Window *window, WindowEventListener* listener );
+        static void removeWindowEventListener( RenderWindow* window, WindowEventListener* listener );
 
         /**
         @remarks
@@ -161,7 +158,7 @@ namespace Ogre
         @param window
             The RenderWindow to monitor
         */
-        static void _addRenderWindow( Window *window );
+        static void _addRenderWindow(RenderWindow* window);
 
         /**
         @remarks
@@ -170,7 +167,7 @@ namespace Ogre
         @param window
             The RenderWindow to remove from list
         */
-        static void _removeRenderWindow( Window *window );
+        static void _removeRenderWindow(RenderWindow* window);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         //! Internal winProc (RenderWindow's use this when creating the Win32 Window)
@@ -181,9 +178,9 @@ namespace Ogre
 #endif
 
         //These are public only so GLXProc can access them without adding Xlib headers header
-        typedef multimap<Window*, WindowEventListener*>::type WindowEventListeners;
+        typedef multimap<RenderWindow*, WindowEventListener*>::type WindowEventListeners;
         static WindowEventListeners _msListeners;
-        static WindowList _msWindows;
+        static RenderWindowList _msWindows;
     };
     /** @} */
     /** @} */

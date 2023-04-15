@@ -219,9 +219,6 @@ namespace Ogre {
         const String& getType(void) const { return mType; }
         
     };
-
-    typedef vector<Archive*>::type ArchiveVec;
-
     /** @} */
     /** @} */
 

@@ -32,18 +32,12 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 #include "Compositor/Pass/OgreCompositorPassDef.h"
-#include "OgrePixelFormatGpu.h"
-
-#include "ogrestd/map.h"
 
 namespace Ogre
 {
     class RenderTarget;
-    typedef TextureGpu* CompositorChannel;
+    struct CompositorChannel;
     class CompositorNode;
-    struct RenderTargetViewDef;
-    struct RenderTargetViewEntry;
-    typedef vector<TextureGpu*>::type TextureGpuVec;
 
     /** \addtogroup Core
     *  @{
@@ -51,21 +45,6 @@ namespace Ogre
     /** \addtogroup Effects
     *  @{
     */
-    struct CompositorTexture
-    {
-        IdString    name;
-        TextureGpu  *texture;
-
-        CompositorTexture( IdString _name, TextureGpu *_texture ) :
-                name( _name ), texture( _texture ) {}
-
-        bool operator == ( IdString right ) const
-        {
-            return name == right;
-        }
-    };
-
-    typedef vector<CompositorTexture>::type CompositorTextureVec;
 
     /** Abstract class for compositor passes. A pass can be a fullscreen quad, a scene
         rendering, a clear. etc.
@@ -81,125 +60,39 @@ namespace Ogre
     {
         CompositorPassDef const *mDefinition;
     protected:
-        static const Quaternion CubemapRotations[6];
-
-        RenderPassDescriptor    *mRenderPassDesc;
-        /// Contains the first valid texture in mRenderPassDesc, to be used for reference
-        /// (e.g. width, height, etc). Could be colour, depth, stencil, or nullptr.
-        TextureGpu              *mAnyTargetTexture;
-        uint8                   mAnyMipLevel;
+        RenderTarget    *mTarget;
+        Viewport        *mViewport;
 
         uint32          mNumPassesLeft;
 
         CompositorNode  *mParentNode;
 
-        CompositorTextureVec    mTextureDependencies;
-
-        BarrierSolver &mBarrierSolver;
-        ResourceTransitionArray mResourceTransitions;
-
-        /// MUST be called by derived class.
-        void initialize( const RenderTargetViewDef *rtv, bool supportsNoRtv=false );
-
-        /// Modifies mRenderPassDesc
-        void setupRenderPassDesc( const RenderTargetViewDef *rtv );
-        /**
-        @param renderPassTargetAttachment
-        @param rtvEntry
-        @param linkedColourAttachment
-            When setting depth & stencil, we'll use this argument for finding
-            a depth buffer in the same depth pool (unless the depth buffer is
-            explicit)
-        */
-        void setupRenderPassTarget( RenderPassTargetBase *renderPassTargetAttachment,
-                                    const RenderTargetViewEntry &rtvEntry,
-                                    bool isColourAttachment,
-                                    TextureGpu *linkedColourAttachment=0, uint16 depthBufferId = 0,
-                                    bool preferDepthTexture = false,
-                                    PixelFormatGpu depthBufferFormat = PFG_UNKNOWN );
-
-        virtual bool allowResolveStoreActionsWithoutResolveTexture(void) const { return false; }
-        /// Called by setupRenderPassDesc right before calling renderPassDesc->entriesModified
-        /// in case derived class wants to make some changes.
-        virtual void postRenderPassDescriptorSetup( RenderPassDescriptor *renderPassDesc ) {}
-
-        /// Does the same as setRenderPassDescToCurrent, but only setting a single Viewport.
-        /// (setRenderPassDescToCurrent does much more)
-        ///
-        /// Needed due to catch-22 problem:
-        ///     1. Some algorithms (like LOD) need a Viewport set
-        ///     2. We can't call setRenderPassDescToCurrent until that algorithm has run
-        ///     3. The algorithm thus can't run if setRenderPassDescToCurrent isn't set
-        ///
-        /// See https://forums.ogre3d.org/viewtopic.php?p=548046#p548046
-        void setViewportSizeToViewport( size_t vpIdx, Viewport *outVp );
-        void setRenderPassDescToCurrent(void);
-
-        void populateTextureDependenciesFromExposedTextures(void);
-
-        void executeResourceTransitions(void);
-
-        void notifyPassEarlyPreExecuteListeners(void);
-        void notifyPassPreExecuteListeners(void);
-        void notifyPassPosExecuteListeners(void);
-
-        /// @see BarrierSolver::resolveTransition
-        void resolveTransition( TextureGpu *texture, ResourceLayout::Layout newLayout,
-                                ResourceAccess::ResourceAccess access, uint8 stageMask );
-        /// @see BarrierSolver::resolveTransition
-        void resolveTransition( GpuTrackedResource *bufferRes, ResourceAccess::ResourceAccess access,
-                                uint8 stageMask );
-
-        /** Bakes most of the memory barriers / resource transition that will be needed
-            during execution.
-
-            Some passes may still generate more barriers/transitions that need to be placed
-            dynamically. These passes must update resourceStatus without inserting a barrier
-            into mResourceTransitions
-        @param boundUavs [in/out]
-            An array of the currently bound UAVs by slot.
-            The derived class CompositorPassUav will write to them as part of the
-            emulation. The base implementation reads from this value.
-        @param resourceStatus [in/out]
-            A map with the last access flags used for each GpuTrackedResource.
-            We need it to identify how it was last used and thus what barrier
-            we need to insert
-        */
-        void analyzeBarriers( void );
+        RenderTarget* calculateRenderTarget( size_t rtIndex, const CompositorChannel &source );
 
     public:
-        CompositorPass( const CompositorPassDef *definition, CompositorNode *parentNode );
+        CompositorPass( const CompositorPassDef *definition, const CompositorChannel &target,
+                        CompositorNode *parentNode );
         virtual ~CompositorPass();
-
-        void profilingBegin(void);
-        void profilingEnd(void);
 
         virtual void execute( const Camera *lodCameraconst ) = 0;
 
         /// @See CompositorNode::notifyRecreated
-        virtual bool notifyRecreated( const TextureGpu *channel );
-        virtual void notifyRecreated( const UavBufferPacked *oldBuffer, UavBufferPacked *newBuffer );
+        virtual void notifyRecreated( const CompositorChannel &oldChannel,
+                                        const CompositorChannel &newChannel );
 
         /// @See CompositorNode::notifyDestroyed
-        virtual void notifyDestroyed( TextureGpu *channel );
-        virtual void notifyDestroyed( const UavBufferPacked *buffer );
+        virtual void notifyDestroyed( const CompositorChannel &channel );
 
         /// @See CompositorNode::_notifyCleared
         virtual void notifyCleared(void);
 
-        virtual void resetNumPassesLeft(void);
-
-        Vector2 getActualDimensions(void) const;
-
         CompositorPassType getType() const  { return mDefinition->getType(); }
 
-        RenderPassDescriptor* getRenderPassDesc(void) const { return mRenderPassDesc; }
+        Viewport* getViewport() const       { return mViewport; }
 
         const CompositorPassDef* getDefinition(void) const  { return mDefinition; }
 
 		const CompositorNode* getParentNode(void) const		{ return mParentNode; }
-
-        const CompositorTextureVec& getTextureDependencies(void) const  { return mTextureDependencies; }
     };
 
     /** @} */

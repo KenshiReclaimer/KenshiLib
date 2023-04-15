@@ -35,11 +35,8 @@ THE SOFTWARE.
 #include "OgreResourceGroupManager.h"
 #include "OgreRenderOperation.h"
 #include "OgreHeaderPrefix.h"
-#include "OgreHardwareBuffer.h"
 
 namespace Ogre
-{
-namespace v1
 {
     /** \addtogroup Core
     *  @{
@@ -109,22 +106,9 @@ namespace v1
     */
     class _OgreExport ManualObject : public MovableObject
     {
-
-        /** Return the HardwareBuffer::Usage that correspound to the input parameters */
-        inline Ogre::v1::HardwareBuffer::Usage getHardwareBufferUsage(bool isDynamic, bool isWriteOnly) const
-        {
-            if (isDynamic)
-                return isWriteOnly ? HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY : HardwareBuffer::HBU_DYNAMIC;
-            else
-                return isWriteOnly ? HardwareBuffer::HBU_STATIC_WRITE_ONLY : HardwareBuffer::HBU_STATIC;
-        }
-
     public:
-        ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager );
+        ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager );
         virtual ~ManualObject();
-
-        /** @copydoc MovableObject::_releaseManualHardwareResources. */
-        void _releaseManualHardwareResources() { clear(); }
 
         //pre-declare ManualObjectSection
         class ManualObjectSection;
@@ -168,7 +152,7 @@ namespace v1
         @param opType The type of operation to use to render. 
         */
         virtual void begin(const String& materialName,
-            OperationType opType = OT_TRIANGLE_LIST, const String & groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            RenderOperation::OperationType opType = RenderOperation::OT_TRIANGLE_LIST, const String & groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
         /** Use before defining geometry to indicate that you intend to update the
             geometry regularly and want the internal structure to reflect that.
@@ -176,16 +160,6 @@ namespace v1
         virtual void setDynamic(bool dyn) { mDynamic = dyn; }
         /** Gets whether this object is marked as dynamic */
         virtual bool getDynamic() const { return mDynamic; }
-
-        /** Use before defining geometry to indicate that you intend to be able
-            to read back from the geometry buffers again down the line (object
-            convertion to v2, physics engine body creation...
-         */
-        virtual void setReadable(bool readable) { mWriteOnly = !readable; }
-        /** Same as setReadable, but with the invese scemantic */
-        virtual void setWriteOnly(bool writeOnly) { setReadable(!writeOnly); }
-        /** Gets wheter this object has geometry buffer marked as write only */
-        virtual bool getWriteOnly() const { return mWriteOnly; }
 
         /** Start the definition of an update to a part of the object.
         @remarks
@@ -265,7 +239,7 @@ namespace v1
         @remarks
             You will have to call this 3 times for each face for a triangle list, 
             or use the alternative 3-parameter version. Other operation types
-            require different numbers of indexes, @see OperationType.
+            require different numbers of indexes, @see RenderOperation::OperationType.
         @note
             32-bit indexes are not supported on all cards and will only be used
             when required, if an index is > 65535.
@@ -324,13 +298,9 @@ namespace v1
         @note Only objects which use indexed geometry may be converted to a mesh.
         @param meshName The name to give the mesh
         @param groupName The resource group to create the mesh in
-        @param buildShadowMapBuffers
-            True to create an optimized copy of the vertex buffers for efficient
-            shadow mapping.
         */
         virtual MeshPtr convertToMesh(const String& meshName, 
-            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-            bool buildShadowMapBuffers = true );
+            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
         /** Sets whether or not to use an 'identity' projection.
         @remarks
@@ -424,7 +394,7 @@ namespace v1
             
         public:
             ManualObjectSection(ManualObject* parent, const String& materialName,
-                OperationType opType, const String & groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+                RenderOperation::OperationType opType, const String & groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
             virtual ~ManualObjectSection();
             
             /// Retrieve render operation for manipulation
@@ -444,7 +414,7 @@ namespace v1
             /** @copydoc Renderable::getMaterial. */
             const MaterialPtr& getMaterial(void) const;
             /** @copydoc Renderable::getRenderOperation. */
-            void getRenderOperation(RenderOperation& op, bool casterPass);
+            void getRenderOperation(RenderOperation& op);
             /** @copydoc Renderable::getWorldTransforms. */
             void getWorldTransforms(Matrix4* xform) const;
             /** @copydoc Renderable::getSquaredViewDepth. */
@@ -458,11 +428,14 @@ namespace v1
 
         typedef vector<ManualObjectSection*>::type SectionList;
 
+        /// @copydoc MovableObject::visitRenderables
+        void visitRenderables(Renderable::Visitor* visitor, 
+            bool debugRenderables = false);
+        
+        
     protected:
         /// Dynamic?
         bool mDynamic;
-        /// Write only?
-        bool mWriteOnly;
         /// List of subsections
         SectionList mSectionList;
         /// Current section
@@ -531,8 +504,7 @@ namespace v1
     {
     protected:
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                                   SceneManager *manager,
-                                                   const NameValuePairList* params = 0 );
+                                                    const NameValuePairList* params = 0 );
     public:
         ManualObjectFactory() {}
         ~ManualObjectFactory() {}
@@ -545,7 +517,6 @@ namespace v1
     };
     /** @} */
     /** @} */
-}
 }
 
 #include "OgreHeaderSuffix.h"

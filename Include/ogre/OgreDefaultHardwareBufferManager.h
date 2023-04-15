@@ -37,7 +37,6 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
-namespace v1 {
     /** \addtogroup Core
     *  @{
     */
@@ -65,7 +64,7 @@ namespace v1 {
         void writeData(size_t offset, size_t length, const void* pSource,
                 bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
+        void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
         /** Override HardwareBuffer to turn off all shadowing. */
         void unlock(void);
 
@@ -90,7 +89,7 @@ namespace v1 {
         void writeData(size_t offset, size_t length, const void* pSource,
                 bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
+        void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
         /** Override HardwareBuffer to turn off all shadowing. */
         void unlock(void);
 
@@ -117,7 +116,7 @@ namespace v1 {
         void writeData(size_t offset, size_t length, const void* pSource,
                 bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
+        void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
         /** Override HardwareBuffer to turn off all shadowing. */
         void unlock(void);
     };
@@ -143,7 +142,7 @@ namespace v1 {
         void writeData(size_t offset, size_t length, const void* pSource,
                        bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
+        void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
         /** Override HardwareBuffer to turn off all shadowing. */
         void unlock(void);
     };
@@ -168,6 +167,8 @@ namespace v1 {
         HardwareIndexBufferSharedPtr 
             createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
                 HardwareBuffer::Usage usage, bool useShadowBuffer = false);
+        /// Create a hardware vertex buffer
+        RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
         /// Create a hardware uniform buffer
         HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, 
                                     HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
@@ -196,7 +197,6 @@ namespace v1 {
     /** @} */
     /** @} */
 
-}
 }
 
 #endif

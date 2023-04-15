@@ -26,8 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include <cmath>
-
 namespace Ogre
 {
     inline void Aabb::setExtents( const Vector3& min, const Vector3& max )
@@ -144,20 +142,20 @@ namespace Ogre
                 ( Math::Abs( dist.z ) <= mHalfSize.z );
     }
     //-----------------------------------------------------------------------------------
-    inline Real Aabb::squaredDistance( const Vector3 &v ) const
+    inline Real Aabb::distance( const Vector3 &v ) const
     {
         Vector3 dist( mCenter - v );
 
-        dist.x = std::max( Math::Abs( dist.x ) - mHalfSize.x, Real( 0.0 ) );
-        dist.y = std::max( Math::Abs( dist.y ) - mHalfSize.y, Real( 0.0 ) );
-        dist.z = std::max( Math::Abs( dist.z ) - mHalfSize.z, Real( 0.0 ) );
+        // x = abs( dist.x ) - halfSize.x
+        // y = abs( dist.y ) - halfSize.y
+        // z = abs( dist.z ) - halfSize.z
+        // return max( min( x, y, z ), 0 ); //Return minimum between xyz, clamp to zero
 
-        return dist.squaredLength();
-    }
-    //-----------------------------------------------------------------------------------
-    inline Real Aabb::distance( const Vector3 &v ) const
-    {
-        return std::sqrt( squaredDistance( v ) );
+        dist.x = Math::Abs( dist.x ) - mHalfSize.x;
+        dist.y = Math::Abs( dist.y ) - mHalfSize.y;
+        dist.z = Math::Abs( dist.z ) - mHalfSize.z;
+
+        return Ogre::max( Ogre::min( Ogre::min( dist.x, dist.y ), dist.z ), 1.0f );
     }
     //-----------------------------------------------------------------------------------
     inline void Aabb::transformAffine( const Matrix4 &m )
@@ -166,15 +164,15 @@ namespace Ogre
 
         mCenter = m.transformAffine( mCenter );
 
-        //Handle infinity & null boxes becoming NaN; leaving the original value instead.
-        Real x = Math::Abs( mHalfSize.x ) == std::numeric_limits<Real>::infinity() ? mHalfSize.x :
-            Math::Abs(m[0][0]) * mHalfSize.x + Math::Abs(m[0][1]) * mHalfSize.y + Math::Abs(m[0][2]) * mHalfSize.z;
-        Real y = Math::Abs( mHalfSize.y ) == std::numeric_limits<Real>::infinity() ? mHalfSize.y :
-            Math::Abs(m[1][0]) * mHalfSize.x + Math::Abs(m[1][1]) * mHalfSize.y + Math::Abs(m[1][2]) * mHalfSize.z;
-        Real z = Math::Abs( mHalfSize.z ) == std::numeric_limits<Real>::infinity() ? mHalfSize.z :
-            Math::Abs(m[2][0]) * mHalfSize.x + Math::Abs(m[2][1]) * mHalfSize.y + Math::Abs(m[2][2]) * mHalfSize.z;
+        Real x = Math::Abs(m[0][0]) * mHalfSize.x + Math::Abs(m[0][1]) * mHalfSize.y + Math::Abs(m[0][2]) * mHalfSize.z;
+        Real y = Math::Abs(m[1][0]) * mHalfSize.x + Math::Abs(m[1][1]) * mHalfSize.y + Math::Abs(m[1][2]) * mHalfSize.z;
+        Real z = Math::Abs(m[2][0]) * mHalfSize.x + Math::Abs(m[2][1]) * mHalfSize.y + Math::Abs(m[2][2]) * mHalfSize.z;
 
-        mHalfSize = Vector3( x, y, z );
+        //Handle infinity & null boxes becoming NaN; leaving the original value instead.
+        mHalfSize = Vector3(
+                Math::Abs(mHalfSize.x) == std::numeric_limits<Real>::infinity() ? mHalfSize.x : x,
+                Math::Abs(mHalfSize.y) == std::numeric_limits<Real>::infinity() ? mHalfSize.y : y,
+                Math::Abs(mHalfSize.z) == std::numeric_limits<Real>::infinity() ? mHalfSize.z : z );
     }
     //-----------------------------------------------------------------------------------
     inline Real Aabb::getRadius() const
@@ -188,15 +186,5 @@ namespace Ogre
         v.makeAbs();
         v += mHalfSize;         
         return v.length();
-    }
-    //-----------------------------------------------------------------------------------
-    inline bool Aabb::operator == ( const Aabb &_r ) const
-    {
-        return mCenter == _r.mCenter && mHalfSize == _r.mHalfSize;
-    }
-    //-----------------------------------------------------------------------------------
-    inline bool Aabb::operator != ( const Aabb &_r ) const
-    {
-        return mCenter != _r.mCenter || mHalfSize != _r.mHalfSize;
     }
 }

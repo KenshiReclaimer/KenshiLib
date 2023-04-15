@@ -29,7 +29,6 @@ THE SOFTWARE.
 #ifndef __OgreIdString__
 #define __OgreIdString__
 
-#include "OgrePrerequisites.h"
 #include "Hash/MurmurHash3.h"
 #include <stdio.h>  // sprintf
 #include <string.h> // strlen
@@ -38,11 +37,11 @@ THE SOFTWARE.
 #define OGRE_HASH_FUNC MurmurHash3_x86_32
 #define OGRE_HASH_BITS 32
 
-#if OGRE_DEBUG_MODE == 0 && OGRE_IDSTRING_ALWAYS_READABLE == 0
+#ifdef NDEBUG
     #define OGRE_COPY_DEBUG_STRING( _Expression ) ((void)0)
     #define OGRE_APPEND_DEBUG_STRING( _Expression ) ((void)0)
 #else
-    #include <assert.h>
+    #include "assert.h"
 #endif
 
 namespace Ogre
@@ -62,7 +61,7 @@ namespace Ogre
         This means that you may no longer recover the real string it was constructed from.
         When the original data is not available getFriendlyText returns [Hash 0x0a0100ef]
         (in the example that mHash = 0x0a0100ef)*
-        In debug mode (OGRE_DEBUG_MODE is defined), IdStrings try to maintain a copy of
+        In non-release modes (NDEBUG is not defined), IdStrings try to maintain a copy of
         the original string for two purposes:
             1. Easy debugging: Reading "Texture/diffuse.png" is much nicer than "0x0a0100ef"
             2. Hash collision: If Ogre finds two IdStrings are identical but their original
@@ -97,14 +96,14 @@ namespace Ogre
         static const uint32_t Seed = 0x3A8EFA67; //It's a prime number :)
 
         uint32      mHash;
-#if OGRE_DEBUG_MODE || OGRE_IDSTRING_ALWAYS_READABLE
+#ifndef NDEBUG
         #define OGRE_DEBUG_STR_SIZE 32
         char        mDebugString[OGRE_DEBUG_STR_SIZE];
 #endif
 
         IdString() : mHash( 0 )
         {
-#if OGRE_DEBUG_MODE || OGRE_IDSTRING_ALWAYS_READABLE
+#ifndef NDEBUG
             mDebugString[0] = '\0';
 #endif
         }
@@ -127,7 +126,7 @@ namespace Ogre
             OGRE_COPY_DEBUG_STRING( value );
         }
 
-#if OGRE_DEBUG_MODE || OGRE_IDSTRING_ALWAYS_READABLE
+#ifndef NDEBUG
         #if OGRE_COMPILER == OGRE_COMPILER_MSVC
             #pragma warning( push )
             #pragma warning( disable: 4996 ) //Unsecure CRT deprecation warning
@@ -235,7 +234,7 @@ namespace Ogre
 
         bool operator == ( IdString idString ) const
         {
-#if OGRE_DEBUG_MODE
+#ifndef NDEBUG
             assert( !(mHash == idString.mHash &&
                     strcmp( mDebugString, idString.mDebugString ) != 0) &&
                     "Collision detected!" );
@@ -245,7 +244,7 @@ namespace Ogre
 
         bool operator != ( IdString idString ) const
         {
-#if OGRE_DEBUG_MODE
+#ifndef NDEBUG
             assert( !(mHash == idString.mHash &&
                     strcmp( mDebugString, idString.mDebugString ) != 0) &&
                     "Collision detected!" );
@@ -256,10 +255,22 @@ namespace Ogre
         /// Returns "[Hash 0x0a0100ef]" strings in Release mode, readable string in debug
         std::string getFriendlyText() const
         {
-#if OGRE_DEBUG_MODE || OGRE_IDSTRING_ALWAYS_READABLE
+#ifndef NDEBUG
             return std::string( mDebugString );
 #else
-            return getReleaseText();
+        #if OGRE_COMPILER == OGRE_COMPILER_MSVC
+            #pragma warning( push )
+            #pragma warning( disable: 4996 ) //Unsecure CRT deprecation warning
+        #endif
+
+            char tmp[(OGRE_HASH_BITS >> 2)+10];
+            sprintf( tmp, "[Hash 0x%.8x]", mHash );
+            tmp[(OGRE_HASH_BITS >> 2)+10-1] = '\0';
+            return std::string( tmp );
+
+        #if OGRE_COMPILER == OGRE_COMPILER_MSVC
+            #pragma warning( pop )
+        #endif
 #endif
         }
 
@@ -280,57 +291,7 @@ namespace Ogre
             #pragma warning( pop )
         #endif
         }
-
-        /** C String version. Zero allocations.
-        @param outCStr
-            C String to store the string.
-        @param stringSize
-            Size of of outCStr. Recommended size: OGRE_DEBUG_STR_SIZE
-        */
-        void getFriendlyText( char *outCStr, size_t stringSize ) const
-        {
-#if OGRE_DEBUG_MODE || OGRE_IDSTRING_ALWAYS_READABLE
-            size_t minSize = std::min<size_t>( OGRE_DEBUG_STR_SIZE, stringSize );
-            memcpy( outCStr, mDebugString, minSize );
-            outCStr[minSize - 1u] = '\0';
-#else
-            getReleaseText( outCStr, stringSize );
-#endif
-        }
-
-        /// C String version. Zero allocations. See getFriendlyText.
-        void getReleaseText( char *outCStr, size_t stringSize ) const
-        {
-        #if OGRE_COMPILER == OGRE_COMPILER_MSVC
-            #pragma warning( push )
-            #pragma warning( disable: 4996 ) //Unsecure CRT deprecation warning
-        #endif
-
-            if( stringSize < (OGRE_HASH_BITS >> 2u)+10u )
-            {
-                //Not big enough. Use a temp buffer and then copy + truncate.
-                char tmp[(OGRE_HASH_BITS >> 2)+10];
-                sprintf( tmp, "[Hash 0x%.8x]", mHash );
-                tmp[(OGRE_HASH_BITS >> 2)+10-1] = '\0';
-
-                memcpy( outCStr, tmp, stringSize );
-                outCStr[stringSize - 1u] = '\0';
-            }
-            else
-            {
-                //Write directly to the output buffer. It's big enough.
-                sprintf( outCStr, "[Hash 0x%.8x]", mHash );
-                outCStr[(OGRE_HASH_BITS >> 2)+10-1] = '\0';
-            }
-
-        #if OGRE_COMPILER == OGRE_COMPILER_MSVC
-            #pragma warning( pop )
-        #endif
-        }
     };
-
-    typedef StdVector<IdString> IdStringVec;
 }
 
 #endif
-

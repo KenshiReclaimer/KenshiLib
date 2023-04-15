@@ -123,11 +123,6 @@ namespace Ogre
             m[3][3] = m33;
         }
 
-        inline Matrix4(const Real* arr)
-        {
-            memcpy(m,arr,16*sizeof(Real));
-        }
-
         /** Creates a standard 4x4 transformation matrix with a zero translation part from a rotation/scaling 3x3 matrix.
          */
 
@@ -574,8 +569,23 @@ namespace Ogre
 
         /** Function for writing to a stream.
         */
-        _OgreExport friend std::ostream &operator<<( std::ostream &o, const Matrix4 &mat );
-
+        inline _OgreExport friend std::ostream& operator <<
+            ( std::ostream& o, const Matrix4& mat )
+        {
+            o << "Matrix4(";
+            for (size_t i = 0; i < 4; ++i)
+            {
+                o << " row" << (unsigned)i << "{";
+                for(size_t j = 0; j < 4; ++j)
+                {
+                    o << mat[i][j] << " ";
+                }
+                o << "}";
+            }
+            o << ")";
+            return o;
+        }
+        
         Matrix4 adjoint() const;
         Real determinant() const;
         Matrix4 inverse() const;
@@ -644,23 +654,6 @@ namespace Ogre
 
         /** 3-D Vector transformation specially for an affine matrix.
             @remarks
-                Transforms the given 3-D vector by the 3x3 submatrix, without
-                adding translation, as should be transformed directions and normals.
-            @note
-                The matrix must be an affine matrix. @see Matrix4::isAffine.
-        */
-        inline Vector3 transformDirectionAffine(const Vector3& v) const
-        {
-            assert(isAffine());
-
-            return Vector3(
-                    m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
-                    m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
-                    m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z);
-        }
-
-        /** 3-D Vector transformation specially for an affine matrix.
-            @remarks
                 Transforms the given 3-D vector by the matrix, projecting the 
                 result back into <i>w</i> = 1.
             @note
@@ -707,5 +700,6 @@ namespace Ogre
     }
     /** @} */
     /** @} */
+
 }
 #endif

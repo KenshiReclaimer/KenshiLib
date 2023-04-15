@@ -30,8 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreSharedPtr.h"
-
-#include "ogrestd/vector.h"
+#include "OgreString.h"
 
 namespace Ogre {
     typedef _StringBase String;

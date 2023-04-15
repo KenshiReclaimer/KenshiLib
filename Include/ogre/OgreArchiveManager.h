@@ -30,8 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "ogrestd/map.h"
-
 #include "OgreSingleton.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreHeaderPrefix.h"

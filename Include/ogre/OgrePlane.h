@@ -61,19 +61,17 @@ namespace Ogre {
     class _OgreExport Plane
     {
     public:
-        Vector3 normal;
-        Real d;
-
-    public:
         /** Default constructor - sets everything to 0.
         */
-        Plane() : normal(Vector3::ZERO), d(0.0f) {}
+        Plane ();
+        Plane (const Plane& rhs);
         /** Construct a plane through a normal, and a distance to move the plane along the normal.*/
-        Plane(const Vector3& rkNormal, Real fConstant) : normal(rkNormal), d(-fConstant) {}
+        Plane (const Vector3& rkNormal, Real fConstant);
         /** Construct a plane using the 4 constants directly **/
-        Plane(Real a, Real b, Real c, Real d) : normal(a, b, c), d(d) {}
-        Plane(const Vector3 &rkNormal, const Vector3 &rkPoint) { redefine(rkNormal, rkPoint); }
-        Plane(const Vector3 &p0, const Vector3 &p1, const Vector3 &p2) { redefine(p0, p1, p2); }
+        Plane (Real a, Real b, Real c, Real d);
+        Plane (const Vector3& rkNormal, const Vector3& rkPoint);
+        Plane (const Vector3& rkPoint0, const Vector3& rkPoint1,
+            const Vector3& rkPoint2);
 
         /** The "positive side" of the plane is the half space to which the
             plane normal points. The "negative side" is the other half
@@ -87,18 +85,7 @@ namespace Ogre {
             BOTH_SIDE
         };
 
-        Side getSide (const Vector3& rkPoint) const
-        {
-            Real fDistance = getDistance(rkPoint);
-    
-            if ( fDistance < 0.0 )
-                return Plane::NEGATIVE_SIDE;
-    
-            if ( fDistance > 0.0 )
-                return Plane::POSITIVE_SIDE;
-    
-            return Plane::NO_SIDE;
-        }
+        Side getSide (const Vector3& rkPoint) const;
 
         /**
         Returns the side where the alignedBox is. The flag BOTH_SIDE indicates an intersecting box.
@@ -125,24 +112,14 @@ namespace Ogre {
             The absolute value of the return value is the true distance only
             when the plane normal is a unit length vector.
         */
-        Real getDistance (const Vector3& rkPoint) const
-        {
-            return normal.dotProduct(rkPoint) + d;
-        }
+        Real getDistance (const Vector3& rkPoint) const;
 
         /** Redefine this plane based on 3 points. */
-        void redefine(const Vector3& p0, const Vector3& p1, const Vector3& p2)
-        {
-            normal = (p1 - p0).crossProduct(p2 - p0).normalisedCopy();
-            d = -normal.dotProduct(p0);
-        }
+        void redefine(const Vector3& rkPoint0, const Vector3& rkPoint1,
+            const Vector3& rkPoint2);
 
         /** Redefine this plane based on a normal and a point. */
-        void redefine(const Vector3& rkNormal, const Vector3& rkPoint)
-        {
-            normal = rkNormal;
-            d = -rkNormal.dotProduct(rkPoint);
-        }
+        void redefine(const Vector3& rkNormal, const Vector3& rkPoint);
 
         /** Project a vector onto the plane. 
         @remarks This gives you the element of the input vector that is perpendicular 
@@ -164,11 +141,8 @@ namespace Ogre {
         */
         Real normalise(void);
 
-        /// Get flipped plane, with same location but reverted orientation
-        Plane operator - () const
-        {
-            return Plane(-(normal.x), -(normal.y), -(normal.z), -d); // not equal to Plane(-normal, -d)
-        }
+        Vector3 normal;
+        Real d;
 
         /// Comparison operator
         bool operator==(const Plane& rhs) const
@@ -183,7 +157,7 @@ namespace Ogre {
         _OgreExport friend std::ostream& operator<< (std::ostream& o, const Plane& p);
     };
 
-    typedef StdVector<Plane> PlaneList;
+    typedef vector<Plane>::type PlaneList;
     /** @} */
     /** @} */
 

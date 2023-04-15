@@ -32,8 +32,6 @@ THE SOFTWARE.
 #include "OgreIdString.h"
 #include "OgreBlendMode.h"
 #include "OgreVector3.h"
-#include "OgreHlmsPso.h"
-#include <stddef.h>
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -60,25 +58,25 @@ namespace Ogre
             assert( start <= original->size() );
         }
 
-        SubStringRef( const String *original, size_t _start, size_t _end ) :
+        SubStringRef( const String *original, size_t start, size_t end_ ) :
             mOriginal( original ),
-            mStart( _start ),
-            mEnd( _end )
+            mStart( start ),
+            mEnd( end_ )
         {
-            assert( _start <= _end );
-            assert( _end <= original->size() );
+            assert( start <= end_ );
+            assert( end_ <= original->size() );
         }
 
-        SubStringRef( const String *original, String::const_iterator _start ) :
+        SubStringRef( const String *original, String::const_iterator start ) :
             mOriginal( original ),
-            mStart( _start - original->begin() ),
+            mStart( start - original->begin() ),
             mEnd( original->size() )
         {
         }
 
-        size_t find( const char *value, size_t pos=0 ) const
+        size_t find( const char *value ) const
         {
-            size_t retVal = mOriginal->find( value, mStart + pos );
+            size_t retVal = mOriginal->find( value, mStart );
             if( retVal >= mEnd )
                 retVal = String::npos;
             else if( retVal != String::npos )
@@ -98,38 +96,6 @@ namespace Ogre
             return retVal;
         }
 
-        size_t findFirstOf( const char *c, size_t pos ) const
-        {
-            size_t retVal = mOriginal->find_first_of( c, mStart + pos );
-            if( retVal >= mEnd )
-                retVal = String::npos;
-            else if( retVal != String::npos )
-                retVal -= mStart;
-
-            return retVal;
-        }
-
-        bool matchEqual( const char *stringCompare ) const
-        {
-            const char *origStr = mOriginal->c_str() + mStart;
-            ptrdiff_t length = mEnd - mStart;
-            while( *origStr == *stringCompare && *origStr && --length )
-                ++origStr, ++stringCompare;
-
-            return length == 0 && *origStr == *stringCompare;
-        }
-
-        bool startWith( const char *stringCompare ) const
-        {
-            return strncmp( mOriginal->c_str() + mStart, stringCompare, strlen( stringCompare ) ) == 0;
-        }
-
-        bool startWith( const String &stringCompare ) const
-        {
-            return strncmp( mOriginal->c_str() + mStart, stringCompare.c_str(),  //
-                            stringCompare.size() ) == 0;
-        }
-
         void setStart( size_t newStart )            { mStart = std::min( newStart, mOriginal->size() ); }
         void setEnd( size_t newEnd )                { mEnd = std::min( newEnd, mOriginal->size() ); }
         size_t getStart(void) const                 { return mStart; }
@@ -140,22 +106,16 @@ namespace Ogre
         const String& getOriginalBuffer() const     { return *mOriginal; }
     };
 
-    struct _OgreExport HlmsProperty
+    struct HlmsProperty
     {
         IdString    keyName;
         int32       value;
 
         HlmsProperty( IdString _keyName, int32 _value ) :
             keyName( _keyName ), value( _value ) {}
-
-        bool operator == ( const HlmsProperty &_r) const
-        {
-            return this->keyName == _r.keyName && this->value == _r.value;
-        }
     };
 
     typedef vector<HlmsProperty>::type HlmsPropertyVec;
-    typedef map<IdString, String>::type PiecesMap;
 
     inline bool OrderPropertyByIdString( const HlmsProperty &_left, const HlmsProperty &_right )
     {
@@ -167,49 +127,101 @@ namespace Ogre
     inline bool OrderParamVecByKey( const std::pair<IdString, String> &_left,
                                     const std::pair<IdString, String> &_right )
     {
-        return _left.first < _right.first;
+        return _left.first < _right.second;
     }
 
-    /** Up to 8 different HLMS generator types are allowed. The maximum values must be in sync
-        with ShaderBits in RenderQueue.cpp (the higher 3 bits)
-    */
-    enum HlmsTypes
+    struct HlmsParam
     {
-        HLMS_LOW_LEVEL, /// Proxy that redirects to a regular Material
-        HLMS_PBS,       /// Physically Based Shader Generator
-        HLMS_TOON,      /// Toon shading / Cel shading
-        HLMS_UNLIT,     /// Made for GUIs, overlays, particle FXs, self-iluminating billboards
+        virtual ~HlmsParam() {}
 
-        HLMS_USER0,
-        HLMS_USER1,
-        HLMS_USER2,
-        HLMS_USER3,
+        CullingMode     cullMode;
+        PolygonMode     polygonMode;
+        bool            alphaToCoverageEnabled;
+        bool            colourWrite;
+        bool            depthCheck;
+        bool            depthWrite;
+        CompareFunction depthFunc;
+        float           depthBiasSlopeScale;
 
-        HLMS_MAX = 8,
+        // Blending factors
+        SceneBlendFactor sourceBlendFactor;
+        SceneBlendFactor destBlendFactor;
+        SceneBlendFactor sourceBlendFactorAlpha;
+        SceneBlendFactor destBlendFactorAlpha;
 
-        HLMS_COMPUTE,
+        // Used to determine if separate alpha blending should be used for color and alpha channels
+        bool            separateBlend;
+
+        //-------------------------------------------------------------------------
+        // Blending operations
+        SceneBlendOperation blendOperation;
+        SceneBlendOperation alphaBlendOperation;
+
+        /// Determines if we should use separate blending operations for color and alpha channels
+        bool                separateBlendOperation;
+    };
+
+    struct HlmsParamPbs : HlmsParam
+    {
+        ColourValue diffuseColour;  //kD
+        Vector3 specularColour;     //kS
+        Vector3 fresnel;            //F0
+
+        //TODO: Most likely these strings should be replaced by an index to the texture arrays.
+        uint16 diffuseMap;
+        uint16 normalMap;
+        uint16 specularMap;
+        uint16 detailMask;
+        uint16 detailMap[4];
     };
 
     struct HlmsCache
     {
         uint32          hash;
-        HlmsTypes       type;
         HlmsPropertyVec setProperties;
 
-        HlmsPso         pso;
+        GpuProgramPtr   vertexShader;
+        GpuProgramPtr   geometryShader;
+        GpuProgramPtr   tesselationHullShader;
+        GpuProgramPtr   tesselationDomainShader;
+        GpuProgramPtr   pixelShader;
 
-        HlmsCache() : hash( 0 ), type( HLMS_MAX ) {}
-        HlmsCache( uint32 _hash, HlmsTypes _type, const HlmsPso &_pso ) :
-            hash( _hash ), type( _type ), pso( _pso ) {}
+        /* This is state, independent of the shader being used
+        CullingMode     cullMode;
+        PolygonMode     polygonMode;
+        bool            alphaToCoverageEnabled;
+        bool            colourWrite;
+        bool            depthCheck;
+        bool            depthWrite;
+        CompareFunction depthFunc;
+        float           depthBiasSlopeScale;
+
+        // Blending factors
+        SceneBlendFactor sourceBlendFactor;
+        SceneBlendFactor destBlendFactor;
+        SceneBlendFactor sourceBlendFactorAlpha;
+        SceneBlendFactor destBlendFactorAlpha;
+
+        // Used to determine if separate alpha blending should be used for color and alpha channels
+        bool            separateBlend;
+
+        //-------------------------------------------------------------------------
+        // Blending operations
+        SceneBlendOperation blendOperation;
+        SceneBlendOperation alphaBlendOperation;
+
+        /// Determines if we should use separate blending operations for color and alpha channels
+        bool                separateBlendOperation;
+*/
+
+        HlmsCache( uint32 _hash ) : hash( _hash ) {}
     };
 
-    #define OGRE_EXTRACT_HLMS_TYPE_FROM_CACHE_HASH( x ) (x >> 29)
+    typedef vector<HlmsCache>::type HlmsCacheVec;
 
-    typedef vector<HlmsCache*>::type HlmsCacheVec;
-
-    inline bool OrderCacheByHash( const HlmsCache *_left, const HlmsCache *_right )
+    inline bool OrderCacheByHash( const HlmsCache &_left, const HlmsCache &_right )
     {
-        return _left->hash < _right->hash;
+        return _left.hash < _right.hash;
     }
 
     /** @} */

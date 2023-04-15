@@ -149,7 +149,7 @@ namespace Ogre {
             You should use the ParticleSystemManager to create particle systems rather than creating
             them directly.
         */
-        ParticleSystem( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager,
+        ParticleSystem( IdType id, ObjectMemoryManager *objectMemoryManager,
                         const String& resourceGroupName );
 
         virtual ~ParticleSystem();
@@ -377,6 +377,10 @@ namespace Ogre {
         */
         virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 
+        /// @copydoc MovableObject::visitRenderables
+        void visitRenderables(Renderable::Visitor* visitor, 
+            bool debugRenderables = false);
+
         /** Fast-forwards this system by the required number of seconds.
         @remarks
             This method allows you to fast-forward a system so that it effectively looks like
@@ -532,7 +536,7 @@ namespace Ogre {
         /** @copydoc MovableObject::setRenderQueueGroup */
         void setRenderQueueGroup(uint8 queueID);
         /** @copydoc MovableObject::setRenderQueueGroupAndPriority */
-        void setRenderQueueSubGroup( uint8 subGroup );
+        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
 
         /** Set whether or not particles are sorted according to the camera.
         @remarks

@@ -30,12 +30,9 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreRenderOperation.h"
-#include "OgreMovableObject.h"
 #include "OgreRenderable.h"
 
 namespace Ogre {
-namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -50,7 +47,7 @@ namespace v1 {
     Beginning Ogre 2.0, it supports building a full screen triangle instead
     of rectangle. Position & UVs are in the first source. Normals are in the second one
     */
-    class _OgreExport Rectangle2D : public Renderable, public MovableObject
+    class _OgreExport Rectangle2D : public Renderable, public MovableAlloc
     {
     protected:
         Vector3     mPosition;
@@ -59,17 +56,14 @@ namespace v1 {
 
         bool        mQuad;
 
+        MaterialPtr mMaterial;
         RenderOperation mRenderOp;
 
-    public:
-        Rectangle2D( bool bQuad, IdType id, ObjectMemoryManager *objectMemoryManager,
-                     SceneManager *manager );
-        ~Rectangle2D();
+        void initRectangle2D(void);
 
-        /** @copydoc MovableObject::_releaseManualHardwareResources */
-        void _releaseManualHardwareResources();
-        /** @copydoc MovableObject::_restoreManualHardwareResources */
-        void _restoreManualHardwareResources();
+    public:
+        Rectangle2D( bool bQuad );
+        ~Rectangle2D();
 
         /** Sets the corners of the rectangle, in relative coordinates.
         @param
@@ -90,36 +84,16 @@ namespace v1 {
 
         Real getSquaredViewDepth(const Camera* cam) const   { (void)cam; return 0; }
 
+        void setMaterial( const String& matName );
+        virtual const MaterialPtr& getMaterial(void) const;
         virtual void getWorldTransforms( Matrix4* xform ) const;
-        virtual void getRenderOperation( RenderOperation& op, bool casterPass );
+        virtual void getRenderOperation( RenderOperation& op );
         virtual const LightList& getLights(void) const;
 
-        /** Returns the type name of this object. */
-        virtual const String& getMovableType(void) const;
     };
-
-    /** Factory object for creating Entity instances */
-    class _OgreExport Rectangle2DFactory : public MovableObjectFactory
-    {
-    protected:
-        virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                                   SceneManager *manager,
-                                                   const NameValuePairList* params = 0 );
-    public:
-        Rectangle2DFactory() {}
-        ~Rectangle2DFactory() {}
-
-        static String FACTORY_TYPE_NAME;
-
-        const String& getType(void) const;
-        void destroyInstance( MovableObject* obj);
-
-    };
-
     /** @} */
     /** @} */
 
-}
 }// namespace
 
 #endif

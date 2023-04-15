@@ -40,7 +40,6 @@ namespace Ogre
     class Camera;
     class CompositorShadowNode;
     class CompositorWorkspace;
-    typedef vector<TextureGpu*>::type TextureGpuVec;
 
     /** \addtogroup Core
     *  @{
@@ -65,21 +64,7 @@ namespace Ogre
         CompositorShadowNode    *mShadowNode;
         Camera                  *mCamera;
         Camera                  *mLodCamera;
-        Camera                  *mCullCamera;
         bool                    mUpdateShadowNode;
-
-        TextureGpuVec   mPrePassTextures;
-        TextureGpu      *mPrePassDepthTexture;
-        TextureGpu      *mSsrTexture;
-        TextureGpu      *mDepthTextureNoMsaa;
-        TextureGpu      *mRefractionsTexture;
-
-        HlmsManager *mHlmsManager;
-
-        void notifyPassSceneAfterShadowMapsListeners(void);
-        void notifyPassSceneAfterFrustumCullingListeners(void);
-
-        void analyzeBarriers( void );
 
     public:
         /** Constructor
@@ -92,7 +77,7 @@ namespace Ogre
             The RenderTarget we're supposed to draw to. Can be RenderWindow, RenderTexture, MRT, etc
         */
         CompositorPassScene( const CompositorPassSceneDef *definition, Camera *defaultCamera,
-                             const RenderTargetViewDef *rtv, CompositorNode *parentNode );
+                                const CompositorChannel &target, CompositorNode *parentNode );
         ~CompositorPassScene();
 
         virtual void execute( const Camera *lodCamera );
@@ -100,11 +85,7 @@ namespace Ogre
         CompositorShadowNode* getShadowNode() const             { return mShadowNode; }
         Camera* getCamera() const                               { return mCamera; }
         void _setCustomCamera( Camera *camera )                 { mCamera = camera; }
-        Camera* getCullCamera() const                           { return mCullCamera; }
-        void _setCustomCullCamera( Camera *camera )             { mCullCamera = camera; }
         void _setUpdateShadowNode( bool update )                { mUpdateShadowNode = update; }
-
-        bool getUpdateShadowNode(void) const                    { return mUpdateShadowNode; }
 
         virtual void notifyCleared(void);
 

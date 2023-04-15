@@ -143,11 +143,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     inline ArrayReal MathlibNEON::Modf4( ArrayReal x, ArrayReal &outIntegral )
     {
-#if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64
-        outIntegral = vrndq_f32( x ); // truncate towards zero
-#else
-        outIntegral = vcvtq_f32_s32( vcvtq_s32_f32( x ) ); // truncate towards zero, overflows for large input
-#endif
+        outIntegral = (ArrayReal)( (ArrayInt)( x ) );   //outIntegral = floor( x )
         return vsubq_f32( x, outIntegral );
     }
     //-----------------------------------------------------------------------------------
@@ -158,7 +154,7 @@ namespace Ogre
         // header for details. Adapted/ported to Ogre intrinsics.
         ArrayReal xabs = Abs4( x );
         ArrayMaskR select = vcltq_f32( x, vdupq_n_f32(0.0f) );
-        ArrayReal t1 = MathlibNEON::Sqrt( vsubq_f32( ONE, xabs ) );
+        ArrayReal t1 = vrsqrteq_f32( vsubq_f32( ONE, xabs ) );
         
         /* Instruction counts can be reduced if the polynomial was
          * computed entirely from nested (dependent) fma's. However, 

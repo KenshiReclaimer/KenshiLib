@@ -41,8 +41,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class LodStrategy;
-namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -52,6 +50,7 @@ namespace v1 {
     */
 
     struct MeshLodUsage;
+    class LodStrategy;
 
     /** Resource holding data about 3D mesh.
     @remarks
@@ -85,11 +84,10 @@ namespace v1 {
         also that mesh sub-sections (when used in an instantiated object)
         share the same scene node as the parent.
     */
-    class _OgreExport Mesh: public Resource, public AnimationContainer
+    class _OgreExport Mesh : public Resource, public AnimationContainer
     {
         friend class SubMesh;
         friend class MeshSerializerImpl;
-        friend class MeshSerializerImpl_v1_10;
         friend class MeshSerializerImpl_v1_8;
         friend class MeshSerializerImpl_v1_4;
         friend class MeshSerializerImpl_v1_3;
@@ -113,24 +111,24 @@ namespace v1 {
             from the Mesh, depending on preference).
         */
         SubMeshList mSubMeshList;
-    
+
         /** Internal method for making the space for a vertex element to hold tangents. */
-        void organiseTangentsBuffer(VertexData *vertexData, 
-            VertexElementSemantic targetSemantic, unsigned short index, 
+        void organiseTangentsBuffer(VertexData* vertexData,
+            VertexElementSemantic targetSemantic, unsigned short index,
             unsigned short sourceTexCoordSet);
 
     public:
         /** A hashmap used to store optional SubMesh names.
             Translates a name into SubMesh index.
         */
-        typedef unordered_map<String, ushort>::type SubMeshNameMap ;
+        typedef OGRE_HashMap<String, ushort> SubMeshNameMap;
 
-        
+
     protected:
 
         DataStreamPtr mFreshFromDisk;
 
-        SubMeshNameMap mSubMeshNameMap ;
+        SubMeshNameMap mSubMeshNameMap;
 
         /// Local bounding box volume.
         AxisAlignedBox mAABB;
@@ -144,7 +142,7 @@ namespace v1 {
         SkeletonPtr mOldSkeleton;
         SkeletonDefPtr mSkeleton;
 
-       
+
         VertexBoneAssignmentList mBoneAssignments;
 
         /// Flag indicating that bone assignments need to be recompiled.
@@ -155,7 +153,7 @@ namespace v1 {
             IndexMap& boneIndexToBlendIndexMap, IndexMap& blendIndexToBoneIndexMap);
         /** Compile bone assignments into blend index and weight buffers. */
         void compileBoneAssignments(const VertexBoneAssignmentList& boneAssignments,
-            unsigned short numBlendWeightsPerVertex, 
+            unsigned short numBlendWeightsPerVertex,
             IndexMap& blendIndexToBoneIndexMap,
             VertexData* targetVertexData);
 
@@ -165,7 +163,6 @@ namespace v1 {
         MeshLodUsageList    mMeshLodUsageList;
         LodValueArray       mLodValues;
 
-        HardwareBufferManagerBase* mBufferManager;
         HardwareBuffer::Usage mVertexBufferUsage;
         HardwareBuffer::Usage mIndexBufferUsage;
         bool mVertexBufferShadowBuffer;
@@ -208,8 +205,9 @@ namespace v1 {
         /// @copydoc Resource::calculateSize
         size_t calculateSize(void) const;
 
-        void mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
-                                     unsigned short texCoordSetToDestroy, VertexData *vertexData );
+        void mergeAdjacentTexcoords(unsigned short finalTexCoordSet,
+            unsigned short texCoordSetToDestroy, VertexData* vertexData);
+
 
     public:
         /** Default constructor - used by MeshManager
@@ -234,7 +232,7 @@ namespace v1 {
         /** Creates a new SubMesh and gives it a name
         */
         SubMesh* createSubMesh(const String& name);
-        
+
         /** Gives a name to a SubMesh
         */
         void nameSubMesh(const String& name, ushort index);
@@ -242,7 +240,7 @@ namespace v1 {
         /** Removes a name from a SubMesh
         */
         void unnameSubMesh(const String& name);
-        
+
         /** Gets the index of a submesh with a given name.
         @remarks
             Useful if you identify the SubMeshes by name (using nameSubMesh)
@@ -260,9 +258,9 @@ namespace v1 {
 
         /** Gets a SubMesh by name
         */
-        SubMesh* getSubMesh(const String& name) const ;
-        
-        /** Destroy a SubMesh with the given index. 
+        SubMesh* getSubMesh(const String& name) const;
+
+        /** Destroy a SubMesh with the given index.
         @note
             This will invalidate the contents of any existing Entity, or
             any other object that is referring to the SubMesh list. Entity will
@@ -270,55 +268,21 @@ namespace v1 {
         */
         void destroySubMesh(unsigned short index);
 
-        /** Destroy a SubMesh with the given name. 
+        /** Destroy a SubMesh with the given name.
         @note
             This will invalidate the contents of any existing Entity, or
             any other object that is referring to the SubMesh list. Entity will
             detect this and reinitialise, but it is still a disruptive action.
         */
         void destroySubMesh(const String& name);
-        
+
         typedef VectorIterator<SubMeshList> SubMeshIterator;
         /// Gets an iterator over the available submeshes
         SubMeshIterator getSubMeshIterator(void)
-        { return SubMeshIterator(mSubMeshList.begin(), mSubMeshList.end()); }
+        {
+            return SubMeshIterator(mSubMeshList.begin(), mSubMeshList.end());
+        }
 
-        /// Converts a v2 mesh back to v1.
-        void importV2( Ogre::Mesh *mesh );
-
-        /** Rearranges the buffers in this Mesh so that they are more efficient for
-            rendering with shaders. It's not recommended to use this option if
-            you plan on using SW skinning or pose/morph animations.
-        @remarks
-            Multiple buffer streams will be merged into one, making an interleaved format.
-            Shared vertices with submeshes will be unshared.
-        @param halfPos
-            True if you want to convert the position data to VET_HALF4 format.
-            Recommended on desktop to reduce memory and bandwidth requirements.
-            Rarely the extra precision is needed.
-
-            Unfortuntately on mobile, not all ES2 devices support VET_HALF4.
-            Do NOT use this flag if you intend to run the mesh in GLES2 devices which
-            don't have the GL_OES_VERTEX_HALF_FLOAT extension (many iOS, some Android).
-        @param halfTexCoords
-            True if you want to convert the position data to VET_HALF2 or VET_HALF4 format.
-            Same recommendations as halfPos.
-        @param qTangents
-            True if you want to generate tangent and reflection information (modifying
-            the original v1 mesh) and convert this data to a QTangent, requiring
-            VET_SHORT4_SNORM (8 bytes vs 28 bytes to store normals, tangents and
-            reflection). Needs much less space, trading for more ALU ops in the
-            vertex shader for decoding the QTangent.
-            Highly recommended on both desktop and mobile if you need tangents (i.e.
-            normal mapping).
-        */
-        void arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents );
-
-        /// Reverts the effects from arrangeEfficient by converting all 16-bit half float back
-        /// to 32-bit float; and QTangents to Normal, Tangent + Reflection representation,
-        /// which are more compatible for doing certain operations vertex operations in the CPU.
-        void dearrangeToInefficient(void);
-      
         /** Shared vertex data.
         @remarks
             This vertex data can be shared among multiple submeshes. SubMeshes may not have
@@ -327,7 +291,7 @@ namespace v1 {
             The use of shared or non-shared buffers is determined when
             model data is converted to the OGRE .mesh format.
         */
-        VertexData *sharedVertexData[NumVertexPass];
+        VertexData* sharedVertexData;
 
         /** Shared index map for translating blend index to bone index.
         @remarks
@@ -364,9 +328,6 @@ namespace v1 {
         */
         MeshPtr clone(const String& newName, const String& newGroup = BLANKSTRING);
 
-        /** @copydoc Resource::reload */
-        void reload(LoadingFlags flags = LF_DEFAULT);
-
         /** Get the axis-aligned bounding box for this mesh.
         */
         const AxisAlignedBox& getBounds(void) const;
@@ -379,24 +340,24 @@ namespace v1 {
 
         /** Manually set the bounding box for this Mesh.
         @remarks
-            Calling this method is required when building manual meshes now, because OGRE can no longer 
-            update the bounds for you, because it cannot necessarily read vertex data back from 
+            Calling this method is required when building manual meshes now, because OGRE can no longer
+            update the bounds for you, because it cannot necessarily read vertex data back from
             the vertex buffers which this mesh uses (they very well might be write-only, and even
             if they are not, reading data from a hardware buffer is a bottleneck).
             @param pad If true, a certain padding will be added to the bounding box to separate it from the mesh
         */
         void _setBounds(const AxisAlignedBox& bounds, bool pad = true);
 
-        /** Manually set the bounding radius. 
+        /** Manually set the bounding radius.
         @remarks
-            Calling this method is required when building manual meshes now, because OGRE can no longer 
-            update the bounds for you, because it cannot necessarily read vertex data back from 
+            Calling this method is required when building manual meshes now, because OGRE can no longer
+            update the bounds for you, because it cannot necessarily read vertex data back from
             the vertex buffers which this mesh uses (they very well might be write-only, and even
             if they are not, reading data from a hardware buffer is a bottleneck).
         */
         void _setBoundingSphereRadius(Real radius);
 
-        /** Manually set the bone bounding radius. 
+        /** Manually set the bone bounding radius.
         @remarks
             This value is normally computed automatically, however it can be overriden with this method.
         */
@@ -418,7 +379,7 @@ namespace v1 {
         */
         void _updateBoundsFromVertexBuffers(bool pad = false);
 
-        /** Calculates 
+        /** Calculates
         @remarks
         Calling this method is required when building manual meshes. However it is recommended to
         use _setBounds and _setBoundingSphereRadius instead, because the vertex buffer may not have
@@ -441,32 +402,32 @@ namespace v1 {
         /** Returns true if this Mesh has a linked Skeleton. */
         bool hasSkeleton(void) const;
 
-        /** Returns whether or not this mesh has some kind of vertex animation. 
+        /** Returns whether or not this mesh has some kind of vertex animation.
         */
         bool hasVertexAnimation(void) const;
-        
-        /** Gets a pointer to any linked Skeleton. 
+
+        /** Gets a pointer to any linked Skeleton.
         @return
             Weak reference to the skeleton - copy this if you want to hold a strong pointer.
         */
         const SkeletonPtr& getOldSkeleton(void) const;
-        const SkeletonDefPtr& getSkeleton(void) const                   { return mSkeleton; }
+        const SkeletonDefPtr& getSkeleton(void) const { return mSkeleton; }
 
         /** Gets the name of any linked Skeleton */
         const String& getSkeletonName(void) const;
-        /** Initialise an animation set suitable for use with this mesh. 
+        /** Initialise an animation set suitable for use with this mesh.
         @remarks
             Only recommended for use inside the engine, not by applications.
         */
         void _initAnimationState(AnimationStateSet* animSet);
 
-        /** Refresh an animation set suitable for use with this mesh. 
+        /** Refresh an animation set suitable for use with this mesh.
         @remarks
             Only recommended for use inside the engine, not by applications.
         */
         void _refreshAnimationState(AnimationStateSet* animSet);
-        /** Assigns a vertex to a bone with a given weight, for skeletal animation. 
-        @remarks    
+        /** Assigns a vertex to a bone with a given weight, for skeletal animation.
+        @remarks
             This method is only valid after calling setSkeletonName.
             Since this is a one-off process there exists only 'addBoneAssignment' and
             'clearBoneAssignments' methods, no 'editBoneAssignment'. You should not need
@@ -479,14 +440,14 @@ namespace v1 {
         */
         void addBoneAssignment(const VertexBoneAssignment& vertBoneAssign);
 
-        /** Removes all bone assignments for this mesh. 
+        /** Removes all bone assignments for this mesh.
         @remarks
             This method is for modifying weights to the shared geometry of the Mesh. To assign
             weights to the per-SubMesh geometry, see the equivalent methods on SubMesh.
         */
         void clearBoneAssignments(void);
 
-        /** Internal notification, used to tell the Mesh which Skeleton to use without loading it. 
+        /** Internal notification, used to tell the Mesh which Skeleton to use without loading it.
         @remarks
             This is only here for unusual situation where you want to manually set up a
             Skeleton. Best to let OGRE deal with this, don't call it yourself unless you
@@ -495,7 +456,7 @@ namespace v1 {
         void _notifySkeleton(SkeletonPtr& pSkel);
 
 
-        /** Gets an iterator for access all bone assignments. 
+        /** Gets an iterator for access all bone assignments.
         */
         BoneAssignmentIterator getBoneAssignmentIterator(void);
 
@@ -503,12 +464,12 @@ namespace v1 {
         */
         const VertexBoneAssignmentList& getBoneAssignments() const { return mBoneAssignments; }
 
-        void setLodStrategyName( const String &name )               { mLodStrategyName = name; }
+        void setLodStrategyName(const String& name) { mLodStrategyName = name; }
 
         /// Returns the name of the Lod strategy the user lod values have been calibrated for
-        const String& getLodStrategyName(void) const                { return mLodStrategyName; }
+        const String& getLodStrategyName(void) const { return mLodStrategyName; }
 
-        /** Returns the number of levels of detail that this mesh supports. 
+        /** Returns the number of levels of detail that this mesh supports.
         @remarks
             This number includes the original model.
         */
@@ -516,7 +477,7 @@ namespace v1 {
         /** Gets details of the numbered level of detail entry. */
         const MeshLodUsage& getLodLevel(ushort index) const;
 
-        /** Retrieves the level of detail index for the given LOD value. 
+        /** Retrieves the level of detail index for the given LOD value.
         @note
             The value passed in is the 'transformed' value. If you are dealing with
             an original source value (e.g. distance), use LodStrategy::transformUserValue
@@ -547,42 +508,18 @@ namespace v1 {
         /** Internal methods for loading LOD, do not use. */
         void _setLodUsage(unsigned short level, const MeshLodUsage& usage);
         /** Internal methods for loading LOD, do not use. */
-        void _setSubMeshLodFaceList( unsigned short subIdx, unsigned short level, IndexData* facedata,
-                                     bool casterPass );
+        void _setSubMeshLodFaceList(unsigned short subIdx, unsigned short level, IndexData* facedata);
         /** Internal methods for loading LOD, do not use. */
         bool _isManualLodLevel(unsigned short level) const;
 
         /** Removes all LOD data from this Mesh. */
         void removeLodLevels(void);
 
-        /** Sets the manager for the vertex and index buffers to be used when loading
-            this Mesh.
-        @remarks
-            By default, when loading the Mesh, static, write-only vertex and index buffers 
-            will be used where possible in order to improve rendering performance. 
-            However, such buffers cannot be manipulated on the fly by CPU code 
-            (although shader code can). If you wish to use the CPU to modify these buffers
-            and will never use it with GPU, you should call this method. Note,
-            however, that it only takes effect after the Mesh has been reloaded. Note that you
-            still have the option of manually repacing the buffers in this mesh with your
-            own if you see fit too, in which case you don't need to call this method since it
-            only affects buffers created by the mesh itself.
-        @par
-            You can define the approach to a Mesh by changing the default parameters to 
-            MeshManager::load if you wish; this means the Mesh is loaded with those options
-            the first time instead of you having to reload the mesh after changing these options.
-        @param bufferManager
-            If set to @c DefaultHardwareBufferManager, the buffers will be created in system memory
-            only, without hardware counterparts. Such mesh could not be rendered, but LODs could be
-            generated for such mesh, it could be cloned, transformed and serialized.
-        */
-        void setHardwareBufferManager(HardwareBufferManagerBase* bufferManager) { mBufferManager = bufferManager; }
-        HardwareBufferManagerBase* getHardwareBufferManager();
         /** Sets the policy for the vertex buffers to be used when loading
             this Mesh.
         @remarks
-            By default, when loading the Mesh, static, write-only vertex and index buffers 
-            will be used where possible in order to improve rendering performance. 
+            By default, when loading the Mesh, static, write-only vertex and index buffers
+            will be used where possible in order to improve rendering performance.
             However, such buffers
             cannot be manipulated on the fly by CPU code (although shader code can). If you
             wish to use the CPU to modify these buffers, you should call this method. Note,
@@ -591,11 +528,11 @@ namespace v1 {
             own if you see fit too, in which case you don't need to call this method since it
             only affects buffers created by the mesh itself.
         @par
-            You can define the approach to a Mesh by changing the default parameters to 
+            You can define the approach to a Mesh by changing the default parameters to
             MeshManager::load if you wish; this means the Mesh is loaded with those options
             the first time instead of you having to reload the mesh after changing these options.
         @param usage
-            The usage flags, which by default are 
+            The usage flags, which by default are
             HardwareBuffer::HBU_STATIC_WRITE_ONLY
         @param shadowBuffer
             If set to @c true, the vertex buffers will be created with a
@@ -606,8 +543,8 @@ namespace v1 {
         /** Sets the policy for the index buffers to be used when loading
             this Mesh.
         @remarks
-            By default, when loading the Mesh, static, write-only vertex and index buffers 
-            will be used where possible in order to improve rendering performance. 
+            By default, when loading the Mesh, static, write-only vertex and index buffers
+            will be used where possible in order to improve rendering performance.
             However, such buffers
             cannot be manipulated on the fly by CPU code (although shader code can). If you
             wish to use the CPU to modify these buffers, you should call this method. Note,
@@ -616,11 +553,11 @@ namespace v1 {
             own if you see fit too, in which case you don't need to call this method since it
             only affects buffers created by the mesh itself.
         @par
-            You can define the approach to a Mesh by changing the default parameters to 
+            You can define the approach to a Mesh by changing the default parameters to
             MeshManager::load if you wish; this means the Mesh is loaded with those options
             the first time instead of you having to reload the mesh after changing these options.
         @param usage
-            The usage flags, which by default are 
+            The usage flags, which by default are
             HardwareBuffer::HBU_STATIC_WRITE_ONLY
         @param shadowBuffer
             If set to @c true, the index buffers will be created with a
@@ -636,7 +573,7 @@ namespace v1 {
         bool isVertexBufferShadowed(void) const { return mVertexBufferShadowBuffer; }
         /** Gets whether or not this meshes index buffers are shadowed. */
         bool isIndexBufferShadowed(void) const { return mIndexBufferShadowBuffer; }
-       
+
 
         /** Rationalises the passed in bone assignment list.
         @remarks
@@ -656,10 +593,10 @@ namespace v1 {
         */
         unsigned short _rationaliseBoneAssignments(size_t vertexCount, VertexBoneAssignmentList& assignments);
 
-        /** Internal method, be called once to compile bone assignments into geometry buffer. 
+        /** Internal method, be called once to compile bone assignments into geometry buffer.
         @remarks
-            The OGRE engine calls this method automatically. It compiles the information 
-            submitted as bone assignments into a format usable in realtime. It also 
+            The OGRE engine calls this method automatically. It compiles the information
+            submitted as bone assignments into a format usable in realtime. It also
             eliminates excessive bone assignments (max is OGRE_MAX_BLEND_WEIGHTS)
             and re-normalises the remaining assignments.
         */
@@ -687,35 +624,21 @@ namespace v1 {
         @param texCoordSetToDestroy The texture coordinate index that will disappear on
             successful merges.
         */
-        void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
-
-        /// @copydoc Mesh::msOptimizeForShadowMapping
-        static bool msOptimizeForShadowMapping;
-
-        void prepareForShadowMapping( bool forceSameBuffers );
-        void destroyShadowMappingGeom(void);
-
-        /// Returns true if the mesh is ready for rendering with valid shadow mapping buffers
-        /// Otherwise prepareForShadowMapping must be called on this mesh.
-        bool hasValidShadowMappingBuffers(void) const;
-
-        /// Returns true if the shadow mapping buffers do not just reference the real buffers,
-        /// but are rather their own separate set of optimized geometry.
-        bool hasIndependentShadowMappingBuffers(void) const;
+        void mergeAdjacentTexcoords(unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy);
 
         /** This method builds a set of tangent vectors for a given mesh into a 3D texture coordinate buffer.
         @remarks
             Tangent vectors are vectors representing the local 'X' axis for a given vertex based
             on the orientation of the 2D texture on the geometry. They are built from a combination
             of existing normals, and from the 2D texture coordinates already baked into the model.
-            They can be used for a number of things, but most of all they are useful for 
+            They can be used for a number of things, but most of all they are useful for
             vertex and fragment programs, when you wish to arrive at a common space for doing
             per-pixel calculations.
         @par
             The prerequisites for calling this method include that the vertex data used by every
             SubMesh has both vertex normals and 2D texture coordinates.
         @param targetSemantic
-            The semantic to store the tangents in. Defaults to 
+            The semantic to store the tangents in. Defaults to
             the explicit tangent binding, but note that this is only usable on more
             modern hardware (Shader Model 2), so if you need portability with older
             cards you should change this to a texture coordinate binding instead.
@@ -724,7 +647,7 @@ namespace v1 {
             of 2D texture coordinates, with which to calculate the tangents.
         @param index
             The element index, ie the texture coordinate set which should be used to store the 3D
-            coordinates representing a tangent vector per vertex, if targetSemantic is 
+            coordinates representing a tangent vector per vertex, if targetSemantic is
             VES_TEXTURE_COORDINATES. If this already exists, it will be overwritten.
         @param splitMirrored
             Sets whether or not to split vertices when a mirrored tangent space
@@ -736,16 +659,16 @@ namespace v1 {
             If @c true, store tangents as a 4-vector and include parity in w.
         */
         void buildTangentVectors(VertexElementSemantic targetSemantic = VES_TANGENT,
-            unsigned short sourceTexCoordSet = 0, unsigned short index = 0, 
+            unsigned short sourceTexCoordSet = 0, unsigned short index = 0,
             bool splitMirrored = false, bool splitRotated = false, bool storeParityInW = false);
 
-        /** Ask the mesh to suggest parameters to a future buildTangentVectors call, 
-            should you wish to use texture coordinates to store the tangents. 
+        /** Ask the mesh to suggest parameters to a future buildTangentVectors call,
+            should you wish to use texture coordinates to store the tangents.
         @remarks
             This helper method will suggest source and destination texture coordinate sets
             for a call to buildTangentVectors. It will detect when there are inappropriate
-            conditions (such as multiple geometry sets which don't agree). 
-            Moreover, it will return 'true' if it detects that there are aleady 3D 
+            conditions (such as multiple geometry sets which don't agree).
+            Moreover, it will return 'true' if it detects that there are aleady 3D
             coordinates in the mesh, and therefore tangents may have been prepared already.
         @param targetSemantic
             The semantic you intend to use to store the tangents
@@ -754,7 +677,7 @@ namespace v1 {
             use texture coordinates if you want compatibility with older, pre-SM2
             graphics cards, and the tangent binding otherwise.
         @param outSourceCoordSet
-            Reference to a source texture coordinate set which 
+            Reference to a source texture coordinate set which
             will be populated.
         @param outIndex
             Reference to a destination element index (e.g. texture coord set)
@@ -770,19 +693,19 @@ namespace v1 {
         /** Destroys and frees the edge lists this mesh has built. */
         void freeEdgeList(void);
 
-        /** This method prepares the mesh for generating a renderable shadow volume. 
+        /** This method prepares the mesh for generating a renderable shadow volume.
         @remarks
-            Preparing a mesh to generate a shadow volume involves firstly ensuring that the 
+            Preparing a mesh to generate a shadow volume involves firstly ensuring that the
             vertex buffer containing the positions for the mesh is a standalone vertex buffer,
             with no other components in it. This method will therefore break apart any existing
-            vertex buffers this mesh holds if position is sharing a vertex buffer. 
-            Secondly, it will double the size of this vertex buffer so that there are 2 copies of 
-            the position data for the mesh. The first half is used for the original, and the second 
-            half is used for the 'extruded' version of the mesh. The vertex count of the main 
-            VertexData used to render the mesh will remain the same though, so as not to add any 
+            vertex buffers this mesh holds if position is sharing a vertex buffer.
+            Secondly, it will double the size of this vertex buffer so that there are 2 copies of
+            the position data for the mesh. The first half is used for the original, and the second
+            half is used for the 'extruded' version of the mesh. The vertex count of the main
+            VertexData used to render the mesh will remain the same though, so as not to add any
             overhead to regular rendering of the object.
-            Both copies of the position are required in one buffer because shadow volumes stretch 
-            from the original mesh to the extruded version. 
+            Both copies of the position are required in one buffer because shadow volumes stretch
+            from the original mesh to the extruded version.
         @par
             Because shadow volumes are rendered in turn, no additional
             index buffer space is allocated by this method, a shared index buffer allocated by the
@@ -790,25 +713,25 @@ namespace v1 {
         */
         void prepareForShadowVolume(void);
 
-        /** Return the edge list for this mesh, building it if required. 
+        /** Return the edge list for this mesh, building it if required.
         @remarks
-            You must ensure that the Mesh as been prepared for shadow volume 
+            You must ensure that the Mesh as been prepared for shadow volume
             rendering if you intend to use this information for that purpose.
         @param lodIndex
             The LOD at which to get the edge list, 0 being the highest.
         */
         EdgeData* getEdgeList(unsigned short lodIndex = 0);
 
-        /** Return the edge list for this mesh, building it if required. 
+        /** Return the edge list for this mesh, building it if required.
         @remarks
-            You must ensure that the Mesh as been prepared for shadow volume 
+            You must ensure that the Mesh as been prepared for shadow volume
             rendering if you intend to use this information for that purpose.
         @param lodIndex
             The LOD at which to get the edge list, 0 being the highest.
         */
         const EdgeData* getEdgeList(unsigned short lodIndex = 0) const;
 
-        /** Returns whether this mesh has already had it's geometry prepared for use in 
+        /** Returns whether this mesh has already had it's geometry prepared for use in
             rendering shadow volumes. */
         bool isPreparedForShadowVolumes(void) const { return mPreparedForShadowVolumes; }
 
@@ -833,10 +756,10 @@ namespace v1 {
             const Matrix4* boneMatrices, const IndexMap& indexMap);
 
         /** Performs a software indexed vertex blend, of the kind used for
-            skeletal animation although it can be used for other purposes. 
+            skeletal animation although it can be used for other purposes.
         @remarks
-            This function is supplied to update vertex data with blends 
-            done in software, either because no hardware support is available, 
+            This function is supplied to update vertex data with blends
+            done in software, either because no hardware support is available,
             or that you need the results of the blend for some other CPU operations.
         @param sourceVertexData
             VertexData class containing positions, normals,
@@ -844,7 +767,7 @@ namespace v1 {
         @param targetVertexData
             VertexData class containing target position
             and normal buffers which will be updated with the blended versions.
-            Note that the layout of the source and target position / normal 
+            Note that the layout of the source and target position / normal
             buffers must be identical, ie they must use the same buffer indexes
         @param blendMatrices
             Pointer to an array of matrix pointers to be used to blend,
@@ -855,13 +778,13 @@ namespace v1 {
         @param blendNormals
             If @c true, normals are blended as well as positions.
         */
-        static void softwareVertexBlend(const VertexData* sourceVertexData, 
+        static void softwareVertexBlend(const VertexData* sourceVertexData,
             const VertexData* targetVertexData,
             const Matrix4* const* blendMatrices, size_t numMatrices,
             bool blendNormals);
 
         /** Performs a software vertex morph, of the kind used for
-            morph animation although it can be used for other purposes. 
+            morph animation although it can be used for other purposes.
         @remarks
             This function will linearly interpolate positions between two
             source buffers, into a third buffer.
@@ -876,16 +799,16 @@ namespace v1 {
             buffer already bound, and the number of vertices must agree with the
             number in start and end
         */
-        static void softwareVertexMorph(Real t, 
-            const HardwareVertexBufferSharedPtr& b1, 
-            const HardwareVertexBufferSharedPtr& b2, 
+        static void softwareVertexMorph(Real t,
+            const HardwareVertexBufferSharedPtr& b1,
+            const HardwareVertexBufferSharedPtr& b2,
             VertexData* targetVertexData);
 
         /** Performs a software vertex pose blend, of the kind used for
-            morph animation although it can be used for other purposes. 
+            morph animation although it can be used for other purposes.
         @remarks
-            This function will apply a weighted offset to the positions in the 
-            incoming vertex data (therefore this is a read/write operation, and 
+            This function will apply a weighted offset to the positions in the
+            incoming vertex data (therefore this is a read/write operation, and
             if you expect to call it more than once with the same data, then
             you would be best to suppress hardware uploads of the position buffer
             for the duration).
@@ -895,12 +818,12 @@ namespace v1 {
             Potentially sparse map of vertex index -> offset.
         @param normalsMap
             Potentially sparse map of vertex index -> normal.
-        @param targetVertexData 
+        @param targetVertexData
             VertexData destination; assumed to have a separate position
             buffer already bound, and the number of vertices must agree with the
             number in start and end.
         */
-        static void softwareVertexPoseBlend(Real weight, 
+        static void softwareVertexPoseBlend(Real weight,
             const map<size_t, Vector3>::type& vertexOffsetMap,
             const map<size_t, Vector3>::type& normalsMap,
             VertexData* targetVertexData);
@@ -911,9 +834,9 @@ namespace v1 {
             when asked for them, or whether it should never build them if
             they are not already provided.
         @remarks
-            This allows you to create meshes which do not have edge lists calculated, 
+            This allows you to create meshes which do not have edge lists calculated,
             because you never want to use them. This value defaults to 'true'
-            for mesh formats which did not include edge data, and 'false' for 
+            for mesh formats which did not include edge data, and 'false' for
             newer formats, where edge lists are expected to have been generated
             in advance.
         */
@@ -931,7 +854,7 @@ namespace v1 {
         /// Returns whether animation on shared vertex data includes normals.
         bool getSharedVertexDataAnimationIncludesNormals() const { return mSharedVertexDataAnimationIncludesNormals; }
 
-        /** Creates a new Animation object for vertex animating this mesh. 
+        /** Creates a new Animation object for vertex animating this mesh.
         @param name
             The name of this animation.
         @param length
@@ -939,14 +862,14 @@ namespace v1 {
         */
         virtual Animation* createAnimation(const String& name, Real length);
 
-        /** Returns the named vertex Animation object. 
+        /** Returns the named vertex Animation object.
         @param name
             The name of the animation.
         */
         virtual Animation* getAnimation(const String& name) const;
 
-        /** Internal access to the named vertex Animation object - returns null 
-            if it does not exist. 
+        /** Internal access to the named vertex Animation object - returns null
+            if it does not exist.
         @param name
             The name of the animation.
         */
@@ -961,19 +884,19 @@ namespace v1 {
         /** Gets the number of morph animations in this mesh. */
         virtual unsigned short getNumAnimations(void) const;
 
-        /** Gets a single morph animation by index. 
+        /** Gets a single morph animation by index.
         */
         virtual Animation* getAnimation(unsigned short index) const;
 
         /** Removes all morph Animations from this mesh. */
         virtual void removeAllAnimations(void);
-        /** Gets a pointer to a vertex data element based on a morph animation 
+        /** Gets a pointer to a vertex data element based on a morph animation
             track handle.
         @remarks
             0 means the shared vertex data, 1+ means a submesh vertex data (index+1)
         */
         VertexData* getVertexDataByTrackHandle(unsigned short handle);
-        /** Iterates through all submeshes and requests them 
+        /** Iterates through all submeshes and requests them
             to apply their texture aliases to the material they use.
         @remarks
             The submesh will only apply texture aliases to the material if matching
@@ -981,7 +904,7 @@ namespace v1 {
             submesh will automatically clone the original material and then apply its
             texture to the new material.
         @par
-            This method is normally called by the protected method loadImpl when a 
+            This method is normally called by the protected method loadImpl when a
             mesh if first loaded.
         */
         void updateMaterialForAllSubMeshes(void);
@@ -1033,9 +956,7 @@ namespace v1 {
         /** Get pose list. */
         const PoseList& getPoseList(void) const;
 
-        const LodValueArray* _getLodValueArray(void) const                      { return &mLodValues; }
-
-        void createAzdoBuffers(void);
+        const LodValueArray* _getLodValueArray(void) const { return &mLodValues; }
 
     };
 
@@ -1054,7 +975,7 @@ namespace v1 {
             Transformed from user-supplied values with LodStrategy::transformUserValue.
         */
         Real value;
-        
+
 
         /// Only relevant if mIsLodManual is true, the name of the alternative mesh to use.
         String manualName;
@@ -1069,7 +990,7 @@ namespace v1 {
     /** @} */
     /** @} */
 
-}
+
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"

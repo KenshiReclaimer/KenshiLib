@@ -254,7 +254,14 @@ namespace Ogre
 
         /** Function for writing to a stream.
         */
-        _OgreExport friend std::ostream &operator<<( std::ostream &o, const Matrix3 &mat );
+        inline _OgreExport friend std::ostream& operator <<
+            ( std::ostream& o, const Matrix3& mat )
+        {
+            o << "Matrix3(" << mat[0][0] << ", " << mat[0][1] << ", " << mat[0][2] << ", " 
+                            << mat[1][0] << ", " << mat[1][1] << ", " << mat[1][2] << ", " 
+                            << mat[2][0] << ", " << mat[2][1] << ", " << mat[2][2] << ")";
+            return o;
+        }
 
         static const Real EPSILON;
         static const Matrix3 ZERO;
@@ -266,6 +273,7 @@ namespace Ogre
         bool QLAlgorithm (Real afDiag[3], Real afSubDiag[3]);
 
         // support for singular value decomposition
+        static const Real msSvdEpsilon;
         static const unsigned int msSvdMaxIterations;
         static void Bidiagonalize (Matrix3& kA, Matrix3& kL,
             Matrix3& kR);

@@ -36,6 +36,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    enum CompareFunction;
+    enum StencilOperation;
+
     /** \addtogroup Core
     *  @{
     */
@@ -46,10 +49,16 @@ namespace Ogre
     class _OgreExport CompositorPassStencilDef : public CompositorPassDef
     {
     public:
-        StencilParams           mStencilParams;
+        bool                    mStencilCheck;
+        bool                    mTwoSided;
+        StencilOperation        mStencilPassOp;
+        StencilOperation        mStencilFailOp;
+        StencilOperation        mStencilDepthFailOp;
+        CompareFunction         mCompareFunc;
+        uint32                  mStencilMask;
         uint32                  mStencilRef;
 
-        CompositorPassStencilDef( CompositorTargetDef *parentTargetDef );
+        CompositorPassStencilDef( uint32 rtIndex );
     };
 
     /** @} */

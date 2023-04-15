@@ -31,6 +31,8 @@ THE SOFTWARE.
 
 // Precompiler options
 #include "OgrePrerequisites.h"
+#include "OgreAxisAlignedBox.h"
+#include "OgreSphere.h"
 #include "OgreAnimable.h"
 #include "OgreSceneNode.h"
 #include "Math/Array/OgreObjectData.h"
@@ -52,8 +54,6 @@ namespace Ogre {
     *  @{
     */
 
-    typedef FastArray<Renderable*> RenderableArray;
-
     /** Abstract class defining a movable object in a scene.
         @remarks
             Instances of this class are discrete, relatively small, movable objects
@@ -62,15 +62,14 @@ namespace Ogre {
     class _OgreExport MovableObject : public AnimableObject, public MovableAlloc, public IdObject
     {
     public:
-        static const FastArray<Real> c_DefaultLodMesh;
-
+        const FastArray<Real> c_DefaultLodMesh;
         /** Listener which gets called back on MovableObject events.
         */
         class _OgreExport Listener
         {
         public:
             Listener(void) {}
-            virtual ~Listener();
+            virtual ~Listener() {}
             /** MovableObject is being destroyed */
             virtual void objectDestroyed(MovableObject*) {}
             /** MovableObject has been attached to a node */
@@ -79,20 +78,23 @@ namespace Ogre {
             virtual void objectDetached(MovableObject*) {}
         };
 
-        RenderableArray   mRenderables;
     protected:
         /// Node to which this object is attached
         Node* mParentNode;
         /// The render queue to use when rendering this object
         uint8 mRenderQueueID;
+        /// The render queue group to use when rendering this object
+        ushort mRenderQueuePriority;
         /// All the object data needed in SoA form
         ObjectData mObjectData;
         /// SceneManager holding this object (if applicable)
         SceneManager* mManager;
 
-        //One for each submesh/Renderable
+        //One for each submesh/material/Renderable
         FastArray<Real> const               *mLodMesh;
+        FastArray< FastArray<Real> const * > mLodMaterial;
         unsigned char                       mCurrentMeshLod;
+        FastArray<unsigned char>            mCurrentMaterialLod;
 
         /// Minimum pixel size to still render
         Real mMinPixelSize;
@@ -105,16 +107,13 @@ namespace Ogre {
         /// List of lights for this object
         LightList mLightList;
 
-        /// Only valid for V2 objects. Derived classes are in charge of
-        /// creating and/or destroying it. Placed here since it's the
-        /// most efficient method of retrieval during rendering, iterating
-        /// over each Item.
-        SkeletonInstance    *mSkeletonInstance;
+        /// Is debug display enabled?
+        bool mDebugDisplay;
 
         /// The memory manager used to allocate the ObjectData.
         ObjectMemoryManager *mObjectMemoryManager;
 
-#if OGRE_DEBUG_MODE
+#ifndef NDEBUG
         mutable bool mCachedAabbOutOfDate;
 #endif
 
@@ -126,8 +125,6 @@ namespace Ogre {
         static uint32 msDefaultQueryFlags;
         /// Default visibility flags
         static uint32 msDefaultVisibilityFlags;
-        /// Default light mask
-        static uint32 msDefaultLightMask;
 
     protected:
         Aabb updateSingleWorldAabb();
@@ -144,12 +141,9 @@ namespace Ogre {
         /// @copydoc mGlobalIndex
         size_t mParentIndex;
 
-        /** Constructor
-        @remarks
-            Valid render queue Id is between 0 & 254 inclusive
-        */
+        /// Constructor
         MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager,
-                       SceneManager* manager, uint8 renderQueueId );
+                        uint8 renderQueueId );
 
         /** Don't use this constructor unless you know what you're doing.
             @See ObjectMemoryManager::mDummyNode
@@ -164,22 +158,6 @@ namespace Ogre {
         void _notifyManager(SceneManager* man) { mManager = man; }
         /** Get the manager of this object, if any (internal use only) */
         SceneManager* _getManager(void) const { return mManager; }
-
-        /** Notifies the movable object that hardware resources were lost
-            @remarks
-                Called automatically by RenderSystem if hardware resources
-                were lost and can not be restored using some internal mechanism.
-                Among affected resources are nested shadow renderables, ManualObjects, etc.
-        */
-        virtual void _releaseManualHardwareResources() {}
-
-        /** Notifies the movable object that hardware resources should be restored
-            @remarks
-                Called automatically by RenderSystem if hardware resources
-                were lost and can not be restored using some internal mechanism.
-                Among affected resources are nested shadow renderables, ManualObjects, etc.
-        */
-        virtual void _restoreManualHardwareResources() {}
 
         /** Sets a custom name for this node. Doesn't have to be unique */
         void setName( const String &name )                                  { mName = name; }
@@ -207,8 +185,6 @@ namespace Ogre {
 
         /// @See Node::_callMemoryChangeListeners
         virtual void _notifyParentNodeMemoryChanged(void) {}
-
-        unsigned char getCurrentMeshLod(void) const                         { return mCurrentMeshLod; }
 
         /// Checks whether this MovableObject is static. @See setStatic
         bool isStatic() const;
@@ -240,18 +216,13 @@ namespace Ogre {
                 The engine will call this method when this object is to be rendered. The object must then create one or more
                 Renderable subclass instances which it places on the passed in Queue for rendering.
         */
-        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera) {}
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera) = 0;
 
         /** @See SceneManager::updateAllBounds
         @remarks
             We don't pass by reference on purpose (avoid implicit aliasing)
         */
         static void updateAllBounds( const size_t numNodes, ObjectData t );
-
-        static inline ArrayReal calculateCameraDistance( uint32 _cameraSortMode, ArrayVector3 cameraPos,
-                                                         ArrayVector3 cameraDir,
-                                                         ArrayAabb *RESTRICT_ALIAS worldAabb,
-                                                         ArrayReal *RESTRICT_ALIAS worldRadius );
 
         /** @See SceneManager::cullFrustum
         @remarks
@@ -271,7 +242,7 @@ namespace Ogre {
             mUpperDistance
         */
         typedef FastArray<MovableObject*> MovableObjectArray;
-        static void cullFrustum( const size_t numNodes, ObjectData t, const Camera *frustum,
+        static void cullFrustum( const size_t numNodes, ObjectData t, const Frustum *frustum,
                                  uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
                                  const Camera *lodCamera );
 
@@ -293,9 +264,8 @@ namespace Ogre {
             An array of all frustums that are used at least once as cubemaps
             (@See SceneManager::createCamera)
         */
-        static void cullLights( const size_t numNodes, ObjectData t, uint32 sceneLightMask,
-                                LightListInfo &outGlobalLightList,
-                                const FrustumVec &frustums, const FrustumVec &cubemapFrustums );
+        static void cullLights( const size_t numNodes, ObjectData t, LightListInfo &outGlobalLightList,
+                                const FrustumVec &frustums , const FrustumVec &cubemapFrustums );
 
         /** @See SceneManager::buildLightList
         @remarks
@@ -353,19 +323,6 @@ namespace Ogre {
         /** Gets the distance at which batches are no longer rendered. */
         inline Real getRenderingDistance(void) const;
 
-        /** Sets the distance at which the object is no longer casting shadows.
-        @param
-            dist Distance beyond which the object will not cast shadows (the default is FLT_MAX,
-            which means objects are always casting shadows). Values equal or below zero will be ignored,
-            and cause an assertion in debug mode.
-        @note ShadowRenderingDistance will be clamped to RenderingDistance value
-        @see setRenderingDistance
-        */
-        inline void setShadowRenderingDistance(Real dist);
-
-        /** Gets the distance at which batches are no longer casting shadows. */
-        inline Real getShadowRenderingDistance(void) const;
-
         /** Sets the minimum pixel size an object needs to be in both screen axes in order to be rendered
         @note Camera::setUseMinPixelSize() needs to be called for this parameter to be used.
         @param pixelSize Number of minimum pixels
@@ -403,13 +360,28 @@ namespace Ogre {
             See RenderQueue for more details.
         @param queueID Enumerated value of the queue group to use. See the
             enum RenderQueueGroupID for what kind of values can be used here.
-        @par
-            Valid render queue ids are between 0 & 254 inclusive
         */
         virtual void setRenderQueueGroup(uint8 queueID);
 
+        /** Sets the render queue group and group priority this entity will be rendered through.
+        @remarks
+            Render queues are grouped to allow you to more tightly control the ordering
+            of rendered objects. Within a single render group there another type of grouping
+            called priority which allows further control.  If you do not call this method, 
+            all Entity objects default to the default queue and priority 
+            (RenderQueue::getDefaultQueueGroup, RenderQueue::getDefaultRenderablePriority), 
+            which is fine for most objects. You may want to alter this if you want this entity 
+            to always appear in front of other objects, e.g. for a 3D menu system or such.
+        @par
+            See RenderQueue for more details.
+        @param queueID Enumerated value of the queue group to use. See the
+            enum RenderQueueGroupID for what kind of values can be used here.
+        @param priority The priority within a group to use.
+        */
+        virtual void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
+
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        inline uint8 getRenderQueueGroup(void) const;
+        uint8 getRenderQueueGroup(void) const;
 
         /// Returns a direct access to the ObjectData state
         ObjectData& _getObjectData()                                        { return mObjectData; }
@@ -445,9 +417,6 @@ namespace Ogre {
             after SceneManager::updateAllBounds() has been called
         */
         Aabb getWorldAabbUpdated();
-
-        /// See getLocalAabb and getWorldRadius
-        float getLocalRadius(void) const;
 
         /** Gets the bounding Radius scaled by max( scale.x, scale.y, scale.z ).
         @remarks
@@ -494,11 +463,6 @@ namespace Ogre {
         */
         static uint32 getDefaultQueryFlags() { return msDefaultQueryFlags; }
 
-        /// Returns the distance to camera as calculated in @cullFrustum
-        inline RealAsUint getCachedDistanceToCamera(void) const;
-
-        /// Returns the distance to camera as calculated in @cullFrustum
-        inline Real getCachedDistanceToCameraAsReal(void) const;
 
         /** Sets the visibility flags for this object.
         @remarks
@@ -561,14 +525,6 @@ namespace Ogre {
         */
         inline void setLightMask(uint32 lightMask);
 
-        /** Set the default light mask for all future MovableObject instances.
-        */
-        static void setDefaultLightMask(uint32 mask) { msDefaultLightMask = mask; }
-
-        /** Get the default light mask for all future MovableObject instances.
-        */
-        static uint32 getDefaultLightMask() { return msDefaultLightMask; }
-
         /** Returns a pointer to the current list of lights for this object.
         @remarks
             You should not modify this list outside of MovableObject::Listener::objectQueryLights
@@ -576,6 +532,8 @@ namespace Ogre {
             as a return value) and for reading it's only accurate as at the last frame.
         */
         LightList* _getLightList() { return &mLightList; }
+
+        const FastArray<unsigned char>& getCurrentMaterialLod(void) const       { return mCurrentMaterialLod; }
 
         /** Sets whether or not this object will cast shadows.
         @remarks
@@ -592,10 +550,39 @@ namespace Ogre {
         inline void setCastShadows( bool enabled );
         /** Returns whether shadow casting is enabled for this object. */
         inline bool getCastShadows(void) const;
+        /** Returns whether the Material of any Renderable that this MovableObject will add to 
+            the render queue will receive shadows. 
+        */
+        bool getReceivesShadows();
 
-        SkeletonInstance* getSkeletonInstance(void) const   { return mSkeletonInstance; }
+        /** Method to allow a caller to abstractly iterate over the Renderable
+            instances that this MovableObject will add to the render queue when
+            asked, if any. 
+        @param visitor Pointer to a class implementing the Renderable::Visitor 
+            interface which will be called back for each Renderable which will
+            be queued. Bear in mind that the state of the Renderable instances
+            may not be finalised depending on when you call this.
+        @param debugRenderables If false, only regular renderables will be visited
+            (those for normal display). If true, debug renderables will be
+            included too.
+        */
+        virtual void visitRenderables(Renderable::Visitor* visitor, 
+            bool debugRenderables = false) = 0;
 
-#if OGRE_DEBUG_MODE
+        /** Sets whether or not the debug display of this object is enabled.
+        @remarks
+            Some objects aren't visible themselves but it can be useful to display
+            a debug representation of them. Or, objects may have an additional 
+            debug display on top of their regular display. This option enables / 
+            disables that debug display. Objects that are not visible never display
+            debug geometry regardless of this setting.
+        */
+        virtual void setDebugDisplayEnabled(bool enabled) { mDebugDisplay = enabled; }
+        /// Gets whether debug display of this object is enabled. 
+        virtual bool isDebugDisplayEnabled(void) const { return mDebugDisplay; }
+
+
+#ifndef NDEBUG
         void _setCachedAabbOutOfDate(void)                  { mCachedAabbOutOfDate = true; }
         bool isCachedAabbOutOfDate() const                  { return mCachedAabbOutOfDate; }
 #endif
@@ -612,8 +599,7 @@ namespace Ogre {
     protected:
         /// Internal implementation of create method - must be overridden
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                                   SceneManager* manager,
-                                                   const NameValuePairList* params = 0) = 0;
+                                                    const NameValuePairList* params = 0) = 0;
     public:
         MovableObjectFactory() {}
         virtual ~MovableObjectFactory() {}
@@ -640,12 +626,13 @@ namespace Ogre {
         {
         }
 
-        virtual ~NullEntity();
-
         virtual const String& getMovableType(void) const
         {
             return msMovableType;
         }
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera) {}
+        virtual void visitRenderables(Renderable::Visitor* visitor, 
+            bool debugRenderables = false) {}
     };
 
     /** @} */

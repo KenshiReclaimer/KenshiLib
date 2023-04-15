@@ -41,9 +41,6 @@ namespace Ogre
     /** \addtogroup Animation
     *  @{
     */
-
-    namespace v1
-    {
     /** Records the assignment of a single vertex to a single bone with the corresponding weight.
     @remarks
         This simple struct simply holds a vertex index, bone index and weight representing the
@@ -57,51 +54,6 @@ namespace Ogre
         Real weight;
 
     } VertexBoneAssignment;
-    }
-
-    /// @copydoc v1::VertexBoneAssignment_s
-    struct VertexBoneAssignment
-    {
-        uint32  vertexIndex;
-        uint16  boneIndex;
-        Real    weight;
-
-        VertexBoneAssignment( uint32 _vertexIndex,  uint16 _boneIndex, Real _weight ) :
-            vertexIndex( _vertexIndex ), boneIndex( _boneIndex ), weight( _weight )
-        {
-        }
-
-        VertexBoneAssignment( const v1::VertexBoneAssignment &c ) :
-            vertexIndex( c.vertexIndex ),
-            boneIndex( c.boneIndex ),
-            weight( c.weight )
-        {
-        }
-
-        bool operator < ( const VertexBoneAssignment &_r ) const
-        {
-            if( vertexIndex < _r.vertexIndex )
-                return true;
-
-            if( vertexIndex == _r.vertexIndex && weight > _r.weight )
-                return true;
-
-            return false;
-        }
-
-        friend bool operator < ( const VertexBoneAssignment &_l, uint32 _vertexIndex );
-        friend bool operator < ( uint32 _vertexIndex, const VertexBoneAssignment &_r );
-    };
-
-    inline bool operator < ( const VertexBoneAssignment &_l, uint32 _vertexIndex )
-    {
-        return _l.vertexIndex < _vertexIndex;
-    }
-
-    inline bool operator < ( uint32 _vertexIndex, const VertexBoneAssignment &_r )
-    {
-        return _vertexIndex < _r.vertexIndex;
-    }
 
     /** @} */
     /** @} */

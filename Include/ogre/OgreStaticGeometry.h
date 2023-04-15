@@ -32,12 +32,9 @@ THE SOFTWARE.
 #include "OgreMovableObject.h"
 #include "OgreRenderable.h"
 #include "OgreMesh.h"
-#include "OgreHardwareIndexBuffer.h"
-#include "OgreVertexIndexData.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -237,7 +234,7 @@ namespace v1 {
             /// @copydoc Renderable::getMaterial
             const MaterialPtr& getMaterial(void) const;
             Technique* getTechnique(void) const;
-            void getRenderOperation(RenderOperation& op, bool casterPass);
+            void getRenderOperation(RenderOperation& op);
             void getWorldTransforms(Matrix4* xform) const;
             Real getSquaredViewDepth(const Camera* cam) const;
             const LightList& getLights(void) const;
@@ -300,6 +297,7 @@ namespace v1 {
             Technique* getCurrentTechnique(void) const { return mTechnique; }
             /// Dump contents for diagnostics
             void dump(std::ofstream& of) const;
+            void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables);
         };
         /** A LODBucket is a collection of smaller buckets with the same LOD. 
         @remarks
@@ -348,6 +346,7 @@ namespace v1 {
             size_t getNumMaterials(void) const          { return mMaterialBucketMap.size(); }
             /// Dump contents for diagnostics
             void dump(std::ofstream& of) const;
+            void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables);
             EdgeData* getEdgeList() const { return mEdgeList; }
             bool isVertexProgramInUse() const { return mVertexProgramInUse; }
             
@@ -409,6 +408,9 @@ namespace v1 {
             const Vector3& getCentre(void) const { return mCentre; }
             const String& getMovableType(void) const;
             void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
+            /// @copydoc MovableObject::visitRenderables
+            void visitRenderables(Renderable::Visitor* visitor, 
+                bool debugRenderables = false);
             uint32 getTypeFlags(void) const;
 
             typedef VectorIterator<LODBucketList> LODIterator;
@@ -706,6 +708,9 @@ namespace v1 {
 
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
         virtual uint8 getRenderQueueGroup(void) const;
+        /// @copydoc MovableObject::visitRenderables
+        void visitRenderables(Renderable::Visitor* visitor, 
+            bool debugRenderables = false);
         
         /// Iterator for iterating over contained regions
         typedef MapIterator<RegionMap> RegionIterator;
@@ -722,7 +727,6 @@ namespace v1 {
     /** @} */
     /** @} */
 
-}
 }
 
 #include "OgreHeaderSuffix.h"

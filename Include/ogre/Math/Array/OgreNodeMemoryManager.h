@@ -51,7 +51,7 @@ namespace Ogre
         Note that some SceneManager implementations (i.e. Octree like) may want to have more
         than one NodeMemoryManager, for example one per octant.
     */
-    class _OgreExport NodeMemoryManager : ArrayMemoryManager::RebaseListener
+    class NodeMemoryManager : ArrayMemoryManager::RebaseListener
     {
         typedef vector<NodeArrayMemoryManager>::type ArrayMemoryManagerVec;
         /// ArrayMemoryManagers grouped by hierarchy depth
@@ -80,8 +80,6 @@ namespace Ogre
 
         /// @See mMemoryManagerType
         void _setTwin( SceneMemoryMgrTypes memoryManagerType, NodeMemoryManager *twinMemoryManager );
-
-        SceneNode* _getDummyNode(void) const                        { return mDummyNode; }
 
         /// Note the return value can be null
         NodeMemoryManager* getTwin() const                          { return mTwinMemoryManager; }
@@ -153,47 +151,6 @@ namespace Ogre
         void migrateTo( Transform &inOutTransform, size_t depth,
                         NodeMemoryManager *dstNodeMemoryManager );
 
-        /** Releases memory belonging to us, not before copying it into another manager.
-        @remarks
-            This function is useful when implementing multiple Memory Managers in Scene Managers
-            or when switching nodes from Static to/from Dynamic.
-        @param inOutTransform
-            Valid Transform that belongs to us. Output will belong to the other memory mgr.
-        @param oldDepth
-            Current hierarchy level depth it belongs to in this manager.
-        @param newDepth
-            New hierarchy level depth it will belong belongs in dstNodeMemoryManager.
-            If this value is zero, then oldDepth must be zero as well. Otherwise use
-            migrateToAndDetach instead.
-        @param dstNodeMemoryManager
-            NodeMemoryManager that will now own the transform.
-        */
-        void migrateTo( Transform &inOutTransform, size_t oldDepth, size_t newDepth,
-                        NodeMemoryManager *dstNodeMemoryManager );
-
-        /** It's the same as calling:
-                this->nodeAttached( transform, depth );
-                this->migrateTo( transform, depth, dstNodeMemoryManager );
-            Without unnecessary transfers.
-        */
-        void migrateToAndAttach( Transform &inOutTransform, size_t depth,
-                                 NodeMemoryManager *dstNodeMemoryManager );
-
-        /** It's _almost_ the same as calling:
-                this->nodeDettached( transform, depth );
-                this->migrateTo( transform, 0, dstNodeMemoryManager );
-            Without unnecessary transfers and setting the correct dstNodeMemoryManager->mDummyNode.
-            instead of this->mDummyNode.
-        */
-        void migrateToAndDetach( Transform &inOutTransform, size_t depth,
-                                 NodeMemoryManager *dstNodeMemoryManager );
-
-        /// @copydoc ArrayMemoryManager::defragment
-        void defragment(void);
-
-        /// @copydoc ArrayMemoryManager::shrinkToFit
-        void shrinkToFit(void);
-
         /** Retrieves the number of depth levels that have been created.
         @remarks
             The return value is equal or below mMemoryManagers.size(), you should cache
@@ -212,12 +169,14 @@ namespace Ogre
         size_t getFirstNode( Transform &outTransform, size_t depth );
 
         //Derived from ArrayMemoryManager::RebaseListener
-        virtual void buildDiffList( uint16 level, const MemoryPoolVec &basePtrs,
+        virtual void buildDiffList( ArrayMemoryManager::ManagerType managerType, uint16 level,
+                                    const MemoryPoolVec &basePtrs,
                                     ArrayMemoryManager::PtrdiffVec &outDiffsList );
-        virtual void applyRebase( uint16 level, const MemoryPoolVec &newBasePtrs,
-                                  const ArrayMemoryManager::PtrdiffVec &diffsList );
-        virtual void performCleanup( uint16 level, const MemoryPoolVec &basePtrs,
-                                     size_t const *elementsMemSizes,
+        virtual void applyRebase( ArrayMemoryManager::ManagerType managerType, uint16 level,
+                                    const MemoryPoolVec &newBasePtrs,
+                                    const ArrayMemoryManager::PtrdiffVec &diffsList );
+        virtual void performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
+                                     const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
                                      size_t startInstance, size_t diffInstances );
     };
 

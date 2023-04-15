@@ -31,10 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreSphere.h"
 #include "OgreRay.h"
-
-#include "ogrestd/list.h"
-#include "ogrestd/set.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -114,7 +110,7 @@ namespace Ogre {
             /// Custom geometry block, only applicable for WFT_CUSTOM_GEOMETRY
             void* geometry;
             /// General render operation structure, fallback if nothing else is available
-            v1::RenderOperation* renderOp; //TODO: VertexArrayObject pointer?
+            RenderOperation* renderOp;
             
         };
     protected:
@@ -182,7 +178,7 @@ namespace Ogre {
     class _OgreExport SceneQueryListener
     {
     public:
-        virtual ~SceneQueryListener();
+        virtual ~SceneQueryListener() { }
         /** Called when a MovableObject is returned by a query.
         @remarks
             The implementor should return 'true' to continue returning objects,
@@ -330,7 +326,7 @@ namespace Ogre {
     class _OgreExport RaySceneQueryListener 
     {
     public:
-        virtual ~RaySceneQueryListener();
+        virtual ~RaySceneQueryListener() { }
         /** Called when a movable objects intersects the ray.
         @remarks
             As with SceneQueryListener, the implementor of this method should return 'true'
@@ -456,7 +452,7 @@ namespace Ogre {
     class _OgreExport IntersectionSceneQueryListener 
     {
     public:
-        virtual ~IntersectionSceneQueryListener();
+        virtual ~IntersectionSceneQueryListener() { }
         /** Called when 2 movable objects intersect one another.
         @remarks
             As with SceneQueryListener, the implementor of this method should return 'true'

@@ -36,7 +36,6 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-namespace v1 {
     /** \addtogroup Core
     *  @{
     */
@@ -57,7 +56,7 @@ namespace v1 {
     class _OgreExport AnimationContainer
     {
     public:
-        virtual ~AnimationContainer();
+        virtual ~AnimationContainer() {}
 
         /** Gets the number of animations in this container. */
         virtual unsigned short getNumAnimations(void) const = 0;
@@ -228,9 +227,6 @@ namespace v1 {
 
         /** Does a track exist with the given handle? */
         bool hasVertexTrack(unsigned short handle) const;
-
-        /** Destroys the node track with the given handle. */
-        void destroyNodeTrack(unsigned short handle);
 
 		/** Destroys the node track with the given handle. */
 		void destroyOldNodeTrack(unsigned short handle);
@@ -575,7 +571,6 @@ namespace v1 {
 
     /** @} */
     /** @} */
-}
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"

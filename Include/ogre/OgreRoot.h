@@ -37,8 +37,6 @@ THE SOFTWARE.
 #include "Android/OgreAndroidLogListener.h"
 #endif
 
-#include "ogrestd/deque.h"
-
 #include <exception>
 
 namespace Ogre
@@ -75,7 +73,6 @@ namespace Ogre
         RenderSystemList mRenderers;
         RenderSystem* mActiveRenderer;
         String mVersion;
-        String mAppName;
         String mConfigFileName;
         bool mQueuedEnd;
         /// In case multiple render windows are created, only once are the resources loaded.
@@ -90,10 +87,9 @@ namespace Ogre
         DynLibManager* mDynLibManager;
         ArchiveManager* mArchiveManager;
         MaterialManager* mMaterialManager;
-        v1::MeshManager* mMeshManagerV1;
         MeshManager* mMeshManager;
         ParticleSystemManager* mParticleManager;
-        v1::OldSkeletonManager* mOldSkeletonManager;
+        OldSkeletonManager* mOldSkeletonManager;
         SkeletonManager* mSkeletonManager;
         
         ArchiveFactory *mZipArchiveFactory;
@@ -106,25 +102,23 @@ namespace Ogre
         
         ResourceGroupManager* mResourceGroupManager;
         ResourceBackgroundQueue* mResourceBackgroundQueue;
+        ShadowTextureManager* mShadowTextureManager;
         RenderSystemCapabilitiesManager* mRenderSystemCapabilitiesManager;
         ScriptCompilerManager *mCompilerManager;
         LodStrategyManager *mLodStrategyManager;
 
         FrameStats* mFrameStats;
         Timer* mTimer;
-        Window* mAutoWindow;
+        RenderWindow* mAutoWindow;
         Profiler* mProfiler;
         HighLevelGpuProgramManager* mHighLevelGpuProgramManager;
         ExternalTextureSourceManager* mExternalTextureSourceManager;
-        HlmsManager         *mHlmsManager;
-        HlmsLowLevel        *mHlmsLowLevelProxy;
-        HlmsCompute         *mHlmsCompute;
         CompositorManager2 *mCompositorManager2;
         unsigned long mNextFrame;
         Real mFrameSmoothingTime;
         bool mRemoveQueueStructuresOnClear;
         Real mDefaultMinPixelSize;
-        float mLightProfilesInvHeight;
+        HardwareBuffer::UploadOptions mFreqUpdatedBuffersUploadOption;
 
     public:
         typedef vector<DynLib*>::type PluginLibList;
@@ -139,24 +133,20 @@ namespace Ogre
         MovableObjectFactoryMap mMovableObjectFactoryMap;
         uint32 mNextMovableObjectTypeFlag;
         // stock movable factories
-        MovableObjectFactory* mDecalFactory;
-        MovableObjectFactory* mCubemapProbeFactory;
         MovableObjectFactory* mEntityFactory;
-        MovableObjectFactory* mItemFactory;
         MovableObjectFactory* mLightFactory;
-        MovableObjectFactory* mRectangle2DFactory;
         MovableObjectFactory* mBillboardSetFactory;
         MovableObjectFactory* mManualObjectFactory;
         MovableObjectFactory* mBillboardChainFactory;
         MovableObjectFactory* mRibbonTrailFactory;
-        MovableObjectFactory* mWireAabbFactory;
+
+        typedef map<String, RenderQueueInvocationSequence*>::type RenderQueueInvocationSequenceMap;
+        RenderQueueInvocationSequenceMap mRQSequenceMap;
 
         /// Are we initialised yet?
         bool mIsInitialised;
 
         WorkQueue* mWorkQueue;
-
-        bool mFrameStarted;
 
         ///Tells whether blend indices information needs to be passed to the GPU
         bool mIsBlendIndicesGpuRedundant;
@@ -227,13 +217,10 @@ namespace Ogre
             Defaults to "ogre.cfg", may be left blank to load nothing.
         @param logFileName The logfile to create, defaults to Ogre.log, may be 
             left blank if you've already set up LogManager & Log yourself
-        @param appName
-            Name for this app. Use this string so driver vendors can create custom driver profiles
-            (e.g. through NVIDIA's or AMD's control panel)
         */
-        Root( const String &pluginFileName = "plugins" OGRE_BUILD_SUFFIX ".cfg",
-              const String &configFileName = "ogre.cfg", const String &logFileName = "Ogre.log",
-              const String &appName = "" );
+        Root(const String& pluginFileName = "plugins" OGRE_BUILD_SUFFIX ".cfg", 
+            const String& configFileName = "ogre.cfg", 
+            const String& logFileName = "Ogre.log");
         ~Root();
 
         /** Saves the details of the current configuration
@@ -258,8 +245,6 @@ namespace Ogre
         bool restoreConfig(void);
 
         /** Displays a dialog asking the user to choose system settings.
-            @param aCustomDialog If left null ogre will use the default config
-                dialog. Otherwise it will use the one provided.
             @remarks
                 This method displays the default dialog allowing the user to
                 choose the rendering system, video mode etc. If there is are
@@ -275,7 +260,7 @@ namespace Ogre
                 If they clicked 'Cancel' (in which case the app should
                 strongly consider terminating), <b>false</b> is returned.
          */
-        bool showConfigDialog( ConfigDialog* aCustomDialog = 0 );
+        bool showConfigDialog(void);
 
         /** Adds a new rendering subsystem to the list of available renderers.
             @remarks
@@ -329,11 +314,6 @@ namespace Ogre
         */
         RenderSystem* getRenderSystem(void);
 
-        const String &getAppName( void ) const { return mAppName; }
-
-        /// Gets the HlmsManager, which is needed to register generators at startup.
-        HlmsManager* getHlmsManager(void) const                     { return mHlmsManager; }
-
         CompositorManager2* getCompositorManager2() const           { return mCompositorManager2; }
 
         /** Initialises the renderer.
@@ -351,8 +331,8 @@ namespace Ogre
                 A pointer to the automatically created window, if
                 requested, otherwise <b>NULL</b>.
         */
-        Window* initialise( bool autoCreateWindow, const String& windowTitle = "OGRE Render Window",
-                            const String& customCapabilitiesConfig = BLANKSTRING );
+        RenderWindow* initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window",
+                                    const String& customCapabilitiesConfig = BLANKSTRING);
 
 		/** Returns whether the system is initialised or not. */
 		bool isInitialised(void) const { return mIsInitialised; }
@@ -412,19 +392,19 @@ namespace Ogre
         @param instanceName Optional name to given the new instance that is
             created. If you leave this blank, an auto name will be assigned.
         @param numWorkerThreads
-            Number of worker threads.
-            You should not oversubscribe the system. I.e. if the system has 4 cores
+            Number of worker threads. Must be greater than 0; you should not
+            oversubscribe the system. I.e. if the system has 4 cores
             and you intend to run your logic 100% in one of the cores,
             set this value to 3. If you intend to fully use 2 cores for your own stuff,
             set this value to 2.
-
-            A value of 0 means there will be no worker threads, and all tasks will
-            run in the main thread. Use this value on platforms that do not support it
-            (i.e. Emscripten) or to troubleshoot very specific issues (e.g. some
-            Debuggers don't work correctly when threads are involved)
+        @param threadedCullingMethod
+            @See InstancingThreadedCullingMethod. Note: When numWorkerThreads is 1,
+            this value is forced to INSTANCING_CULLING_SINGLETHREAD (as otherwise
+            it would only degrade performance).
         */
-        SceneManager* createSceneManager( const String& typeName, size_t numWorkerThreads,
-                                          const String& instanceName = BLANKSTRING );
+        SceneManager* createSceneManager(const String& typeName, size_t numWorkerThreads,
+                                        InstancingThreadedCullingMethod threadedCullingMethod,
+                                        const String& instanceName = BLANKSTRING);
 
         /** Create a SceneManager instance based on scene type support.
         @remarks
@@ -443,9 +423,14 @@ namespace Ogre
             and you intend to run your logic 100% in one of the cores,
             set this value to 3. If you intend to fully use 2 cores for your own stuff,
             set this value to 2.
+        @param threadedCullingMethod
+            @See InstancingThreadedCullingMethod. Note: When numWorkerThreads is 1,
+            this value is forced to INSTANCING_CULLING_SINGLETHREAD (as otherwise
+            it would only degrade performance).
         */
-        SceneManager* createSceneManager(SceneTypeMask typeMask, size_t numWorkerThreads,
-                                         const String& instanceName = BLANKSTRING);
+        SceneManager* createSceneManager(SceneTypeMask typeMask, size_t numWorkerThreads, 
+                                        InstancingThreadedCullingMethod threadedCullingMethod,
+                                        const String& instanceName = BLANKSTRING);
 
         /** Destroy an instance of a SceneManager. */
         void destroySceneManager(SceneManager* sm);
@@ -463,12 +448,29 @@ namespace Ogre
         /** Get an iterator over all the existing SceneManager instances. */
         SceneManagerEnumerator::SceneManagerIterator getSceneManagerIterator(void);
 
+        /** Retrieves a reference to the current TextureManager.
+            @remarks
+                This performs the same function as
+                TextureManager::getSingleton, but is provided for convenience
+                particularly to scripting engines.
+            @par
+                Note that a TextureManager will NOT be available until the
+                Ogre system has been initialised by selecting a RenderSystem,
+                calling Root::initialise and a window having been created
+                (this may have been done by initialise if required). This is
+                because the exact runtime subclass which will be implementing
+                the calls will differ depending on the rendering engine
+                selected, and these typically require a window upon which to
+                base texture format decisions.
+        */
+        TextureManager* getTextureManager(void);
+
         /** Retrieves a reference to the current MeshManager.
             @remarks
                 This performs the same function as MeshManager::getSingleton
                 and is provided for convenience to scripting engines.
         */
-        v1::MeshManager* getMeshManagerV1(void);
+        MeshManager* getMeshManager(void);
 
         /** Utility function for getting a better description of an error
             code.
@@ -690,17 +692,43 @@ namespace Ogre
                 returns a null pointer when Root has not been initialised with
                 the option of creating a window.
         */
-        Window* getAutoCreatedWindow(void);
+        RenderWindow* getAutoCreatedWindow(void);
 
         /** @copydoc RenderSystem::_createRenderWindow
         */
-        Window* createRenderWindow( const String &name, uint32 width, uint32 height,
-                                    bool fullScreen, const NameValuePairList *miscParams = 0);
+        RenderWindow* createRenderWindow(const String &name, unsigned int width, unsigned int height, 
+            bool fullScreen, const NameValuePairList *miscParams = 0) ;
 
         /** @copydoc RenderSystem::_createRenderWindows
         */
         bool createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
-            WindowList &createdWindows);
+            RenderWindowList& createdWindows);
+    
+        /** Detaches a RenderTarget from the active render system
+        and returns a pointer to it.
+        @note
+        If the render target cannot be found, NULL is returned.
+        */
+        RenderTarget* detachRenderTarget( RenderTarget* pWin );
+
+        /** Detaches a named RenderTarget from the active render system
+        and returns a pointer to it.
+        @note
+        If the render target cannot be found, NULL is returned.
+        */
+        RenderTarget* detachRenderTarget( const String & name );
+
+        /** Destroys the given RenderTarget.
+        */
+        void destroyRenderTarget(RenderTarget* target);
+
+        /** Destroys the given named RenderTarget.
+        */
+        void destroyRenderTarget(const String &name);
+
+        /** Retrieves a pointer to a named render target.
+        */
+        RenderTarget * getRenderTarget(const String &name);
 
         /** Manually load a Plugin contained in a DLL / DSO.
          @remarks
@@ -898,8 +926,32 @@ namespace Ogre
         */
         bool _updateAllRenderTargets(FrameEvent& evt);
 
-        void _renderingFrameEnded( void );
-        void _notifyRenderingFrameStarted( void );
+        /** Create a new RenderQueueInvocationSequence, useful for linking to
+            Viewport instances to perform custom rendering.
+        @param name The name to give the new sequence
+        */
+        RenderQueueInvocationSequence* createRenderQueueInvocationSequence(
+            const String& name);
+
+        /** Get a RenderQueueInvocationSequence. 
+        @param name The name to identify the sequence
+        */
+        RenderQueueInvocationSequence* getRenderQueueInvocationSequence(
+            const String& name);
+
+        /** Destroy a RenderQueueInvocationSequence. 
+        @remarks
+            You must ensure that no Viewports are using this sequence.
+        @param name The name to identify the sequence
+        */
+        void destroyRenderQueueInvocationSequence(
+            const String& name);
+
+        /** Destroy all RenderQueueInvocationSequences. 
+        @remarks
+            You must ensure that no Viewports are using custom sequences.
+        */
+        void destroyAllRenderQueueInvocationSequences(void);
 
         /** Override standard Singleton retrieval.
             @remarks
@@ -1049,9 +1101,19 @@ namespace Ogre
         /** Get the default minimum pixel size for object to be rendered by
         */
         Real getDefaultMinPixelSize() { return mDefaultMinPixelSize; }
+    
+        /** Set the default upload option for buffers that frequently changed
+        Setting upload option to HBU_ON_DEMAND can increase the framerate in multi-device scenarios,
+        as it will upload frequently changing buffers to devices that require them.
+        However setting the HBU_ON_DEMAND may also introduce hiccups.
+        */
+        void setFreqUpdatedBuffersUploadOption(HardwareBuffer::UploadOptions uploadOp) { mFreqUpdatedBuffersUploadOption = uploadOp; }
+        /** Get the default upload option for buffers that frequently changed
+        @note
+            To use this feature see Camera::setFreqUpdatedBuffersUploadOption()
+        */
+        HardwareBuffer::UploadOptions getFreqUpdatedBuffersUploadOption() const { return mFreqUpdatedBuffersUploadOption; }
 
-        void _setLightProfilesInvHeight( float invHeight ) { mLightProfilesInvHeight = invHeight; }
-        float getLightProfilesInvHeight( void ) const { return mLightProfilesInvHeight; }
     };
     /** @} */
     /** @} */

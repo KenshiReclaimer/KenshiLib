@@ -33,10 +33,6 @@ THE SOFTWARE.
 
 #include "OgreLog.h"
 #include "OgreSingleton.h"
-#include "Threading/OgreThreadHeaders.h"
-
-#include "ogrestd/map.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

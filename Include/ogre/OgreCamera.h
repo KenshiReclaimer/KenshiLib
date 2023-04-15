@@ -42,25 +42,6 @@ namespace Ogre {
     class Matrix4;
     class Ray;
 
-    struct VrData
-    {
-        Matrix4 mHeadToEye[2];
-        Matrix4 mProjectionMatrix[2];
-        //Matrix4 mLeftToRight;
-        Vector3 mLeftToRight;
-
-        void set( const Matrix4 eyeToHead[2], const Matrix4 projectionMatrix[2] )
-        {
-            for( int i=0; i<2; ++i )
-            {
-                mHeadToEye[i] = eyeToHead[i];
-                mProjectionMatrix[i] = projectionMatrix[i];
-                mHeadToEye[i] = mHeadToEye[i].inverseAffine();
-            }
-            mLeftToRight = (mHeadToEye[0] * eyeToHead[1]).getTrans();
-        }
-    };
-
     /** \addtogroup Core
     *  @{
     */
@@ -107,7 +88,7 @@ namespace Ogre {
         {
         public:
             Listener() {}
-            virtual ~Listener();
+            virtual ~Listener() {}
 
             /// Called prior to the scene being rendered with this camera
             virtual void cameraPreRenderScene(Camera* cam)
@@ -122,37 +103,6 @@ namespace Ogre {
                         { (void)cam; }
 
         };
-
-        /// Sets how the objects are sorted. This affects both opaque
-        /// (performance optimization, rendered front to back) and
-        /// transparents (visual correctness, rendered back to front)
-        ///
-        /// Object sorting is approximate, and some scenes are suited
-        /// to different modes depending on the objects' geometric properties
-        ///
-        /// See https://forums.ogre3d.org/viewtopic.php?f=2&t=94090 for examples
-        ///
-        /// Please note that RenderQueue::addRenderable quantizes the final depth value.
-        /// Therefore if two objects are numerically very close, the chosen mode may not
-        /// make too much of a difference.
-        enum CameraSortMode
-        {
-            /// Sort objects by distance to camera. i.e.
-            ///     cameraPos.distance( objPos ) - objRadius
-            ///
-            /// The bigger the object radius, the closer it is considered to be to the camera
-            SortModeDistance,
-            /// Sort objects by depth i.e.
-            ///     objViewSpacePos.z - objRadius
-            ///
-            /// The bigger the object radius, the closer it is considered to be to the camera
-            SortModeDepth,
-            /// Same as SortModeDistance, but skips object radius from calculations
-            SortModeDistanceRadiusIgnoring,
-            /// Same as SortModeDepth, but skips object radius from calculations
-            SortModeDepthRadiusIgnoring
-        };
-
     protected:
         /// Scene manager responsible for the scene
         SceneManager *mSceneMgr;
@@ -176,10 +126,14 @@ namespace Ogre {
         /// Fixed axis to yaw around
         Vector3 mYawFixedAxis;
 
-        /// Stored number of visible faces, batches, etc. in the last render
-        RenderingMetrics mLastRenderingMetrics;
+        /// Rendering type
+        PolygonMode mSceneDetail;
 
-        VrData *mVrData;
+        /// Stored number of visible faces in the last render
+        unsigned int mVisFacesLastRender;
+
+        /// Stored number of visible batches in the last render
+        unsigned int mVisBatchesLastRender;
 
         /// Shared class-level name for Movable type
         static String msMovableType;
@@ -202,7 +156,7 @@ namespace Ogre {
         /// Is viewing window used.
         bool mWindowSet;
         /// Windowed viewport clip planes 
-        mutable PlaneList mWindowClipPlanes;
+        mutable vector<Plane>::type mWindowClipPlanes;
         /// Was viewing window changed.
         mutable bool mRecalcWindow;
         /// The last viewport to be added using this camera
@@ -218,14 +172,10 @@ namespace Ogre {
         /// Camera to use for LOD calculation
         const Camera* mLodCamera;
         
-        bool mNeedsDepthClamp;
-
         /// Whether or not the minimum display size of objects should take effect for this camera
         bool mUseMinPixelSize;
         /// @see Camera::getPixelDisplayRatio
         Real mPixelDisplayRatio;
-
-        float mConstantBiasScale;
 
         /// Each frame it is set to all false. After rendering each RQ, it is set to true
         vector<bool>::type  mRenderedRqs;
@@ -233,18 +183,7 @@ namespace Ogre {
         typedef vector<Listener*>::type ListenerList;
         ListenerList mListeners;
 
-        static CameraSortMode msDefaultSortMode;
 
-    public:
-        /// PUBLIC VARIABLE. This variable can be altered directly.
-        /// Changes are reflected immediately.
-        CameraSortMode mSortMode;
-
-        /** Sets the default sort mode for all future Camera instances. */
-        static void setDefaultSortMode( CameraSortMode sortMode ) { msDefaultSortMode = sortMode; }
-        static CameraSortMode getDefaultSortMode( void ) { return msDefaultSortMode; }
-
-    protected:
         // Internal functions for calcs
         bool isViewOutOfDate(void) const;
         /// Signal to update frustum information.
@@ -279,6 +218,19 @@ namespace Ogre {
         /** Returns a pointer to the SceneManager this camera is rendering through.
         */
         SceneManager* getSceneManager(void) const;
+
+        /** Sets the level of rendering detail required from this camera.
+        @remarks
+            Each camera is set to render at full detail by default, that is
+            with full texturing, lighting etc. This method lets you change
+            that behaviour, allowing you to make the camera just render a
+            wireframe view, for example.
+        */
+        void setPolygonMode(PolygonMode sd);
+
+        /** Retrieves the level of detail that the camera will render.
+        */
+        PolygonMode getPolygonMode(void) const;
 
         /** Sets the camera's position.
         */
@@ -396,22 +348,6 @@ namespace Ogre {
         */
         void setOrientation(const Quaternion& q);
 
-        /** When a camera is created via SceneManager::createCamera, there are two
-            additional parameters.
-        @param collectLights
-            Tell Ogre to cull lights against this camera. This requires additional
-            CPU power. If a camera is not going to be used for a long time (or it
-            doesn't need lights, which is what happens with shadow mapping cameras)
-            you want this set to false. Otherwise if you need to render and need
-            lights, enable this setting.
-        @param isCubemap
-            Use an alternative algorithm to collect lights in 360° around the camera.
-            This is required if the camera is going to be used in passes where
-            CompositorPassSceneDef::mCameraCubemapReorient = true;
-            Does nothing if collectLights = false
-        */
-        void setLightCullingVisibility( bool collectLights, bool isCubemap );
-
         /** Tells the Camera to contact the SceneManager to render from it's viewpoint.
         @param vp The viewport to render to
         @param includeOverlays Whether or not any overlay objects should be included
@@ -420,12 +356,10 @@ namespace Ogre {
         @param lastRq
             Last RenderQueue ID to render (exclusive)
         */
-        void _cullScenePhase01( Camera *renderCamera, const Camera *lodCamera,
-                                Viewport *vp, uint8 firstRq, uint8 lastRq,
-                                bool reuseCullData );
+        void _cullScenePhase01(const Camera *lodCamera, Viewport *vp, uint8 firstRq, uint8 lastRq );
 
-        void _renderScenePhase02( const Camera *lodCamera
-                                  , uint8 firstRq, uint8 lastRq, bool includeOverlays );
+        void _renderScenePhase02(const Camera *lodCamera, Viewport *vp, uint8 firstRq, uint8 lastRq,
+                                 bool includeOverlays);
 
         /** Function for outputting to a stream.
         */
@@ -433,21 +367,19 @@ namespace Ogre {
 
         /** Internal method to notify camera of the visible faces in the last render.
         */
-        void _notifyRenderingMetrics( const RenderingMetrics& metrics );
+        void _notifyRenderedFaces(unsigned int numfaces);
 
-        /** Internal method to retrieve the number of visible faces, batches, etc in the last render.
+        /** Internal method to notify camera of the visible batches in the last render.
         */
-        const RenderingMetrics& _getRenderingMetrics( void ) const;
+        void _notifyRenderedBatches(unsigned int numbatches);
 
         /** Internal method to retrieve the number of visible faces in the last render.
-        * @deprecated use Camera::_getRenderingMetrics() instead.
         */
-        size_t _getNumRenderedFaces( void ) const;
+        unsigned int _getNumRenderedFaces(void) const;
 
         /** Internal method to retrieve the number of visible batches in the last render.
-        * @deprecated use Camera::_getRenderingMetrics() instead.
-         */
-        size_t _getNumRenderedBatches( void ) const;
+        */
+        unsigned int _getNumRenderedBatches(void) const;
 
         /** Gets the derived orientation of the camera, including any
             rotation inherited from a node attachment and reflection matrix. */
@@ -466,8 +398,7 @@ namespace Ogre {
         Vector3 getDerivedRight(void) const;
 
         /// Same as getDerivedPosition, but doesn't check if dirty.
-        const Vector3& _getCachedDerivedPosition(void) const            { return mDerivedPosition; }
-        const Quaternion& _getCachedDerivedOrientation(void) const      { return mDerivedOrientation; }
+        const Vector3& _getCachedDerivedPosition(void) const                { return mDerivedPosition; }
 
         /** Gets the real world orientation of the camera, including any
             rotation inherited from a node attachment */
@@ -484,9 +415,6 @@ namespace Ogre {
         /** Gets the real world right vector of the camera, including any
             rotation inherited from a node attachment. */
         Vector3 getRealRight(void) const;
-
-        const Vector3& _getCachedRealPosition(void) const               { return mRealPosition; }
-        const Quaternion& _getCachedRealOrientation(void) const         { return mRealOrientation; }
 
         /** Overridden from Frustum/Renderable */
         void getWorldTransforms(Matrix4* mat) const;
@@ -626,7 +554,7 @@ namespace Ogre {
         /// Returns if a viewport window is being used
         virtual bool isWindowSet(void) const { return mWindowSet; }
         /// Gets the window clip planes, only applicable if isWindowSet == true
-        const PlaneList &getWindowPlanes( void ) const;
+        const vector<Plane>::type& getWindowPlanes(void) const;
 
         /** Get the auto tracking target for this camera, if any. */
         SceneNode* getAutoTrackTarget(void) const { return mAutoTrackTarget; }
@@ -669,22 +597,6 @@ namespace Ogre {
         void setCullingFrustum(Frustum* frustum) { mCullFrustum = frustum; }
         /** Returns the custom culling frustum in use. */
         Frustum* getCullingFrustum(void) const { return mCullFrustum; }
-
-        /** Sets VR data for calculating left & right eyes
-            See OpenVR sample for more info
-        @param vrData
-            Pointer to valid VrData
-            This pointer must remain valid while the Camera is using it.
-            We won't free this pointer. It is the developer's responsability to free it
-            once no longer in use.
-            Multiple cameras can share the same VrData pointer.
-            The internal data hold by VrData can be changed withohut having to call setVrData again
-        */
-        void setVrData( VrData *vrData );
-        const VrData* getVrData(void) const     { return mVrData; }
-
-        Matrix4 getVrViewMatrix( size_t eyeIdx ) const;
-        Matrix4 getVrProjectionMatrix( size_t eyeIdx ) const;
 
         /** Forward projects frustum rays to find forward intersection with plane.
         @remarks
@@ -754,9 +666,6 @@ namespace Ogre {
         */
         bool getUseMinPixelSize() const { return mUseMinPixelSize; }
 
-        void _setNeedsDepthClamp( bool bNeedsDepthClamp );
-        bool getNeedsDepthClamp( void ) const { return mNeedsDepthClamp; }
-
         /** Returns an estimated ratio between a pixel and the display area it represents.
             For orthographic cameras this function returns the amount of meters covered by
             a single pixel along the vertical axis. For perspective cameras the value
@@ -768,9 +677,6 @@ namespace Ogre {
             This parameter is used in min display size calculations.
         */
         Real getPixelDisplayRatio() const { return mPixelDisplayRatio; }
-
-        void _setConstantBiasScale( const float bias ) { mConstantBiasScale = bias; }
-        float _getConstantBiasScale( void ) const { return mConstantBiasScale; }
 
         /** Called at the beginning of each frame to know which RenderQueue IDs have been rendered
         @param numRqs

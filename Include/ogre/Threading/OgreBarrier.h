@@ -31,14 +31,13 @@ THE SOFTWARE.
 
 #include "OgrePlatform.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     //No need to include the heavy windows.h header for something like this!
     typedef long LONG;
     typedef void* HANDLE;
 #else
     #include <pthread.h>
-    #if( defined( ANDROID ) && __ANDROID_API__ < __ANDROID_API_N__ ) || \
-        OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    #if defined(ANDROID) || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     typedef struct
     {
         pthread_mutex_t mutex;
@@ -46,7 +45,7 @@ THE SOFTWARE.
         int count;
         int tripCount;
     } pthread_barrier_t;
-#endif
+    #endif
 #endif
 
 namespace Ogre
@@ -62,7 +61,7 @@ namespace Ogre
     */
     class _OgreExport Barrier
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         size_t                  mNumThreads;
         size_t                  mIndex;
         OGRE_ALIGNED_DECL( volatile LONG,   mLockCount,     4 );

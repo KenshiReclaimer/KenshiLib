@@ -35,9 +35,6 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgreAny.h"
 #include "Threading/OgreThreadHeaders.h"
-
-#include "ogrestd/list.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -192,7 +189,7 @@ namespace Ogre
     {
     public: // Externally accessible types
         //typedef map<String,uint32>::type IdMap;
-        typedef unordered_map<String,uint32>::type IdMap;
+        typedef OGRE_HashMap<String,uint32> IdMap;
 
         // The container for errors
         struct Error : public ScriptCompilerAlloc
@@ -515,8 +512,6 @@ namespace Ogre
             TEXTURE,
             MATERIAL,
             GPU_PROGRAM,
-            UAV,
-            UAV_BUFFER,
             COMPOSITOR
         };
         ResourceType mResourceType;
@@ -685,10 +680,17 @@ namespace Ogre
         ID_ALPHA_TO_COVERAGE,
         ID_LIGHT_SCISSOR,
         ID_LIGHT_CLIP_PLANES,
+        ID_TRANSPARENT_SORTING,
+        ID_ILLUMINATION_STAGE,
+            ID_DECAL,
         ID_CULL_HARDWARE,
-        ID_CULL_MODE,
             ID_CLOCKWISE,
             ID_ANTICLOCKWISE,
+        ID_CULL_SOFTWARE,
+            ID_BACK,
+            ID_FRONT,
+        ID_NORMALISE_NORMALS,
+        ID_LIGHTING,
         ID_SHADING,
             ID_FLAT, 
             ID_GOURAUD,
@@ -704,7 +706,6 @@ namespace Ogre
             ID_EXP,
             ID_EXP2,
         ID_COLOUR_WRITE,
-        ID_CHANNEL_MASK,
         ID_MAX_LIGHTS,
         ID_START_LIGHT,
         ID_ITERATION,
@@ -747,6 +748,9 @@ namespace Ogre
             ID_BILINEAR,
             ID_TRILINEAR,
             ID_ANISOTROPIC,
+        ID_CMPTEST,
+            ID_ON,
+            ID_OFF,
         ID_CMPFUNC,
         ID_MAX_ANISOTROPY,
         ID_MIPMAP_BIAS,
@@ -804,7 +808,6 @@ namespace Ogre
             ID_NAMED,
             ID_SHADOW,
             ID_COMPOSITOR,
-        ID_AUTOMATIC_BATCHING,
         ID_TEXTURE_SOURCE,
         ID_SHARED_PARAMS,
         ID_SHARED_PARAM_NAMED,
@@ -817,134 +820,52 @@ namespace Ogre
         ID_WORKSPACE,
             ID_ALIAS,
             ID_CONNECT,
-            ID_CONNECT_BUFFER,
             ID_CONNECT_OUTPUT,
-            ID_CONNECT_EXTERNAL,
-            ID_CONNECT_BUFFER_EXTERNAL,
         ID_COMPOSITOR_NODE,
             ID_IN,
             ID_OUT,
-            ID_IN_BUFFER,
-            ID_OUT_BUFFER,
             ID_CUSTOM_ID,
-            ID_RTV,
-                //ID_COLOUR,
-                    ID_RESOLVE,
-                    ID_MIP,
-                    //ID_MIPMAP,
-                    ID_RESOLVE_MIP,
-                    ID_RESOLVE_MIPMAP,
-                    ID_SLICE,
-                    ID_RESOLVE_SLICE,
-                    ID_ALL_LAYERS,
-                //ID_DEPTH,
-                //ID_STENCIL,
-                ID_DEPTH_STENCIL,
-                //ID_DEPTH_TEXTURE,
-                //ID_DEPTH_FORMAT,
-                ID_DEPTH_READ_ONLY,
-                ID_STENCIL_READ_ONLY,
-            ID_BUFFER,
         //  ID_TEXTURE,
                 ID_TARGET_WIDTH,
                 ID_TARGET_HEIGHT,
                 ID_TARGET_WIDTH_SCALED,
                 ID_TARGET_HEIGHT_SCALED,
-                ID_TARGET_FORMAT,
             //  ID_GAMMA,
                 ID_NO_GAMMA,
                 ID_NO_FSAA,
-                ID_MSAA,
-                ID_MSAA_AUTO,
                 ID_EXPLICIT_RESOLVE,
-                ID_REINTERPRETABLE,
-                ID_KEEP_CONTENT,
                 ID_DEPTH_POOL,
-                ID_DEPTH_TEXTURE,
-                ID_DEPTH_FORMAT,
-                ID_2D_ARRAY,
-                //ID_3D,
-                ID_CUBEMAP,
-                ID_CUBEMAP_ARRAY,
-                ID_MIPMAPS,
-
-                ID_NO_AUTOMIPMAPS,
             ID_TARGET,
         //  ID_PASS,
                 ID_CLEAR,
                 ID_STENCIL,
                 ID_RENDER_SCENE,
                 ID_RENDER_QUAD,
-                ID_DEPTH_COPY,
-                ID_BIND_UAV,
-                    ID_LOAD,
-                        ID_ALL,
-                        //ID_COLOUR,
-                        //ID_DEPTH,
-                        //ID_STENCIL,
-                        ID_CLEAR_COLOUR,
-                        ID_CLEAR_COLOUR_REVERSE_DEPTH_AWARE,
-                        ID_CLEAR_DEPTH,
-                        ID_CLEAR_STENCIL,
-                        ID_WARN_IF_RTV_WAS_FLUSHED,
-                    ID_STORE,
                     ID_VIEWPORT,
                     ID_NUM_INITIAL,
-                    ID_FLUSH_COMMAND_BUFFERS,
                     ID_IDENTIFIER,
                     ID_OVERLAYS,
-                    ID_EXECUTION_MASK,
-                    ID_VIEWPORT_MODIFIER_MASK,
-                    ID_USES_UAV,
-                        ID_ALLOW_WRITE_AFTER_WRITE, //Used inside ID_USES_UAV
-                    //ID_COLOUR_WRITE,
-                    ID_EXPOSE,
-                    ID_SHADOW_MAP_FULL_VIEWPORT,
-                    ID_PROFILING_ID,
 
                     //Used by PASS_SCENE
                     ID_LOD_BIAS,
                     ID_LOD_UPDATE_LIST,
                     ID_LOD_CAMERA,
-                    ID_CULL_REUSE_DATA,
-                    ID_CULL_CAMERA,
-                    ID_MATERIAL_SCHEME,
+                    ID_MATERIAL_SCHEME, //TODO
                     ID_VISIBILITY_MASK,
-                    ID_LIGHT_VISIBILITY_MASK,
                     ID_SHADOWS_ENABLED,
                     ID_CAMERA,
                     ID_FIRST_RENDER_QUEUE,
                     ID_LAST_RENDER_QUEUE,
                     ID_CAMERA_CUBEMAP_REORIENT,
-                    ID_ENABLE_FORWARDPLUS,
-                    ID_FLUSH_COMMAND_BUFFERS_AFTER_SHADOW_NODE,
-                    ID_IS_PREPASS,
-                    ID_USE_PREPASS,
-                    ID_GEN_NORMALS_GBUFFER,
-                    ID_USE_REFRACTIONS,
-                    ID_UV_BAKING,
-                    ID_UV_BAKING_OFFSET,
-                    ID_BAKE_LIGHTING_ONLY,
-                    ID_INSTANCED_STEREO,
 
                     //Used by PASS_QUAD
                     ID_USE_QUAD,
                     ID_QUAD_NORMALS,
                         ID_CAMERA_FAR_CORNERS_VIEW_SPACE,
-                        ID_CAMERA_FAR_CORNERS_VIEW_SPACE_NORMALIZED,
-                        ID_CAMERA_FAR_CORNERS_VIEW_SPACE_NORMALIZED_LH,
                         ID_CAMERA_FAR_CORNERS_WORLD_SPACE,
-                        ID_CAMERA_FAR_CORNERS_WORLD_SPACE_CENTERED,
-                        ID_CAMERA_DIRECTION,
                     ID_INPUT,
 
-
-                    //Used by PASS_IBL_SPECULAR
-                    //ID_INPUT,
-                    ID_OUTPUT,
-
                     //Used by PASS_CLEAR
-                    ID_NON_TILERS_ONLY,
                     ID_BUFFERS,
                     ID_COLOUR,
                     ID_DEPTH,
@@ -955,13 +876,9 @@ namespace Ogre
                     ID_DISCARD_ONLY,
 
                     ID_CHECK,
+                    ID_COMP_FUNC,
                     ID_REF_VALUE,
                     ID_MASK,
-                    ID_READ_MASK,
-                    ID_BOTH,
-                    ID_FRONT,
-                    ID_BACK,
-                        ID_COMP_FUNC,
                     ID_FAIL_OP,
                         ID_KEEP,
                         ID_INCREMENT,
@@ -972,54 +889,17 @@ namespace Ogre
                     ID_DEPTH_FAIL_OP,
                     ID_PASS_OP,
                     ID_TWO_SIDED,
-
-                    //Used by PASS_UAV (& PASS_COMPUTE)
-                    ID_UAV,
-                    ID_UAV_EXTERNAL,
-                    ID_UAV_BUFFER,
-                    ID_STARTING_SLOT,
-                    ID_KEEP_PREVIOUS_UAV,
-                    ID_READ,
-                    ID_WRITE,
-                    ID_MIPMAP,
-
-                    //Used by PASS_COMPUTE
-                    ID_JOB,
-
-                    //Used by PASS_MIPMAP
-                    ID_MIPMAP_METHOD,
-                        ID_API_DEFAULT,
-                        //ID_COMPUTE,
-                        ID_COMPUTE_HQ,
-                    ID_KERNEL_RADIUS,
-                    ID_GAUSS_DEVIATION,
-
-                    //Used by IBL_SPECULAR
-                    ID_SAMPLES_PER_ITERATION,
-                    ID_SAMPLES_SINGLE_ITERATION_FALLBACK,
-                    ID_FORCE_MIPMAP_FALLBACK,
-
             ID_READ_BACK_AS_TEXTURE,
 
         ID_SHADOW_NODE,
             ID_NUM_SPLITS,
-            ID_NUM_STABLE_SPLITS,
-            ID_NORMAL_OFFSET_BIAS,
-            ID_CONSTANT_BIAS_SCALE,
             ID_PSSM_SPLIT_PADDING,
-            ID_PSSM_SPLIT_BLEND,
-            ID_PSSM_SPLIT_FADE,
             ID_PSSM_LAMBDA,
-            ID_SHADOW_MAP_TARGET_TYPE,
-            ID_SHADOW_MAP_REPEAT,
             ID_SHADOW_MAP,
-                ID_UV,
-                ID_ARRAY_INDEX,
+            ID_SHADOW_ATLAS,
                 ID_FSAA,
                 ID_LIGHT,
                 ID_SPLIT,
-
-        ID_HLMS,
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
         ID_RT_SHADER_SYSTEM,

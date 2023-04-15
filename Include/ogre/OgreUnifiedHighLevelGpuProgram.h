@@ -147,7 +147,7 @@ namespace Ogre {
         void resetCompileError(void);
 
         void load(bool backgroundThread = false);
-        void reload(LoadingFlags flags = LF_DEFAULT);
+        void reload(void);
         bool isReloadable(void) const;
         bool isLoaded(void) const;
         bool isLoading() const;

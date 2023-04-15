@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#if OGRE_DEBUG_MODE
+#ifndef NDEBUG
     //Needed by the dynamic_cast assert
     #include "OgreSceneNode.h"
 #endif
@@ -38,16 +38,6 @@ namespace Ogre
         msDefaultVisibilityFlags = (flags & VisibilityFlags::RESERVED_VISIBILITY_FLAGS) |
                                     ( msDefaultVisibilityFlags &
                                       ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS );
-    }
-    //-----------------------------------------------------------------------------------
-    inline RealAsUint MovableObject::getCachedDistanceToCamera(void) const
-    {
-        return mObjectData.mDistanceToCamera[mObjectData.mIndex];
-    }
-    //-----------------------------------------------------------------------------------
-    inline Real MovableObject::getCachedDistanceToCameraAsReal(void) const
-    {
-        return (reinterpret_cast<Real*RESTRICT_ALIAS>(mObjectData.mDistanceToCamera))[mObjectData.mIndex];
     }
     //-----------------------------------------------------------------------------------
     inline void MovableObject::setVisibilityFlags( uint32 flags )
@@ -109,30 +99,13 @@ namespace Ogre
     inline void MovableObject::setRenderingDistance( Real dist )
     {
         assert( dist > 0.0f );
-        if (dist > 0.0f)
-        {
-            mObjectData.mUpperDistance[0][mObjectData.mIndex] = dist;
-            mObjectData.mUpperDistance[1][mObjectData.mIndex] = std::min(dist, mObjectData.mUpperDistance[1][mObjectData.mIndex]);
-        }
+        if( dist > 0.0f )
+            mObjectData.mUpperDistance[mObjectData.mIndex] = dist;
     }
     //-----------------------------------------------------------------------------------
     inline Real MovableObject::getRenderingDistance(void) const
     {
-        return mObjectData.mUpperDistance[0][mObjectData.mIndex];
-    }
-    //-----------------------------------------------------------------------------------
-    inline void MovableObject::setShadowRenderingDistance(Real dist)
-    {
-        assert(dist > 0.0f);
-        if (dist > 0.0f)
-        {
-            mObjectData.mUpperDistance[1][mObjectData.mIndex] = std::min(dist, mObjectData.mUpperDistance[0][mObjectData.mIndex]);
-        }
-    }
-    //-----------------------------------------------------------------------------------
-    inline Real MovableObject::getShadowRenderingDistance(void) const
-    {
-        return mObjectData.mUpperDistance[1][mObjectData.mIndex];
+        return mObjectData.mUpperDistance[mObjectData.mIndex];
     }
     //-----------------------------------------------------------------------------------
     inline void MovableObject::setVisible( bool visible )
@@ -164,11 +137,6 @@ namespace Ogre
     {
         return (mObjectData.mVisibilityFlags[mObjectData.mIndex] &
                                                     VisibilityFlags::LAYER_SHADOW_CASTER) != 0;
-    }
-    //-----------------------------------------------------------------------------------
-    inline uint8 MovableObject::getRenderQueueGroup(void) const
-    {
-        return mRenderQueueID;
     }
     //-----------------------------------------------------------------------------------
     inline SceneNode* MovableObject::getParentSceneNode(void) const

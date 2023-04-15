@@ -33,8 +33,6 @@ THE SOFTWARE.
 #include "OgreIdString.h"
 #include "Math/Array/OgreBoneMemoryManager.h"
 
-#include "ogrestd/list.h"
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -101,7 +99,7 @@ namespace Ogre
         may have 3 bones, 10 animations, another may have 6 bones, 2 animations, etc)
         unless we wasted a lot of RAM or perform a lot of book-keeping.
     */
-    struct _OgreExport SkeletonAnimManager
+    struct SkeletonAnimManager
     {
         typedef list<BySkeletonDef>::type BySkeletonDefList;
         BySkeletonDefList bySkeletonDefs;
@@ -110,7 +108,6 @@ namespace Ogre
         SkeletonInstance* createSkeletonInstance( const SkeletonDef *skeletonDef,
                                                     size_t numWorkerThreads );
         void destroySkeletonInstance( SkeletonInstance *skeletonInstance );
-        void removeSkeletonDef( const SkeletonDef *skeletonDef );
     };
 
     /** @} */

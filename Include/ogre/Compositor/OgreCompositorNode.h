@@ -32,12 +32,8 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 #include "Compositor/OgreCompositorCommon.h"
 #include "Compositor/OgreCompositorChannel.h"
-#include "Compositor/OgreCompositorNamedBuffer.h"
-#include "OgreResourceTransition.h"
 #include "OgreIdString.h"
 #include "OgreId.h"
-
-#include "ogrestd/map.h"
 
 namespace Ogre
 {
@@ -49,8 +45,6 @@ namespace Ogre
     /** \addtogroup Effects
     *  @{
     */
-
-    struct BoundUav;
 
     /** Compositor nodes are the core subject of compositing.
         This is an instantiation. All const, shared parameters are in the definition
@@ -108,9 +102,6 @@ namespace Ogre
         /// Contains pointers that are ither in mInTextures or mLocalTextures
         CompositorChannelVec    mOutTextures;
 
-        size_t                      mNumConnectedBufferInputs;
-        CompositorNamedBufferVec    mBuffers;
-
         CompositorPassVec   mPasses;
 
         /// Nodes we're connected to. If we destroy our local textures, we need to inform them
@@ -135,17 +126,12 @@ namespace Ogre
         */
         void disconnectOutput();
 
-        /// Makes global buffers visible to our passes. Must be done last in case
-        /// there's an input/local buffer with the same name as a global buffer
-        /// (local scope prevails over global scope)
-        void populateGlobalBuffers(void);
-
-        /** Called right after we create a pass. Derived
+        /** Called right after we create a PASS_SCENE pass. Derived
             classes may want to do something with it
         @param pass
             Newly created pass to toy with.
         */
-        virtual void postInitializePass( CompositorPass *pass ) {}
+        virtual void postInitializePassScene( CompositorPassScene *pass ) {}
 
     public:
         /** The Id must be unique across all engine so we can create unique named textures.
@@ -153,15 +139,11 @@ namespace Ogre
         */
         CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
                         CompositorWorkspace *workspace, RenderSystem *renderSys,
-                        TextureGpu *finalTarget );
+                        const RenderTarget *finalTarget );
         virtual ~CompositorNode();
-
-        void destroyAllPasses(void);
 
         IdString getName(void) const                                { return mName; }
         const CompositorNodeDef* getDefinition() const              { return mDefinition; }
-
-        RenderSystem* getRenderSystem(void) const                   { return mRenderSystem; }
 
         /** Enables or disables all instances of this node
         @remarks
@@ -173,22 +155,13 @@ namespace Ogre
             This function is useful frequently toggling a compositor effect without having
             to recreate any API resource (which often would involve stalls).
         */
-        void setEnabled( bool bEnabled );
+        void setEnabled( bool bEnabled )                    { mEnabled = bEnabled; }
 
         /// Returns if this instance is enabled. @See setEnabled
         bool getEnabled(void) const                         { return mEnabled; }
 
         /** Connects this node (let's call it node 'A') to node 'B', mapping the output
-            channel from A into the input channel from B (buffer version)
-        @param outChannelA
-            Output to use from node A.
-        @param inChannelB
-            Input to connect the output from A.
-        */
-        void connectBufferTo( size_t outChannelA, CompositorNode *nodeB, size_t inChannelB );
-
-        /** Connects this node (let's call it node 'A') to node 'B', mapping the output
-            channel from A into the input channel from B (texture version)
+            channel from A into the input channel from B
         @param outChannelA
             Output to use from node A.
         @param inChannelB
@@ -197,7 +170,7 @@ namespace Ogre
         void connectTo( size_t outChannelA, CompositorNode *nodeB, size_t inChannelB );
 
         /** Connects (injects) an external RT into the given channel. Usually used for
-            the "connect_output" / "connect_external" directive for the RenderWindow.
+            the "connect_output" directive for the RenderWindow.
         @param rt
             The RenderTarget.
         @param textures
@@ -206,18 +179,10 @@ namespace Ogre
         @param inChannelA
             In which channel number to inject to.
         */
-        void connectExternalRT( TextureGpu *externalTexture, size_t inChannelA );
+        void connectFinalRT( RenderTarget *rt, CompositorChannel::TextureVec &textures,
+                                size_t inChannelA );
 
-        /** Connects (injects) an external buffer into the given channel. Usually used for
-            the 'connect_buffer_external' directive.
-        @param buffer
-            The buffer.
-        @param inChannelA
-            In which channel number to inject to.
-        */
-        void connectExternalBuffer( UavBufferPacked *buffer, size_t inChannelA );
-
-        bool areAllInputsConnected() const;
+        bool areAllInputsConnected() const  { return mNumConnectedInputs == mInTextures.size(); }
         const CompositorChannelVec& getInputChannel() const         { return mInTextures; }
         const CompositorChannelVec& getLocalTextures() const        { return mLocalTextures; }
 
@@ -230,26 +195,13 @@ namespace Ogre
             refer to an input texture, a local texture, or a global one.
             If the global texture wasn't registered with addTextureSourceName,
             it will fail.
+        @param mrtIndex
+            The MRT (Multiple Render Target) index. If the texture isn't MRT or has
+            less RTs than the index, it returns the highest valid index found.
         @return
             Null if not found (or global texture not registered). The texture otherwise
         */
-        TextureGpu* getDefinedTexture( IdString textureName ) const;
-
-        /** Returns the buffer pointer of a buffer based on it's name.
-        @remarks
-            The buffer may come from a local buffer, an input buffer, or
-            global (workspace).
-        @param bufferName
-            The name of the buffer. This name may only be valid at node scope. It can
-            refer to an input buffer, a local buffer, or a global one.
-            If a local or input buffer has the same name as a global one, the global
-            one is ignored.
-        @return
-            Regular: The buffer. Throws if buffer wasn't found.
-            No throw version: Null if not found. The buffer otherwise
-        */
-        UavBufferPacked* getDefinedBuffer( IdString bufferName ) const;
-        UavBufferPacked* getDefinedBufferNoThrow( IdString bufferName ) const;
+        TexturePtr getDefinedTexture( IdString textureName, size_t mrtIndex ) const;
 
         /** Creates all passes based on our definition
         @remarks
@@ -276,16 +228,14 @@ namespace Ogre
         @param newChannel
             The new replacement textures
         */
-        void notifyRecreated( TextureGpu *channel );
-        void notifyRecreated( const UavBufferPacked *oldBuffer, UavBufferPacked *newBuffer );
+        void notifyRecreated( const CompositorChannel &oldChannel, const CompositorChannel &newChannel );
 
         /** Call this function when caller has destroyed a RenderTarget in which the callee
             may have a reference to that pointer, so that we can clean it up.
         @param channel
             Channel containing the pointer about to be destroyed (must still be valid)
         */
-        void notifyDestroyed( TextureGpu *channel );
-        void notifyDestroyed( const UavBufferPacked *buffer );
+        void notifyDestroyed( const CompositorChannel &channel );
 
         /** Internal Use. Called when connections are all being zero'ed. We rely our
             caller is doing this to all nodes, hence we do not notify our @mConnectedNodes
@@ -300,23 +250,11 @@ namespace Ogre
         @remarks
             We inform all connected nodes and passes related to us of RenderTargets/Textures
             that may have been recreated (pointers could become danlging otherwise).
-        @par
-            This is divided in two steps: recreateResizableTextures01 & recreateResizableTextures02
-            since in some cases in RenderPassDescriptor, setting up MRT and depth textures
-            requires all textures to be up to date, otherwise validation errors would occur
-            since we'll have partial data (e.g. MRT 0 is 1024x768 while MRT 1 is 800x600)
         @param finalTarget
             The Final Target (i.e. RenderWindow) from which we'll base our local textures'
             resolution.
         */
-        virtual void finalTargetResized01( const TextureGpu *finalTarget );
-        virtual void finalTargetResized02( const TextureGpu *finalTarget );
-
-        /// @copydoc CompositorWorkspace::resetAllNumPassesLeft
-        void resetAllNumPassesLeft(void);
-
-        /// @copydoc CompositorPassDef::getPassNumber
-        size_t getPassNumber( CompositorPass *pass ) const;
+        virtual void finalTargetResized( const RenderTarget *finalTarget );
 
         /// Returns our parent workspace
         CompositorWorkspace* getWorkspace(void)                     { return mWorkspace; }
