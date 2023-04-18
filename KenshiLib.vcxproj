@@ -143,6 +143,7 @@
     <ClInclude Include="Include\kenshi\Platoon.h" />
     <ClInclude Include="Include\kenshi\PlayerInterface.h" />
     <ClInclude Include="Include\kenshi\Root.h" />
+    <ClInclude Include="Include\kenshi\SaveManager.h" />
     <ClInclude Include="Include\kenshi\Tasks.h" />
     <ClInclude Include="Include\kenshi\util\hand.h" />
     <ClInclude Include="Include\kenshi\util\lektor.h" />

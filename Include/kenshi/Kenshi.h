@@ -22,6 +22,9 @@ namespace Kenshi
     struct ResearchManager;
     struct ResearchItem;
     struct InputHandler;
+    class SaveManager;
+    class SaveFileSystem;
+    typedef bool SaveGameFunc(SaveManager* thisptr, std::string savesDirectory, std::string saveName);
 
     MyGUI::WidgetPtr FindWidget(MyGUI::EnumeratorWidgetPtr enumerator, std::string name);
 
@@ -127,4 +130,8 @@ namespace Kenshi
     int& GetMaxFactionSize();
     int& GetMaxSquadSize();
     int& GetMaxSquads();
+
+    SaveManager* GetSaveManager();
+    SaveGameFunc* GetSaveManagerSaveGameFunction();
+    SaveFileSystem* GetSaveFileSystem();
 }

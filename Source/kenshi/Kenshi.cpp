@@ -111,6 +111,25 @@ StaticMap<Kenshi::BinaryVersion, offset_t> InputHandlerOffset = StaticMap<Kenshi
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01AC9960)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01AC78A0);
 
+// SaveManager**
+// No vmt, find this by breakpointing SaveManager::saveGame() and backtrack from RCX
+StaticMap<Kenshi::BinaryVersion, offset_t> SaveManagerOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC4D98)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01AC5D88)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01AC3CE8);
+
+// SaveFileSystem**
+// easiest way to track this down is to find the vtable and backtrack
+StaticMap<Kenshi::BinaryVersion, offset_t> SaveFileSystemOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC4DD8)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01AC5DC8)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01AC3D28);
+
+StaticMap<Kenshi::BinaryVersion, offset_t> SaveManagerSaveGameFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x002B5D30)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x002B5D90)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x002B5830);
+
 StaticMap<Kenshi::BinaryVersion, offset_t> ModLoadFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x006BEF60)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.62"), 0x006BF9E0)
@@ -239,6 +258,30 @@ Kenshi::InputHandler& Kenshi::GetInputHandler()
     offset_t inputHandlerOffset = InputHandlerOffset.at(kenshiVersion);
     static RVAPtr<InputHandler> c_inst(inputHandlerOffset);
     return *c_inst.GetPtr();
+}
+
+Kenshi::SaveManager* Kenshi::GetSaveManager()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t saveManagerPtrOffset = SaveManagerOffset.at(kenshiVersion);
+    static RVAPtr<SaveManager*> c_inst(saveManagerPtrOffset);
+    return *c_inst.GetPtr();
+}
+
+Kenshi::SaveFileSystem* Kenshi::GetSaveFileSystem()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t saveFileSystemPtrOffset = SaveFileSystemOffset.at(kenshiVersion);
+    static RVAPtr<SaveFileSystem*> c_inst(saveFileSystemPtrOffset);
+    return *c_inst.GetPtr();
+}
+
+Kenshi::SaveGameFunc* Kenshi::GetSaveManagerSaveGameFunction()
+{
+    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
+    offset_t saveManagerSaveGameFunction = SaveManagerSaveGameFunction.at(kenshiVersion);
+    static RVAPtr<SaveGameFunc> c_inst(saveManagerSaveGameFunction);
+    return c_inst.GetPtr();
 }
 
 // TODO templateize
