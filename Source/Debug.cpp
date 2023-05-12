@@ -36,8 +36,8 @@ void ErrorLog(std::string message)
 	char timeStr[10];
 	sprintf_s(timeStr, "%i.%03i", timeInMSecs / 1000, timeInMSecs % 1000);
 
-	debugFile << " Error " << timeStr << ": " << message << std::endl;
-	debugLog << " Error " << timeStr << ": " << message << std::endl;
+	debugFile << "Error " << timeStr << ": " << message << std::endl;
+	debugLog << "Error " << timeStr << ": " << message << std::endl;
 }
 
 std::string GetDebugLog()
