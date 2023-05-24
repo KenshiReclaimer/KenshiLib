@@ -4,7 +4,6 @@
 #include <kenshi/PlayerInterface.h>
 
 #include <core/RVA.h>
-#include <cassert>
 
 #include <core/md5.h>
 

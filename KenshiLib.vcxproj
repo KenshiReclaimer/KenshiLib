@@ -825,6 +825,7 @@
     <ClInclude Include="Include\ois\win32\Win32Mouse.h" />
     <ClInclude Include="Include\ois\win32\Win32Prereqs.h" />
     <ClInclude Include="Include\reclaimer\Reclaimer.h" />
+    <ClInclude Include="Include\Release_Assert.h" />
     <ClInclude Include="Include\stdafx.h" />
   </ItemGroup>
   <ItemGroup>

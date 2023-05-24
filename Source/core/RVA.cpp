@@ -1,13 +1,13 @@
 #include <core/RVA.h>
 
-#include <cassert>
 #include <core/Scanner.h>
 #include <stdexcept>
+#include "Release_Assert.h"
 
 static size_t GetRegionSize(uintptr_t base)
 {
     MEMORY_BASIC_INFORMATION mbi;
-    assert(VirtualQuery((LPCVOID)base, &mbi, sizeof(mbi)));
+    assert_release(VirtualQuery((LPCVOID)base, &mbi, sizeof(mbi)));
     return static_cast<size_t>(mbi.RegionSize);
 }
 uintptr_t RVACore::c_base = reinterpret_cast<uintptr_t>(GetModuleHandleA(nullptr));
