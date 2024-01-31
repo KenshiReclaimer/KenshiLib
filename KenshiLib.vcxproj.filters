@@ -45,9 +45,6 @@
     <ClCompile Include="Source\core\Scanner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\kenshi\Root.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\core\md5.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -2069,9 +2066,6 @@
     <ClInclude Include="Include\kenshi\PlayerInterface.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
-    <ClInclude Include="Include\kenshi\Root.h">
-      <Filter>Header Files\kenshi</Filter>
-    </ClInclude>
     <ClInclude Include="Include\stdafx.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
@@ -2176,6 +2170,12 @@
     </ClInclude>
     <ClInclude Include="Include\Release_Assert.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\RootObject.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\TimeOfDay.h">
+      <Filter>Header Files\kenshi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -119,7 +119,6 @@
     <ClCompile Include="Source\Debug.cpp" />
     <ClCompile Include="Source\kenshi\Inventory.cpp" />
     <ClCompile Include="Source\kenshi\Kenshi.cpp" />
-    <ClCompile Include="Source\kenshi\Root.cpp" />
     <ClCompile Include="Source\kenshi\UI.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -142,9 +141,10 @@
     <ClInclude Include="Include\kenshi\ModInfo.h" />
     <ClInclude Include="Include\kenshi\Platoon.h" />
     <ClInclude Include="Include\kenshi\PlayerInterface.h" />
-    <ClInclude Include="Include\kenshi\Root.h" />
+    <ClInclude Include="Include\kenshi\RootObject.h" />
     <ClInclude Include="Include\kenshi\SaveManager.h" />
     <ClInclude Include="Include\kenshi\Tasks.h" />
+    <ClInclude Include="Include\kenshi\TimeOfDay.h" />
     <ClInclude Include="Include\kenshi\util\hand.h" />
     <ClInclude Include="Include\kenshi\util\lektor.h" />
     <ClInclude Include="Include\kenshi\View.h" />

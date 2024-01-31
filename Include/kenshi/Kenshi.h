@@ -6,22 +6,22 @@ namespace Kenshi
 {
 
 
-    struct GameWorld;
-    struct PlayerInterface;
-    struct Character;
-    struct Building;
-    struct Renderer;
-    struct PhysicsActual;
-    struct ModInfo;
-    struct Character;
-    struct Building;
-    struct ZoneManager;
-    struct AudioSystemGlobal;
-    struct Alarm;
-    struct PlayerInterface;
-    struct ResearchManager;
-    struct ResearchItem;
-    struct InputHandler;
+    class GameWorld;
+    class PlayerInterface;
+    class Character;
+    class Building;
+    class Renderer;
+    class PhysicsActual;
+    class ModInfo;
+    class Character;
+    class Building;
+    class ZoneManager;
+    class AudioSystemGlobal;
+    class Alarm;
+    class PlayerInterface;
+    class ResearchManager;
+    class ResearchItem;
+    class InputHandler;
     class SaveManager;
     class SaveFileSystem;
     typedef bool SaveGameFunc(SaveManager* thisptr, std::string savesDirectory, std::string saveName);

@@ -30,8 +30,9 @@ namespace Kenshi
 		bool isLeaf; // 0x29 TODO re-check what this does?
 
 	};
-	struct InputHandler
+	class InputHandler
 	{
+	public:
 		char unk1[0x20];
 		// Ogre::STLAllocator<std::pair<std::basic_string<char,std::char_traits<char>,std::allocator<char> > const ,InputHandler::Command>,Ogre::CategorisedAllocPolicy<0> >
 		char unk1_2[0x10];

@@ -1,4 +1,7 @@
+#pragma once
+
 #define LEAN_AND_MEAN
+#define NOMINMAX
 #include <windows.h>
 #include <string>
 #include "util/lektor.h"
