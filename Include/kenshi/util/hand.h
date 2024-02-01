@@ -1,8 +1,9 @@
 #pragma once
 
+#include "../Enums.h"
+
 #include <stdafx.h>
 #include <string>
-
 
 namespace Kenshi
 {
@@ -15,8 +16,6 @@ namespace Kenshi
     class TownBase;
     class Building;
     class Character;
-    // TODO
-    enum itemType {};
     class hand
     {
     public:

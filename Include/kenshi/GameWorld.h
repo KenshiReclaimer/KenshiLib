@@ -6,6 +6,7 @@
 #include "RootObject.h"
 #include "TimeOfDay.h"
 #include "GameDataManager.h"
+#include "ModInfo.h"
 
 #include <ogre/OgreMemoryAllocatedObject.h>
 #include <boost/unordered_set.hpp>
@@ -16,7 +17,6 @@ namespace Kenshi
 {
     class Renderer;
     class PhysicsActual;
-    class ModInfo;
     class Character;
     class Building;
     class ZoneManager;

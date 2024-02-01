@@ -138,6 +138,7 @@
     <ClInclude Include="Include\kenshi\Item.h" />
     <ClInclude Include="Include\kenshi\Kenshi.h" />
     <ClInclude Include="Include\kenshi\KeyBind.h" />
+    <ClInclude Include="Include\kenshi\Logger.h" />
     <ClInclude Include="Include\kenshi\MedicalSystem.h" />
     <ClInclude Include="Include\kenshi\ModInfo.h" />
     <ClInclude Include="Include\kenshi\Platoon.h" />
