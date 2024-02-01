@@ -28,7 +28,6 @@ namespace Kenshi
     class AIPlayer;
     class PlayerInterface;
     class Faction;
-    enum CharacterTypeEnum {}; // TODO
     enum DialogConditionEnum {}; // TODO
     enum ComparisonEnum {}; // TODO
     enum BuildingDesignation {}; // TODO

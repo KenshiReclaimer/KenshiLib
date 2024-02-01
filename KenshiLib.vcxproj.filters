@@ -2186,6 +2186,12 @@
     <ClInclude Include="Include\kenshi\Logger.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
+    <ClInclude Include="Include\kenshi\util\Array2d.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\util\YesNoMaybe.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Libraries\mygui\MyGUIEngine_x64.lib">

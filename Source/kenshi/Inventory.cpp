@@ -1,6 +1,6 @@
 #include "kenshi/inventory.h"
 
-
+/*
 namespace Kenshi
 {
 	const std::string InventorySection::Hip = "hip";
@@ -24,3 +24,4 @@ namespace Kenshi
         return nullptr;
     }
 }
+*/
