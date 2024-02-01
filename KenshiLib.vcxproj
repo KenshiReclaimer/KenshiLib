@@ -129,6 +129,7 @@
     <ClInclude Include="Include\Debug.h" />
     <ClInclude Include="Include\kenshi\Building.h" />
     <ClInclude Include="Include\kenshi\Character.h" />
+    <ClInclude Include="Include\kenshi\Enums.h" />
     <ClInclude Include="Include\kenshi\Faction.h" />
     <ClInclude Include="Include\kenshi\GameData.h" />
     <ClInclude Include="Include\kenshi\GameDataManager.h" />
@@ -147,6 +148,7 @@
     <ClInclude Include="Include\kenshi\TimeOfDay.h" />
     <ClInclude Include="Include\kenshi\util\hand.h" />
     <ClInclude Include="Include\kenshi\util\lektor.h" />
+    <ClInclude Include="Include\kenshi\util\StringPair.h" />
     <ClInclude Include="Include\kenshi\View.h" />
     <ClInclude Include="Include\kenshi\Zone.h" />
     <ClInclude Include="Include\mygui\MyGUI.h" />
