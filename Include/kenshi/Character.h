@@ -10,69 +10,6 @@
 
 namespace Kenshi
 {
-    /*
-    * old reversed code
-    struct GameData;
-    struct Faction;
-    struct Inventory;
-    struct Sword;
-    struct Effect;
-    enum WeatherAffecting;
-
-    class CharStats
-    {
-        virtual ~CharStats();
-
-    public:
-        MedicalSystem* medicalSystem; // 0x08
-        Character* character; // 0x10
-        char unk_0018[0x68]; // 0x18
-        float strength; // 0x80
-        float unk_0084; // 0x84
-        float dexterity; // 0x88
-        float perception; // 0x8C
-        float toughness; // 0x90
-        float athletics; // 0x94
-        float fieldMedic; // 0x98
-        float unk_009C; // 0x9C
-        float unk_00A0; // 0xA0
-        float stealth; // 0xA4
-        float swimming; // 0xA8
-        float thievery; // 0xAC
-        float lockpicking; // 0xB0
-        float unk_00B4; // 0xB4
-        float assassination; // 0xB8
-        char unk_00BC[0x10]; // 0xBC
-        float engineer; // 0xCC
-        float weaponSmith; // 0xD0
-        float armourSmith; // 0xD4
-        float crossbowSmith; // 0xD8
-        float robotics; // 0xDC
-        float science; // 0xE0
-        float labouring; // 0xE4
-        float farming; // 0xE8
-        float cooking; // 0xEC
-        float dodge; // 0xF0
-        float precisionShooting; // 0xF4
-        float katanas; // 0xF8
-        float sabres; // 0xFC
-        float hackers; // 0x100
-        float heavyWeapons; // 0x104
-        float blunt; // 0x108
-        float martialArts; // 0x10C
-        float crossbows; // 0x110
-        float turrets; // 0x114
-        float polearms; // 0x118
-        float unk_011C; // 0x11C
-        float meleeAttack; // 0x120
-        float meleeDefense; // 0x124
-    };
-
-    // CharacterHuman extends Character (length 0x708)
-    // CharacterAnimal extends Character (length 0x718)
-    // Character (at least 0x6D0 long - probably 0x6D8)
-    */
-
     enum ProneState {};// TODO
     enum SquadMemberType {};// TODO
     enum CrimeEnum {};// TODO
@@ -164,7 +101,6 @@ namespace Kenshi
     };
     enum EventTriggerEnum {};// TODO 
     enum CharacterMessage {};// TODO
-    enum CutOrigination {};// TODO
     enum CharacterPerceptionTags_ShortTerm {};// TODO
     enum CharacterPerceptionTags_LongTerm {};// TODO
     enum UseStuffState {};// TODO

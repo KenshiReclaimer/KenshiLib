@@ -129,6 +129,7 @@
     <ClInclude Include="Include\Debug.h" />
     <ClInclude Include="Include\kenshi\Building.h" />
     <ClInclude Include="Include\kenshi\Character.h" />
+    <ClInclude Include="Include\kenshi\CharStats.h" />
     <ClInclude Include="Include\kenshi\Enums.h" />
     <ClInclude Include="Include\kenshi\Faction.h" />
     <ClInclude Include="Include\kenshi\GameData.h" />

@@ -202,7 +202,6 @@ namespace Kenshi
 		// no_addr public virtual void * __vecDelDtor(unsigned int);// vtable offset = 0x0
 	};
 
-	enum WeaponCategory {};// TODO
 	class Sword;
 	class Crossbow;
 

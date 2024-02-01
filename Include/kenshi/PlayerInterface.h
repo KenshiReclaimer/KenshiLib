@@ -173,7 +173,7 @@ namespace Kenshi
         void serialise(GameData*);// RVA = 0x659F60
         void loadFromSerialise(GameData*);// RVA = 0x65A0B0
         bool getInteriorsVisible(Building*);// RVA = 0x658500
-        std::basic_string<char, std::char_traits<char>, std::allocator<char> > factionName; // 0x8 Member
+        std::string factionName; // 0x8 Member
         CameraClass* camera; // 0x30 Member
         Research* technology; // 0x38 Member
         bool selectedObjectsChangedThisFrame; // 0x40 Member

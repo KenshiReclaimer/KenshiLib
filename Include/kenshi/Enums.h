@@ -3,6 +3,7 @@
 // for global enums 
 enum itemType {};// TODO
 enum CutDirection {};// TODO
+enum CutOrigination {};// TODO
 enum HitMaterialType {};// TODO
 enum WeatherAffecting {};// TODO
 enum AttachSlot {};// TODO
@@ -10,6 +11,8 @@ enum ItemFunction {};//TODO
 enum ArmourType {};// TODO
 enum CharacterTypeEnum {}; // TODO
 enum TaskType {}; // TODO
+enum WeaponCategory {};// TODO
+enum LeftRight {};// TODO
 
 
 class MessageForB

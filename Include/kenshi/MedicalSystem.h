@@ -54,7 +54,6 @@ namespace Kenshi
         enum Enum {};// TODO
     }
 
-    enum LeftRight {};// TODO
     enum StatsEnumerated {}; // TODO
 
     class Wound;
