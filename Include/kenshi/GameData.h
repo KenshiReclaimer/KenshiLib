@@ -25,67 +25,6 @@ namespace Kenshi
     {
         typedef std::map<T1, T2, std::less<T1>, Ogre::STLAllocator<std::pair<T1 const, T2>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > type;
     };
-    /*
-    * Old manually reversed code
-    // TODO
-    enum itemType {};
-
-    struct GameDataManager;
-
-    // TODO move?
-    class TripleInt
-    {
-        int value[0x3]; // 0x0 Member
-        static class TripleInt ZERO; // Static Member
-    };
-    // TODO move?
-    class GameDataReference
-    {
-        class TripleInt values; // 0x0 Member
-        std::string sid; // 0x10 Member
-        class GameData* ptr; // 0x38 Member
-    };
-
-    // extends Ogre::AllocatedObject<Ogre::CategorisedAllocPolicy<0>>
-    // vtable only contains destructor?
-    class GameData // probably 0x300 long
-    {
-        virtual ~GameData();
-    public:
-        class ObjectInstance
-        {
-            class Ogre::Vector3 pos; // 0x0 Member
-            class Ogre::Quaternion rot; // 0xC Member
-            std::string refID; // 0x20 Member
-            short created; // 0x48 Member
-            short modified; // 0x4A Member
-            class lektor<std::string> stateIDs; // 0x50 Member
-        };
-
-        int validity; // 0x8 Member
-        class GameDataContainer* sourceContainer; // 0x10 Member
-        bool isStandalone; // 0x18 Member
-        int id; // 0x1C Member
-        bool readOnly; // 0x20 Member
-        std::string name; // 0x28 Member
-        enum itemType type; // 0x50 Member
-        std::string stringID; // 0x58 Member
-        bool isFromActiveFile; // 0x80 Member
-        map_ogre<std::string, GameData::ObjectInstance>::type instances; // 0x88 Member
-        int currentID; // 0xB0 Member
-        unordered_map_ogre<std::string, bool>::type activeValues; // 0xB8 Member
-        unordered_map_ogre<std::string, bool>::type bdata; // 0xF8 Member
-        unordered_map_ogre<std::string, std::string>::type sdata; // 0x138 Member
-        unordered_map_ogre<std::string, int>::type idata; // 0x178 Member
-        unordered_map_ogre<std::string, float>::type fdata; // 0x1B8 Member
-        unordered_map_ogre<std::string, std::string>::type filesdata; // 0x1F8 Member
-        unordered_map_ogre<std::string, Ogre::Vector3>::type vecdata; // 0x238 Member
-        unordered_map_ogre<std::string, Ogre::Quaternion>::type quatdata; // 0x278 Member
-        unordered_map_ogre<std::string, std::vector<GameDataReference>>::type objectReferences; // 0x2B8 Member
-        unsigned short createdIndex; // 0x2F8 Member
-    };
-    */
-
 
     class GameDataContainer;
     class GameDataReference;
