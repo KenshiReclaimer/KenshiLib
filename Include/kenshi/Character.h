@@ -157,7 +157,6 @@ namespace Kenshi
     };
 
     enum MoveSpeed {};// TODO
-    enum TaskType {}; // TODO
     class RagdollPart // TODO this isn't in the symbols
     {
     public:
@@ -216,7 +215,7 @@ namespace Kenshi
     class CharacterAnimal;
     class CharacterHuman;
 
-    class Character : RootObject, Ogre::AllocatedObject<Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> >
+    class Character : public RootObject, Ogre::AllocatedObject<Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> >
     {
     public:
         // RootObject offset = 0x0, length = 0xC0
@@ -602,10 +601,10 @@ namespace Kenshi
         void recalculateTotalEquipmentSkillBonus();// RVA = 0x6D11D0
         virtual void setupAudio();// RVA = 0x4E8990// vtable offset = 0x400
         unsigned __int64 getAudioObject();// RVA = 0x358D30
-        bool audioEvent(const char*, enum SoundRange);// RVA = 0x4997F0
+        bool audioEvent(const char*, SoundRange);// RVA = 0x4997F0
         void audioValue(const char*, float);// RVA = 0x499720
         void audioValue(const char*, const char*);// RVA = 0x499700
-        void setGroundType(enum GroundType);// RVA = 0x49AD40
+        void setGroundType(GroundType);// RVA = 0x49AD40
         GroundType getGroundType();// RVA = 0x4996F0
         void calculateMainArmourType();// RVA = 0x4A2630
         ArmourType getMainArmourType();// RVA = 0x3BE80
@@ -615,7 +614,7 @@ namespace Kenshi
         bool startEffect(GameData*);// RVA = 0x49B3C0
         bool stopEffect(GameData*);// RVA = 0x49A5D0
         void stopAllEffects();// RVA = 0x49A6A0
-        virtual void notifyEffect(enum EffectType::Enum, enum WeatherAffecting, float);// RVA = 0x49BA40// vtable offset = 0x0
+        virtual void notifyEffect(EffectType::Enum, WeatherAffecting, float);// RVA = 0x49BA40// vtable offset = 0x0
         virtual void equipItem(const std::string&, Item*);// RVA = 0x4ABB00// vtable offset = 0x0
         virtual void unequipItem(const std::string&, Item*);// RVA = 0x4AC090// vtable offset = 0x0
         virtual void validateInventorySections();// RVA = 0x4AC8A0// vtable offset = 0x410
@@ -683,28 +682,97 @@ namespace Kenshi
         lektor<std::pair<WeatherAffecting, float> > activeEffects; // 0x6A0 Member
         lektor<Effect*> particleEffects; // 0x6B8 Member
         void setEffectBT(GameData*, bool);// RVA = 0x49D620
-        virtual void postRagdollCallback(bool, enum RagdollPart::Enum);// RVA = 0x49BD10// vtable offset = 0x420
+        virtual void postRagdollCallback(bool, RagdollPart::Enum);// RVA = 0x49BD10// vtable offset = 0x420
         Sword* naturalWeapon; // 0x6D0 Member
         virtual void reCalculateNaturalWeapon();// RVA = 0x4E9AB0// vtable offset = 0x428
         // no_addr public class Character & operator=(const class Character &);
         // no_addr public virtual void * __vecDelDtor(unsigned int);// vtable offset = 0x0
     };
 
-
+    class Weapon;
 
     class CharacterHuman : public Character
     {
-        virtual ~CharacterHuman();
-
-    public:
-
+        // Character offset = 0x0, length = 0x6D8
+        // no_addr public void CharacterHuman(class CharacterHuman &);
+        CharacterHuman(GameData*, Faction*, hand);// RVA = 0x49B790
+        virtual ~CharacterHuman();// RVA = 0x49B7E0// vtable offset = 0x0
+        virtual CharacterHuman* isHuman();// RVA = 0x4AFB70// vtable offset = 0x0
+        virtual bool drawWeapon(Item*, std::string);// RVA = 0x4ABD00// vtable offset = 0x0
+        virtual void sheatheWeapon();// RVA = 0x49C5A0// vtable offset = 0x0
+        virtual Weapon* getCurrentWeapon();// RVA = 0x499510// vtable offset = 0x0
+        virtual Weapon* getThePreferredWeapon();// RVA = 0x499520// vtable offset = 0x0
+        virtual Crossbow* getRangedWeapon();// RVA = 0x4988A0// vtable offset = 0x0
+        virtual GameSaveState serialise(GameDataContainer*, GameData*, PosRotPair*);// RVA = 0x4E85F0// vtable offset = 0x0
+        virtual void loadFromSerialise(GameSaveState*);// RVA = 0x4E81A0// vtable offset = 0x0
+        virtual bool giveBirth(GameDataCopyStandalone*, const Ogre::Vector3&, const Ogre::Quaternion&, GameSaveState*, ActivePlatoon*, Faction*);// RVA = 0x4EDFC0// vtable offset = 0x0
+        virtual bool setupInventorySections(GameSaveState*);// RVA = 0x4EB530// vtable offset = 0x0
+        virtual void validateInventorySections();// RVA = 0x4E0940// vtable offset = 0x0
+        virtual void setupAudio();// RVA = 0x4E8EA0// vtable offset = 0x0
+        void shaveHead(bool);// RVA = 0x486630
+        virtual bool isHeadShaven();// RVA = 0x486650// vtable offset = 0x0
+        virtual void createAnimationClass();// RVA = 0x4993F0// vtable offset = 0x0
+        virtual void dropItem(RootObject*);// RVA = 0x49A4C0// vtable offset = 0x0
+        void dropWeaponInHands();// RVA = 0x49C4E0
+        void dropWeaponInHandsFake();// RVA = 0x4993E0
+        virtual void unequipItem(const std::string&, Item*);// RVA = 0x4AC2E0// vtable offset = 0x0
+        virtual void weatherUpdate(float);// RVA = 0x49F510// vtable offset = 0x0
+        void leaveSheathEquipped(std::string, int);// RVA = 0x4A2230
+        Weapon* weaponInHands; // 0x6D8 Member
+        std::string weaponInHandsSheathLocation; // 0x6E0 Member
+        virtual void postRagdollCallback(bool, RagdollPart::Enum);// RVA = 0x49BFB0// vtable offset = 0x0
+        virtual void reCalculateNaturalWeapon();// RVA = 0x4E9D40// vtable offset = 0x0
+        // no_addr public class CharacterHuman & operator=(const class CharacterHuman &);
+        // no_addr protected virtual void * __vecDelDtor(unsigned int);// vtable offset = 0x0
     };
 
     class CharacterAnimal : public Character
     {
-        virtual ~CharacterAnimal();
-
-    public:
-
+        // Character offset = 0x0, length = 0x6D8
+        virtual CharacterAnimal* isAnimal();// RVA = 0x4AC8B0// vtable offset = 0x0
+        virtual void createAnimationClass();// RVA = 0x4B2450// vtable offset = 0x0
+        // no_addr public bool preventRagdollMode();
+        virtual bool drawWeapon(Item*, std::string);// RVA = 0x4AFA90// vtable offset = 0x0
+        virtual void sheatheWeapon();// RVA = 0x4AC8C0// vtable offset = 0x0
+        virtual Weapon* getCurrentWeapon();// RVA = 0x4AC8D0// vtable offset = 0x0
+        virtual Weapon* getThePreferredWeapon();// RVA = 0x4AC8E0// vtable offset = 0x0
+        virtual InventoryLayout* createInventoryLayout();// RVA = 0x49C3B0// vtable offset = 0x0
+        virtual bool giveBirth(GameDataCopyStandalone*, const Ogre::Vector3&, const Ogre::Quaternion&, GameSaveState*, ActivePlatoon*, Faction*);// RVA = 0x4EE050// vtable offset = 0x0
+        virtual bool setupInventorySections(GameSaveState*);// RVA = 0x4E9180// vtable offset = 0x0
+        virtual void setupAudio();// RVA = 0x4E9040// vtable offset = 0x0
+        virtual void periodicUpdate();// RVA = 0x49DC80// vtable offset = 0x0
+        virtual void setAge(float);// RVA = 0x4AC8F0// vtable offset = 0x0
+        virtual float getAge();// RVA = 0x4AC900// vtable offset = 0x0
+        virtual float getAgeInverse();// RVA = 0x4AC930// vtable offset = 0x0
+        virtual float getAge0to1();// RVA = 0x4AC970// vtable offset = 0x0
+        virtual unsigned int getDefaultTaskRepertoireEnum();// RVA = 0x4AC980// vtable offset = 0x0
+        virtual bool canGoIndoors(Building*);// RVA = 0x497F50// vtable offset = 0x0
+        virtual float getSmellHuntingThresholdBlood();// RVA = 0x4AC990// vtable offset = 0x430
+        virtual float getSmellHuntingThresholdEggs();// RVA = 0x4AC9A0// vtable offset = 0x438
+        bool weaponIsTechnicallyEquipped; // 0x6D8 Member
+        virtual float getHPMultiplier();// RVA = 0x4AC9B0// vtable offset = 0x0
+        float HPMultiplier; // 0x6DC Member
+        TimeOfDay itemInMouthTimeStamp; // 0x6E0 Member
+        virtual void foodUpdate();// RVA = 0x4AC3D0// vtable offset = 0x0
+        bool pickupItemInMouth(Item*);// RVA = 0x4A08D0
+        bool dropItemInMouth();// RVA = 0x497FC0
+        Item* getItemInMouth();// RVA = 0x498050
+        void eatItemInMouth();// RVA = 0x4A0AA0
+        // no_addr public void CharacterAnimal(class CharacterAnimal &);
+        CharacterAnimal(GameData*, Faction*, hand, float);// RVA = 0x497ED0
+        virtual ~CharacterAnimal();// RVA = 0x497F30// vtable offset = 0x0
+        virtual void init();// RVA = 0x4E26B0// vtable offset = 0x0
+        virtual void dropItem(RootObject*);// RVA = 0x49A220// vtable offset = 0x0
+        float smellThresholdBlood; // 0x6E8 Member
+        float smellThresholdEggs; // 0x6EC Member
+        float ageSizeMin; // 0x6F0 Member
+        float ageSizeMax; // 0x6F4 Member
+        float lifespanInDays; // 0x6F8 Member
+        float lastUpdatedAge; // 0x6FC Member
+        float age; // 0x700 Member
+        Weapon* weaponInHands; // 0x708 Member
+        float audioTimeStamp; // 0x710 Member
+        // no_addr public class CharacterAnimal & operator=(const class CharacterAnimal &);
+        // no_addr protected virtual void * __vecDelDtor(unsigned int);// vtable offset = 0x0
     };
 }
