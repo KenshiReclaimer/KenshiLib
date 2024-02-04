@@ -135,6 +135,7 @@
     <ClInclude Include="Include\kenshi\GameData.h" />
     <ClInclude Include="Include\kenshi\GameDataManager.h" />
     <ClInclude Include="Include\kenshi\GameWorld.h" />
+    <ClInclude Include="Include\kenshi\GlobalConstants.h" />
     <ClInclude Include="Include\kenshi\Inventory.h" />
     <ClInclude Include="Include\kenshi\Item.h" />
     <ClInclude Include="Include\kenshi\Kenshi.h" />

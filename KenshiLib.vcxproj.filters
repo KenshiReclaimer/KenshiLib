@@ -2195,6 +2195,9 @@
     <ClInclude Include="Include\kenshi\CharStats.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
+    <ClInclude Include="Include\kenshi\GlobalConstants.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Libraries\mygui\MyGUIEngine_x64.lib">

@@ -24,6 +24,7 @@ namespace Kenshi
     class InputHandler;
     class SaveManager;
     class SaveFileSystem;
+    class GlobalConstants;
     typedef bool SaveGameFunc(SaveManager* thisptr, std::string savesDirectory, std::string saveName);
 
     MyGUI::WidgetPtr FindWidget(MyGUI::EnumeratorWidgetPtr enumerator, std::string name);
@@ -101,6 +102,7 @@ namespace Kenshi
 
     // GameWorld looks to be an object of all game state, whether its loaded or not.
     // Has things like a list of loaded mods and all the GameData loaded in, probably saves too.
+    // GameWorld ou;
     GameWorld& GetGameWorld();
 
     // default 2000
@@ -126,10 +128,8 @@ namespace Kenshi
     void* GetUpdateFonts();
 
     // Static var separate to GameWorld
-    int& GetNumAttackSlots();
-    int& GetMaxFactionSize();
-    int& GetMaxSquadSize();
-    int& GetMaxSquads();
+    // GlobalConstants con;
+    GlobalConstants* GetCon();
 
     SaveManager* GetSaveManager();
     SaveGameFunc* GetSaveManagerSaveGameFunction();

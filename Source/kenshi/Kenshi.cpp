@@ -2,6 +2,7 @@
 
 #include <kenshi/GameWorld.h>
 #include <kenshi/PlayerInterface.h>
+#include <kenshi/GlobalConstants.h>
 
 #include <core/RVA.h>
 
@@ -58,43 +59,22 @@ StaticMap<std::string, Kenshi::BinaryVersion> HashToVersionMap = StaticMap<std::
 
 // Game world address Steam 1.51.1 0x001AAE060
 // Game world address GOG 1.51.1 0x001AADFB0
+// ou
 StaticMap<Kenshi::BinaryVersion, offset_t> GameWorldOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC9510)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01ACA520)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01AC8460)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC9470);
 
-StaticMap<Kenshi::BinaryVersion, offset_t> NumAttackSlotsOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC92D8)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01ACA2E8)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01AC8228)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC9238);
-
-StaticMap<Kenshi::BinaryVersion, offset_t> MaxFactionSizeOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC9350)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01ACA360)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01AC82A0)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC92B0);
-
-StaticMap<Kenshi::BinaryVersion, offset_t> MaxSquadSizeOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC9348)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01ACA358)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01AC8298)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC92A8);
-
-StaticMap<Kenshi::BinaryVersion, offset_t> MaxSquadsOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC934C)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01ACA35C)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01AC829C)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC92AC);
-
 // Search for 2000.000f in non-writable and one of th ose will be the correct value
+// CAMERA_FAR
 StaticMap<Kenshi::BinaryVersion, offset_t> MaxCameraDistanceOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x011F4E18)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x011F5D88)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x011F4B68)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x011F5AD8);
 
+// CAMERA_CLOSE
 StaticMap<Kenshi::BinaryVersion, offset_t> MinCameraDistanceOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01188734)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01189734)
@@ -153,6 +133,15 @@ StaticMap<Kenshi::BinaryVersion, offset_t> UpdateFontsFunction = StaticMap<Kensh
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x00311870)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x00311370);
 
+// read at 0x006C1325 Steam 1.0.64
+// the numbers check out
+// GlobalConstants con; // 0x001ACA1E0
+// int MAX_SQUAD_SIZE; // 0x178 Member // 0x01ACA358
+StaticMap<Kenshi::BinaryVersion, offset_t> GlobalConOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC91D0)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01ACA1E0)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC8120);
+
 std::string kenshiHash = GetEXEHash();
 Kenshi::BinaryVersion kenshiVersion = HashToVersionMap.count(kenshiHash) > 0 ? HashToVersionMap.at(kenshiHash) : Kenshi::BinaryVersion(Kenshi::BinaryVersion::UNKNOWN, "UNKNOWN");
 
@@ -205,36 +194,12 @@ Kenshi::GameWorld& Kenshi::GetGameWorld()
     return *c_inst.GetPtr();
 }
 
-int& Kenshi::GetNumAttackSlots()
+Kenshi::GlobalConstants* Kenshi::GetCon() 
 {
     Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t attackSlotsOffset = NumAttackSlotsOffset.at(kenshiVersion);
-    static RVAPtr<int> c_inst(attackSlotsOffset);
-    return *c_inst.GetPtr();
-}
-
-int& Kenshi::GetMaxFactionSize()
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t attackSlotsOffset = MaxFactionSizeOffset.at(kenshiVersion);
-    static RVAPtr<int> c_inst(attackSlotsOffset);
-    return *c_inst.GetPtr();
-}
-
-int& Kenshi::GetMaxSquadSize()
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t attackSlotsOffset = MaxSquadSizeOffset.at(kenshiVersion);
-    static RVAPtr<int> c_inst(attackSlotsOffset);
-    return *c_inst.GetPtr();
-}
-
-int& Kenshi::GetMaxSquads()
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t attackSlotsOffset = MaxSquadsOffset.at(kenshiVersion);
-    static RVAPtr<int> c_inst(attackSlotsOffset);
-    return *c_inst.GetPtr();
+    offset_t conOffset = GlobalConOffset.at(kenshiVersion);
+    static RVAPtr<GlobalConstants> c_inst(conOffset);
+    return c_inst.GetPtr();
 }
 
 float& Kenshi::GetMaxCameraDistance()
