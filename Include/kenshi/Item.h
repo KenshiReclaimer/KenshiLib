@@ -283,7 +283,14 @@ namespace Kenshi
 		// no_addr public virtual void * __vecDelDtor(unsigned int);// vtable offset = 0x0
 	};
 
-	enum ArmourClass {};// TODO
+	enum ArmourClass
+	{
+		GEAR_CLOTH = 0x0,
+		GEAR_LIGHT = 0x1,
+		GEAR_MEDIUM = 0x2,
+		GEAR_HEAVY = 0x3,
+		GEAR_MAX = 0x4
+	};
 
 	class Armour : Gear
 	{

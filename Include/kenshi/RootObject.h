@@ -118,8 +118,7 @@ namespace Kenshi
         // no_addr public class RootObjectBase & operator=(const class RootObjectBase &);
         // no_addr public virtual void * __vecDelDtor(unsigned int);// vtable offset = 0x0
     };
-    // TODO
-    enum WeatherDirection {};
+
     class InstanceID;
     class ZoneMap;
     class RaceData;

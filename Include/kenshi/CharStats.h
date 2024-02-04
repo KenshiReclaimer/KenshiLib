@@ -10,7 +10,6 @@
 
 namespace Kenshi
 {
-    enum StatsEnumerated {};// TODO
     class MedicalSystem;
     class Character;
 

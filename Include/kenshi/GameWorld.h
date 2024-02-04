@@ -36,7 +36,13 @@ namespace Kenshi
     class NestBatcher;
     class RendererT;
     class ThreadWannabe;
-    enum NxShapesType {}; // TODO
+
+    enum NxShapesType
+    {
+        NX_STATIC_SHAPES = 0x1,
+        NX_DYNAMIC_SHAPES = 0x2,
+        NX_ALL_SHAPES = 0x3
+    };
 
     // TODO move?
     class SimpleTimeStamper

@@ -12,7 +12,14 @@
 // MedicalSystem::TakeDamage(HealthPartStatus* part, struct damage, uint64_t unk)
 namespace Kenshi
 {
-    enum LimbState {};// TODO
+    enum LimbState
+    {
+        LIMB_ORIGINAL = 0x0,
+        LIMB_STUMP = 0x1,
+        LIMB_REPLACED = 0x2,
+        LIMB_CRUSHED = 0x3
+    };
+
     class Character;
     class GameData;
     class Item;
@@ -49,12 +56,18 @@ namespace Kenshi
         // no_addr public void * __vecDelDtor(unsigned int);
     };
 
-    namespace AttackDirection // this doesn't appear to have type info so I think it's a namespace?
+    namespace AttackDirection 
     {
-        enum Enum {};// TODO
+        enum Enum
+        {
+            FRONT = 0x1,
+            BACK = 0x2,
+            LEFT = 0x4,
+            RIGHT = 0x8,
+            TOP = 0x10,
+            BOTTOM = 0x20
+        };
     }
-
-    enum StatsEnumerated {}; // TODO
 
     class Wound;
     class CharStats;
