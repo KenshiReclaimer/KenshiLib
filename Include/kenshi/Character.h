@@ -12,42 +12,42 @@ namespace Kenshi
 {
     enum ProneState
     {
-        PS_NORMAL = 0x0,
-        PS_STAYING_LOW = 0x1,
-        PS_CRIPPLED = 0x2,
-        PS_PLAYING_DEAD = 0x3,
-        PS_KO = 0x4
+        PS_NORMAL,
+        PS_STAYING_LOW,
+        PS_CRIPPLED,
+        PS_PLAYING_DEAD,
+        PS_KO
     };
 
     enum SquadMemberType
     {
-        SQUAD_1 = 0x0,
-        SQUAD_2 = 0x1,
-        SQUAD_LEADER = 0x2,
-        SQUAD_SIGNALS_PLAN = 0x3,
-        SQUAD_SLAVE = 0x4
+        SQUAD_1,
+        SQUAD_2,
+        SQUAD_LEADER,
+        SQUAD_SIGNALS_PLAN,
+        SQUAD_SLAVE
     };
 
     enum CrimeEnum
     {
-        CRIME_NONE = 0x0,
-        CRIME_ENSLAVING = 0x1,
-        CRIME_LOCKPICKING = 0x2,
-        CRIME_STEALING = 0x3,
-        CRIME_MURDER = 0x4,
-        CRIME_ASSAULT = 0x5,
-        CRIME_ASSAULT_VIP = 0x6,
-        CRIME_SLAVE_FREEING = 0x7,
-        CRIME_SMUGGLING = 0x8,
-        CRIME_TERRORISM = 0x9,
-        CRIME_LOOTING = 0xA,
-        CRIME_TRESSPASSING = 0xB,
-        CRIME_ESCAPE_PRISON = 0xC,
-        CRIME_FENCING = 0xD,
-        CRIME_FARM_EATING = 0xE,
-        CRIME_KIDNAPPING = 0xF,
-        CRIME_UNIFORM_THEFT = 0x10,
-        CRIME_END = 0x11
+        CRIME_NONE,
+        CRIME_ENSLAVING,
+        CRIME_LOCKPICKING,
+        CRIME_STEALING,
+        CRIME_MURDER,
+        CRIME_ASSAULT,
+        CRIME_ASSAULT_VIP,
+        CRIME_SLAVE_FREEING,
+        CRIME_SMUGGLING,
+        CRIME_TERRORISM,
+        CRIME_LOOTING,
+        CRIME_TRESSPASSING,
+        CRIME_ESCAPE_PRISON,
+        CRIME_FENCING,
+        CRIME_FARM_EATING,
+        CRIME_KIDNAPPING,
+        CRIME_UNIFORM_THEFT,
+        CRIME_END
     };
 
     class Bounty
@@ -121,21 +121,21 @@ namespace Kenshi
     public:
         enum Enum
         {
-            NO_WATER = 0x0,
-            VERY_SHALLOW_WATER = 0x1,
-            THIGH_DEEP_WATER = 0x2,
-            DEEP_WATER = 0x3
+            NO_WATER,
+            VERY_SHALLOW_WATER,
+            THIGH_DEEP_WATER,
+            DEEP_WATER
         };
 
     };
 
     enum MoveSpeed
     {
-        WALK = 0x0,
-        JOG = 0x1,
-        RUN = 0x2,
-        GROUPED = 0x3,
-        NO_SPEED_CHANGE = 0x4
+        WALK,
+        JOG,
+        RUN,
+        GROUPED,
+        NO_SPEED_CHANGE
     };
 
     class RagdollPart // TODO this isn't in the symbols
@@ -144,132 +144,52 @@ namespace Kenshi
         enum Enum {};
     };
 
-    enum EventTriggerEnum
-    {
-        EV_NONE = 0x0,
-        EV_PLAYER_TALK_TO_ME = 0x1,
-        EV_ANNOUNCEMENT = 0x2,
-        EV_I_SEE_NEUTRAL_SQUAD = 0x3,
-        EV_I_SEE_RAGDOLL = 0x4,
-        EV_______ = 0x5,
-        EV_SOUND_THE_ALARM = 0x6,
-        EV_I_________ = 0x7,
-        EV_THIEF_CAUGHT_STEALING_FROM_ME = 0x8,
-        EV_SHOO_FROM_MY_BUILDING = 0x9,
-        EV_MARKED_FOR_DEATH = 0xA,
-        EV_SCREAMING_TORTURE = 0xB,
-        EV_BAR_TALK = 0xC,
-        EV_UNLOCK_MY_CAGE_OR_SHACKLES = 0xD,
-        EV_UNLOCK_MY_CAGE_ATTEMPT = 0xE,
-        EV_I_DEFEATED_SQUAD = 0xF,
-        EV_LAUNCH_ATTACK = 0x10,
-        EV_INTRUDER_FOUND = 0x11,
-        EV_HEALING_OTHER_START = 0x12,
-        EV_BEING_HEALED_START = 0x13,
-        EV_HEALING_OTHER_FINISHED = 0x14,
-        EV_BEING_HEALED_FINISHED = 0x15,
-        EV_FIRSTAID_KIT_EMPTY = 0x16,
-        EV_GET_UP_PEACE = 0x17,
-        EV_GET_UP_FIGHT = 0x18,
-        EV_GET_UP_UNNECCESSARY_FIGHT = 0x19,
-        EV_HARRASSMENT_SHOUTS = 0x1A,
-        EV_I_SEE_ANIMAL_SQUAD = 0x1B,
-        EV_SPEECH_INTERRUPTED_ATTACKED_BY_TARGET = 0x1C,
-        EV_SPEECH_INTERRUPTED_ATTACKED_BY_STRANGERS = 0x1D,
-        EV_CONTRACT_JOB_ENDED = 0x1E,
-        EV_BETRAYAL = 0x1F,
-        EV_LOOTING_WEAPON_ONLY = 0x20,
-        EV_LOOTING_EVERYTHING = 0x21,
-        EV_I_SEE_UNIFORM_IMPOSTER = 0x22,
-        EV_INTRODUCING_NEW_SLAVE = 0x23,
-        EV_ESCAPING_SLAVE_SPOTTED = 0x24,
-        EV_RECAPTURED_A_SLAVE = 0x25,
-        EV_SHOUT_AT_SLAVE_WORKER = 0x26,
-        EV_SLAVE_DELIVERY = 0x27,
-        EV_ESCAPED_EX_SLAVE_SPOTTED = 0x28,
-        EV_WITNESS_GENERIC_ASSAULT = 0x29,
-        EV_WITNESS_LOOTING_ALLY = 0x2A,
-        EV_WITNESS_THIEF_OR_LOCKPICK = 0x2B,
-        EV_BOUNTY_SPOTTED = 0x2C,
-        EV_ESCAPED_PRISONER_SPOTTED = 0x2D,
-        EV_PRISONER_FREE_TO_GO = 0x2E,
-        EV_ALMOST_WOKE_UP = 0x2F,
-        EV_ENTER_BIOME = 0x30,
-        EV_ENTER_TOWN = 0x31,
-        EV_SQUAD_BROKEN = 0x32,
-        EV_BOUGHT_ME_FROM_SLAVERY = 0x33,
-        EV_EATING_SOMETHING_SOUNDS = 0x34,
-        EV_WORSHIPING_SOMETHING = 0x35,
-        EV_SLAVE_ESCAPE_OPPORTUNITY_SAVIOR = 0x36,
-        EV_SLAVE_ESCAPE_OPPORTUNITY_ALONE = 0x37,
-        EV_ASSASSINATION_FAILED = 0x38,
-        EV_EATING_MY_CROPS = 0x39,
-        EV_KIDNAPPING_MY_ALLY = 0x3A,
-        EV_USING_MY_TRAINING_EQUIPMENT = 0x3B,
-        EV_GIVE_UP_CHASE = 0x3C,
-        EV_ACID_FEET = 0x3D,
-        EV_ACID_RAIN = 0x3E,
-        EV_ACID_WATER = 0x3F,
-        EV_WINDY = 0x40,
-        EV_POISON_GAS = 0x41,
-        EV_I_SEE_ENEMY_PLAYER = 0x42,
-        EV_I_SEE_ALLY_PLAYER = 0x43,
-        EV_I_SEE_ILLEGAL_PLAYER_BUILDING = 0x44,
-        EV_BURNING = 0x45,
-        EV_LOST_LEG = 0x46,
-        EV_LOST_ARM = 0x47,
-        EV_I_SEE_PLAYER_NICE_BUILDING = 0x48,
-        EV_TAKEN_OVER_PLAYER_TOWN = 0x49,
-        EV_CROWD_TRIGGERED = 0x4A,
-        EV_MAX = 0x4B
-    };
-
     enum CharacterMessage
     {
-        ATTACKING_MELEE = 0x0
+        ATTACKING_MELEE
     };
 
     enum CharacterPerceptionTags_ShortTerm
     {
-        ST_NONE = 0x0,
-        ST_INTRUDER = 0x1,
-        ST_AGGRESSOR = 0x2,
-        ST_TEMPORARY_ALLY = 0x3,
-        ST_TEMPORARY_ENEMY = 0x4,
-        ST_PRISONER = 0x5,
-        ST_HAS_BEEN_LOOTED = 0x6,
-        ST_CRIMINAL = 0x7
+        ST_NONE,
+        ST_INTRUDER,
+        ST_AGGRESSOR,
+        ST_TEMPORARY_ALLY,
+        ST_TEMPORARY_ENEMY,
+        ST_PRISONER,
+        ST_HAS_BEEN_LOOTED,
+        ST_CRIMINAL
     };
 
     enum CharacterPerceptionTags_LongTerm
     {
-        LT_NONE = 0x0,
-        LT_MY_INTRUDER = 0x1,
-        LT_MY_LIFESAVER = 0x2,
-        LT_FREED_ME = 0x3,
-        LT_STOLE_FROM_ME = 0x4,
-        LT_MY_CAPTOR = 0x5,
-        LT_FRIENDLY_AQUAINTANCE = 0x6,
-        LT_DEFEATED_MY_SQUAD_ONCE = 0x7,
-        LT_SQUAD_LOST_TO_ME_ONCE = 0x8,
-        LT_KILLED_MY_FRIEND = 0x9,
-        LT_I_SCREWED_THIS_GUY = 0xA,
-        LT_MAX = 0xB
+        LT_NONE,
+        LT_MY_INTRUDER,
+        LT_MY_LIFESAVER,
+        LT_FREED_ME,
+        LT_STOLE_FROM_ME,
+        LT_MY_CAPTOR,
+        LT_FRIENDLY_AQUAINTANCE,
+        LT_DEFEATED_MY_SQUAD_ONCE,
+        LT_SQUAD_LOST_TO_ME_ONCE,
+        LT_KILLED_MY_FRIEND,
+        LT_I_SCREWED_THIS_GUY,
+        LT_MAX
     };
 
     enum UseStuffState
     {
-        IN_NOTHING = 0x0,
-        IN_BED = 0x1,
-        IN_PRISON = 0x2
+        IN_NOTHING,
+        IN_BED,
+        IN_PRISON
     };
 
     enum SlaveStateEnum
     {
-        NOT_SLAVE = 0x0,
-        IS_SLAVE = 0x1,
-        ESCAPING_SLAVE = 0x2,
-        EX_SLAVE = 0x3
+        NOT_SLAVE,
+        IS_SLAVE,
+        ESCAPING_SLAVE,
+        EX_SLAVE
     };
 
     enum SoundRange
@@ -281,42 +201,42 @@ namespace Kenshi
 
     enum GroundType
     {
-        GROUND_SAND = 0x0,
-        GROUND_GRASS = 0x1,
-        GROUND_CONCRETE = 0x2,
-        GROUND_WOOD = 0x3,
-        GROUND_METAL = 0x4,
-        GROUND_WATER = 0x5,
-        GROUND_MUD = 0x6,
-        GROUND_SNOW = 0x7,
-        GROUND_DIRT = 0x8
+        GROUND_SAND,
+        GROUND_GRASS,
+        GROUND_CONCRETE,
+        GROUND_WOOD,
+        GROUND_METAL,
+        GROUND_WATER,
+        GROUND_MUD,
+        GROUND_SNOW,
+        GROUND_DIRT
     };
 
     enum WeaponCategory
     {
-        SKILL_KATANAS = 0x0,
-        SKILL_SABRES = 0x1,
-        SKILL_BLUNT = 0x2,
-        SKILL_HEAVY = 0x3,
-        SKILL_HACKERS = 0x4,
-        SKILL_UNARMED = 0x5,
-        SKILL_BOW = 0x6,
-        SKILL_TURRET = 0x7,
-        ATTACK_POLEARMS = 0x8,
-        ATTACK_ELEPHANT = 0x9,
-        ATTACK_DOG = 0xA,
-        ATTACK_BULL = 0xB,
-        ATTACK_ROBOTSPIDER = 0xC,
-        ATTACK_SPIDER = 0xD,
-        ATTACK_CAGEBEAST = 0xE,
-        ATTACK_DUCK = 0xF,
-        ATTACK_GORILLA = 0x10,
-        ATTACK_GAR = 0x11,
-        ATTACK_FROG = 0x12,
-        ATTACK_GOAT = 0x13,
-        ATTACK_GIRAFFE = 0x14,
-        ATTACK_NULL = 0x15,
-        NUM_SKILL_TYPES = 0x16
+        SKILL_KATANAS,
+        SKILL_SABRES,
+        SKILL_BLUNT,
+        SKILL_HEAVY,
+        SKILL_HACKERS,
+        SKILL_UNARMED,
+        SKILL_BOW,
+        SKILL_TURRET,
+        ATTACK_POLEARMS,
+        ATTACK_ELEPHANT,
+        ATTACK_DOG,
+        ATTACK_BULL,
+        ATTACK_ROBOTSPIDER,
+        ATTACK_SPIDER,
+        ATTACK_CAGEBEAST,
+        ATTACK_DUCK,
+        ATTACK_GORILLA,
+        ATTACK_GAR,
+        ATTACK_FROG,
+        ATTACK_GOAT,
+        ATTACK_GIRAFFE,
+        ATTACK_NULL,
+        NUM_SKILL_TYPES
     };
 
     class DoorLock;
@@ -462,9 +382,9 @@ namespace Kenshi
         float getTerrainHeightPosition();// RVA = 0x485260
         enum DisguiseGUIFeedback
         {
-            DGF_SAME_FACTION = 0x0,
-            DGF_MY_SLAVE = 0x1,
-            DGF_I_HATE_YOU = 0x2
+            DGF_SAME_FACTION,
+            DGF_MY_SLAVE,
+            DGF_I_HATE_YOU
         };
 
         void setDisguiseMessage(Character::DisguiseGUIFeedback);// RVA = 0x6B3A70
@@ -767,9 +687,9 @@ namespace Kenshi
         virtual void validateInventorySections();// RVA = 0x4AC8A0// vtable offset = 0x410
         enum CharMessage
         {
-            CHARMESSAGE_NONE = 0x0,
-            CHARMESSAGE_CARRY = 0x1,
-            CHARMESSAGE_CAGE = 0x2
+            CHARMESSAGE_NONE,
+            CHARMESSAGE_CARRY,
+            CHARMESSAGE_CAGE
         };
 
         CharMessage messages; // 0x3A0 Member

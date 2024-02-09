@@ -7,12 +7,12 @@ class Logger
 public:
     enum Severity
     {
-        Trace = 0x0,
-        Debug = 0x1,
-        Info = 0x2,
-        Warning = 0x3,
-        Error = 0x4,
-        Fatal = 0x5
+        Tracw,
+        Debug,
+        Info,
+        Warning,
+        Error,
+        Fatal
     };
 
     static void init();// RVA = 0x11D2C0

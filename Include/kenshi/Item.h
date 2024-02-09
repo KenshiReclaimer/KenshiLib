@@ -285,11 +285,11 @@ namespace Kenshi
 
 	enum ArmourClass
 	{
-		GEAR_CLOTH = 0x0,
-		GEAR_LIGHT = 0x1,
-		GEAR_MEDIUM = 0x2,
-		GEAR_HEAVY = 0x3,
-		GEAR_MAX = 0x4
+		GEAR_CLOTH,
+		GEAR_LIGHT,
+		GEAR_MEDIUM,
+		GEAR_HEAVY,
+		GEAR_MAX
 	};
 
 	class Armour : Gear

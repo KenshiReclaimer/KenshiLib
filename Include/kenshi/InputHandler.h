@@ -25,8 +25,8 @@ namespace Kenshi
 
         enum GameMode
         {
-            GLOBAL = 0x0,
-            EDITOR = 0x1
+            GLOBAL,
+            EDITOR
         };
 
         struct Command

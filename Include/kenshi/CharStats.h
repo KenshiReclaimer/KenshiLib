@@ -97,9 +97,9 @@ namespace Kenshi
         std::string formatWholeStatStringWithBonuses(StatsEnumerated);// RVA = 0x6ECAD0
         enum GUIStatsDisplayMode
         {
-            GUI_STATS_NORMAL = 0x0,
-            GUI_STATS_MARTIALARTIST = 0x1,
-            GUI_STATS_RANGED = 0x2
+            GUI_STATS_NORMAL,
+            GUI_STATS_MARTIALARTIST,
+            GUI_STATS_RANGED
         };
 
         GUIStatsDisplayMode getGUIStatsDisplayMode();// RVA = 0x6CE270
@@ -217,13 +217,13 @@ namespace Kenshi
         float getSkillDifferenceRatio(float, float);// RVA = 0x703550
         enum DeadTimeState
         {
-            ATTACK_HIT = 0x0,
-            ATTACK_WAS_BLOCKED = 0x1,
-            BLOCKED_IT = 0x2,
-            ATTACK_SLOT_OPEN = 0x3,
-            WAS_HIT = 0x4,
-            ATTACK_INTERRUPTED = 0x5,
-            ATTACK_MISSED = 0x6
+            ATTACK_HIT,
+            ATTACK_WAS_BLOCKED,
+            BLOCKED_IT,
+            ATTACK_SLOT_OPEN,
+            WAS_HIT,
+            ATTACK_INTERRUPTED,
+            ATTACK_MISSED
         };
 
         float calculateDeadTime(DeadTimeState);// RVA = 0x6CE190

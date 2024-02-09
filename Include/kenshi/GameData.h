@@ -48,12 +48,12 @@ namespace Kenshi
         void destroy();// RVA = 0x6530B0
         enum DataType
         {
-            NONE = 0x0,
-            INT = 0x1,
-            FLOAT = 0x2,
-            BOOL = 0x3,
-            FILE = 0x4,
-            STRING = 0x5
+            NONE,
+            INT,
+            FLOAT,
+            BOOL,
+            FILE,
+            STRING
         };
 
         class ItemData

@@ -155,23 +155,23 @@ namespace Kenshi
         boost::unordered::unordered_set<Character*, boost::hash<Character*>, std::equal_to<Character*>, Ogre::STLAllocator<Character*, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > charactersWithLights; // 0x588 Member
         enum SysMessageEnum
         {
-            SYS_NONE = 0x0,
-            SYS_RESIDENT_CHANGE = 0x1,
-            SYS_SHOW_PROSPECTING_WINDOW = 0x2,
-            SYS_CREATE_PHYSICAL = 0x3,
-            SYS_DESTROY_PHYSICAL = 0x4,
-            SYS_SET_CHAINED_MODE = 0x5,
-            SYS_UPDATE_ORDERS_PANEL = 0x6,
-            SYS_UPDATE_PORTRAIT = 0x7,
-            SYS_RESEARCH_PROGRESS = 0x8,
-            SYS_CLOSE_ALL_INVENTORIES = 0x9,
-            SYS_CLOSE_INVENTORY = 0xA,
-            SYS_BUILDING_PROGRESS = 0xB,
-            SYS_DROP_ALL_GEAR = 0xC,
-            SYS_CHARACTER_PARTICLES = 0xD,
-            SYS_RESTORE_SQUAD = 0xE,
-            SYS_DESTROY_PLATOON = 0xF,
-            SYS_BREAK_BUILDING = 0x10
+            SYS_NONE,
+            SYS_RESIDENT_CHANGE,
+            SYS_SHOW_PROSPECTING_WINDOW,
+            SYS_CREATE_PHYSICAL,
+            SYS_DESTROY_PHYSICAL,
+            SYS_SET_CHAINED_MODE,
+            SYS_UPDATE_ORDERS_PANEL,
+            SYS_UPDATE_PORTRAIT,
+            SYS_RESEARCH_PROGRESS,
+            SYS_CLOSE_ALL_INVENTORIES,
+            SYS_CLOSE_INVENTORY,
+            SYS_BUILDING_PROGRESS,
+            SYS_DROP_ALL_GEAR,
+            SYS_CHARACTER_PARTICLES,
+            SYS_RESTORE_SQUAD,
+            SYS_DESTROY_PLATOON,
+            SYS_BREAK_BUILDING
         };
 
         class SysMessage

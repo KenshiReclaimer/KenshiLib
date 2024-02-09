@@ -98,9 +98,9 @@ namespace Kenshi
         MyGUI::ImageBox* savingIcon; // 0x1C0 Member
         enum MessageType
         {
-            MSG_COPY = 0x0,
-            MSG_COPY_REPLACE = 0x1,
-            MSG_DELETE = 0x2
+            MSG_COPY,
+            MSG_COPY_REPLACE,
+            MSG_DELETE
         };
 
         struct FileMessage
@@ -118,9 +118,9 @@ namespace Kenshi
         void addMessage(SaveFileSystem::MessageType, const std::string&, const std::string&);// RVA = 0x380F90
         enum State
         {
-            NORMAL = 0x0,
-            SAVING = 0x1,
-            COMPLETE = 0x2
+            NORMAL,
+            SAVING,
+            COMPLETE
         };
 
         State state; // 0x1E0 Member

@@ -26,17 +26,17 @@ namespace Kenshi
     public:
         enum Enum
         {
-            NONE = 0x0,
-            CAMERA = 0x1,
-            POINT = 0x2,
-            WANDERING = 0x3,
-            GLOBAL = 0x4,
-            CAMERA_RAIN = 0x5,
-            CAMERA_ACID_RAIN = 0x6,
-            POINT_LIGHTING = 0x7,
-            WANDERING_STORM = 0x8,
-            WANDERING_GAS = 0x9,
-            GLOBAL_POINT = 0xA
+            NONE,
+            CAMERA,
+            POINT,
+            WANDERING,
+            GLOBAL,
+            CAMERA_RAIN,
+            CAMERA_ACID_RAIN,
+            POINT_LIGHTING,
+            WANDERING_STORM,
+            WANDERING_GAS,
+            GLOBAL_POINT
         };
     };
     
@@ -123,7 +123,7 @@ namespace Kenshi
     class ZoneMap;
     class RaceData;
     class Inventory;
-    class RootObject : RootObjectBase
+    class RootObject : public RootObjectBase
     {
         // RootObjectBase offset = 0x0, length = 0x78
         // no_addr public void RootObject(const class RootObject &);

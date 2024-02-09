@@ -5,9 +5,9 @@ class YesNoMaybe
 public:
     enum ynm
     {
-        NO = 0x0,
-        YES = 0x1,
-        MAYBE = 0x2
+        NO,
+        YES,
+        MAYBE
     };
 
     YesNoMaybe(int);// RVA = 0x224E30

@@ -111,10 +111,10 @@ namespace Kenshi
             void load(GameData*, int);// RVA = 0x505DE0
             enum PartType
             {
-                PART_TORSO = 0x0,
-                PART_LEG = 0x1,
-                PART_ARM = 0x2,
-                PART_HEAD = 0x3
+                PART_TORSO,
+                PART_LEG,
+                PART_ARM,
+                PART_HEAD
             };
 
             PartType whatAmI; // 0x8 Member
@@ -208,9 +208,9 @@ namespace Kenshi
         bool isCollapse(MedicalSystem::HealthPartStatus*, float);// RVA = 0x4FC290
         enum CollapseStage
         {
-            COLLAPSE_NONE = 0x0,
-            COLLAPSE_BUT_NO_RAGDOLL = 0x1,
-            COLLAPSE_KO = 0x2
+            COLLAPSE_NONE,
+            COLLAPSE_BUT_NO_RAGDOLL,
+            COLLAPSE_KO
         };
 
         CollapseStage getCollapseStage(MedicalSystem::HealthPartStatus*, float);// RVA = 0x4FCC30
