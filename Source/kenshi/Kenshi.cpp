@@ -3,10 +3,14 @@
 #include <kenshi/GameWorld.h>
 #include <kenshi/PlayerInterface.h>
 #include <kenshi/GlobalConstants.h>
+#include <kenshi/util/functions.h>
 
 #include <core/RVA.h>
 
 #include <core/md5.h>
+
+#include <Debug.h>
+#include <Release_Assert.h>
 
 /**
  * Kenshi.cpp
@@ -106,33 +110,6 @@ StaticMap<Kenshi::BinaryVersion, offset_t> SaveFileSystemOffset = StaticMap<Kens
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x01AC3D28)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC4D18);
 
-StaticMap<Kenshi::BinaryVersion, offset_t> SaveManagerSaveGameFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x002B5D30)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x002B5D90)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x002B5830)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x02B5890);
-
-StaticMap<Kenshi::BinaryVersion, offset_t> ModLoadFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x006BEF60)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x006BFFA0)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x006BE8E0)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x06BF910);
-
-StaticMap<Kenshi::BinaryVersion, offset_t> CrashReportFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x005CB0D0)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x005CC110)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x005CABD0)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x05CBC10);
-
-// TODO remove after dropping support for old versions
-StaticMap<Kenshi::BinaryVersion, offset_t> CurrentFontSizeOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x001AC8AF8)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x001AC7A48);
-
-StaticMap<Kenshi::BinaryVersion, offset_t> UpdateFontsFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x00311870)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.59"), 0x00311370);
-
 // read at 0x006C1325 Steam 1.0.64
 // the numbers check out
 // GlobalConstants con; // 0x001ACA1E0
@@ -145,48 +122,37 @@ StaticMap<Kenshi::BinaryVersion, offset_t> GlobalConOffset = StaticMap<Kenshi::B
 std::string kenshiHash = GetEXEHash();
 Kenshi::BinaryVersion kenshiVersion = HashToVersionMap.count(kenshiHash) > 0 ? HashToVersionMap.at(kenshiHash) : Kenshi::BinaryVersion(Kenshi::BinaryVersion::UNKNOWN, "UNKNOWN");
 
+void Kenshi::Init()
+{
+    assert_release(FUNCTION_ERROR == 0);
+
+    // binary RVA path
+    std::string RVAFilePath = "RE_Kenshi/RVAs/" + kenshiVersion.GetPlatformStr() + "_" + kenshiVersion.GetVersion() + ".br";
+    std::ifstream rvaFile(RVAFilePath, std::ios::ate | std::ios::binary);
+    if (!rvaFile.is_open())
+        ErrorLog("Unable to open RVA file at " + RVAFilePath);
+    assert_release(rvaFile.is_open());
+    size_t end = rvaFile.tellg();
+    assert_release(end == (FUNCTION_BUFF_LENGTH * sizeof(intptr_t) / 2));
+    rvaFile.seekg(0);
+
+    for (int i = 0; i < FUNCTION_BUFF_LENGTH; ++i)
+    {
+        int offset;
+        rvaFile.read((char*)(&offset), 4);
+
+        RVAPtr<void> c_inst(offset);
+        function_pointers[i] = (intptr_t)c_inst.GetPtr();
+    }
+    DebugLog("RVAs loaded");
+}
+
 Kenshi::BinaryVersion Kenshi::GetKenshiVersion()
 {
     return kenshiVersion;
 }
 
-void* Kenshi::GetModLoadFunction()
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t modLoadFunction = ModLoadFunction.at(kenshiVersion);
-    static RVAPtr<void> c_inst(modLoadFunction);
-    return c_inst.GetPtr();
-}
-
-void* Kenshi::GetCrashReporterFunction()
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t crashReportFunction = CrashReportFunction.at(kenshiVersion);
-    static RVAPtr<void> c_inst(crashReportFunction);
-    return c_inst.GetPtr();
-}
-
-// On 1.0.55 + 1.0.59 Kenshi doesn't initailize MyGUI with this properly
-// TODO remove after dropping support for old versions
-float& Kenshi::GetCurrentFontSize()
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t currentFontSizeOffset = CurrentFontSizeOffset.at(kenshiVersion);
-    static RVAPtr<float> c_inst(currentFontSizeOffset);
-    return *c_inst.GetPtr();
-}
-
-// this takes args, but it doesn't access them, so we can pretend it's a void(void)
-// It appears it has to be called *after* the UI is created
-void* Kenshi::GetUpdateFonts()
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t currentFontSizeOffset = UpdateFontsFunction.at(kenshiVersion);
-    static RVAPtr<float> c_inst(currentFontSizeOffset);
-    return c_inst.GetPtr();
-}
-
-Kenshi::GameWorld& Kenshi::GetGameWorld()
+GameWorld& Kenshi::GetGameWorld()
 {
     Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
     offset_t gameWorldOffset = GameWorldOffset.at(kenshiVersion);
@@ -194,7 +160,7 @@ Kenshi::GameWorld& Kenshi::GetGameWorld()
     return *c_inst.GetPtr();
 }
 
-Kenshi::GlobalConstants* Kenshi::GetCon() 
+GlobalConstants* Kenshi::GetCon() 
 {
     Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
     offset_t conOffset = GlobalConOffset.at(kenshiVersion);
@@ -218,7 +184,7 @@ float& Kenshi::GetMinCameraDistance()
     return *c_inst.GetPtr();
 }
 
-Kenshi::InputHandler& Kenshi::GetInputHandler()
+InputHandler& Kenshi::GetInputHandler()
 {
     Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
     offset_t inputHandlerOffset = InputHandlerOffset.at(kenshiVersion);
@@ -226,7 +192,7 @@ Kenshi::InputHandler& Kenshi::GetInputHandler()
     return *c_inst.GetPtr();
 }
 
-Kenshi::SaveManager* Kenshi::GetSaveManager()
+SaveManager* Kenshi::GetSaveManager()
 {
     Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
     offset_t saveManagerPtrOffset = SaveManagerOffset.at(kenshiVersion);
@@ -234,20 +200,12 @@ Kenshi::SaveManager* Kenshi::GetSaveManager()
     return *c_inst.GetPtr();
 }
 
-Kenshi::SaveFileSystem* Kenshi::GetSaveFileSystem()
+SaveFileSystem* Kenshi::GetSaveFileSystem()
 {
     Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
     offset_t saveFileSystemPtrOffset = SaveFileSystemOffset.at(kenshiVersion);
     static RVAPtr<SaveFileSystem*> c_inst(saveFileSystemPtrOffset);
     return *c_inst.GetPtr();
-}
-
-Kenshi::SaveGameFunc* Kenshi::GetSaveManagerSaveGameFunction()
-{
-    Kenshi::BinaryVersion kenshiVersion = GetKenshiVersion();
-    offset_t saveManagerSaveGameFunction = SaveManagerSaveGameFunction.at(kenshiVersion);
-    static RVAPtr<SaveGameFunc> c_inst(saveManagerSaveGameFunction);
-    return c_inst.GetPtr();
 }
 
 // TODO templateize
@@ -270,10 +228,3 @@ MyGUI::WidgetPtr Kenshi::FindWidget(MyGUI::EnumeratorWidgetPtr enumerator, std::
     }
     return nullptr;
 }
-
-#if 0
-Kenshi::PlayerInterface& Kenshi::GetPlayerInterface()
-{
-   return *Kenshi::GetGameWorld().player_interface;
-}
-#endif

@@ -2,31 +2,28 @@
 #include "mygui/MyGUI_Gui.h"
 
 
+class GameWorld;
+class PlayerInterface;
+class Character;
+class Building;
+class Renderer;
+class PhysicsActual;
+class ModInfo;
+class Character;
+class Building;
+class ZoneManager;
+class AudioSystemGlobal;
+class Alarm;
+class PlayerInterface;
+class ResearchManager;
+class ResearchItem;
+class InputHandler;
+class SaveManager;
+class SaveFileSystem;
+class GlobalConstants;
+
 namespace Kenshi 
 {
-
-
-    class GameWorld;
-    class PlayerInterface;
-    class Character;
-    class Building;
-    class Renderer;
-    class PhysicsActual;
-    class ModInfo;
-    class Character;
-    class Building;
-    class ZoneManager;
-    class AudioSystemGlobal;
-    class Alarm;
-    class PlayerInterface;
-    class ResearchManager;
-    class ResearchItem;
-    class InputHandler;
-    class SaveManager;
-    class SaveFileSystem;
-    class GlobalConstants;
-    typedef bool SaveGameFunc(SaveManager* thisptr, std::string savesDirectory, std::string saveName);
-
     MyGUI::WidgetPtr FindWidget(MyGUI::EnumeratorWidgetPtr enumerator, std::string name);
 
     class BinaryVersion
@@ -98,6 +95,8 @@ namespace Kenshi
         std::string version;
     };
 
+    void Init();
+
     BinaryVersion GetKenshiVersion();
 
     // GameWorld looks to be an object of all game state, whether its loaded or not.
@@ -113,25 +112,10 @@ namespace Kenshi
     // Not 100% sure what this is called
     InputHandler& GetInputHandler();
 
-    // I haven't reverse-engineered this function, it probably does more than just load mods
-    // but we hook it for sync'ing with the mod loader
-    // (this function sets up GameWorld::loadedMods)
-    void* GetModLoadFunction();
-    // This function creates the "Kenshi has crashed" window
-    void* GetCrashReporterFunction();
-
-    // On 1.0.55 + 1.0.59 Kenshi doesn't initailize MyGUI with this properly
-    // TODO remove after dropping support for old versions
-    float& GetCurrentFontSize();
-    // this is an OptionsWindow member function - probably a MyGUI OnClick delegate or something
-    // it takes arguments, but doesn't read them, so we can just pretend it's a void(void) function
-    void* GetUpdateFonts();
-
     // Static var separate to GameWorld
     // GlobalConstants con;
     GlobalConstants* GetCon();
 
     SaveManager* GetSaveManager();
-    SaveGameFunc* GetSaveManagerSaveGameFunction();
     SaveFileSystem* GetSaveFileSystem();
 }

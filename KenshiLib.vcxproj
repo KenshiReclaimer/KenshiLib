@@ -33,6 +33,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -136,6 +137,7 @@
     <ClInclude Include="Include\kenshi\GameDataManager.h" />
     <ClInclude Include="Include\kenshi\GameWorld.h" />
     <ClInclude Include="Include\kenshi\GlobalConstants.h" />
+    <ClInclude Include="Include\kenshi\Globals.h" />
     <ClInclude Include="Include\kenshi\Inventory.h" />
     <ClInclude Include="Include\kenshi\Item.h" />
     <ClInclude Include="Include\kenshi\Kenshi.h" />
@@ -150,6 +152,7 @@
     <ClInclude Include="Include\kenshi\Tasks.h" />
     <ClInclude Include="Include\kenshi\TimeOfDay.h" />
     <ClInclude Include="Include\kenshi\util\Array2d.h" />
+    <ClInclude Include="Include\kenshi\util\functions.h" />
     <ClInclude Include="Include\kenshi\util\hand.h" />
     <ClInclude Include="Include\kenshi\util\lektor.h" />
     <ClInclude Include="Include\kenshi\util\StringPair.h" />
@@ -839,7 +842,11 @@
     <Library Include="Libraries\mygui\MyGUIEngine_x64.lib" />
     <Library Include="Libraries\ogre\OgreMain_x64.lib" />
   </ItemGroup>
+  <ItemGroup>
+    <MASM Include="Include\kenshi\util\functions.asm" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
   </ImportGroup>
 </Project>
