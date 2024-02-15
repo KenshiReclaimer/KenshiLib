@@ -6,6 +6,9 @@
 FUNC_BEGIN proc
 FUNC_BEGIN endp
 
+?_CONSTRUCTOR@CharacterHuman@@QEAAXPEAVGameData@@PEAVFaction@@Vhand@@@Z proc
+?_CONSTRUCTOR@CharacterHuman@@QEAAXPEAVGameData@@PEAVFaction@@Vhand@@@Z endp
+
 ; CharacterHuman::CharacterHuman(class GameData *, class Faction *, class hand);
 ??0CharacterHuman@@QEAA@PEAVGameData@@PEAVFaction@@Vhand@@@Z proc
 jmp function_pointers[0*8]
@@ -13,6 +16,9 @@ jmp function_pointers[0*8]
 
 FUNC_SECOND proc
 FUNC_SECOND endp
+
+?_DESTRUCTOR@CharacterHuman@@QEAAXXZ proc
+?_DESTRUCTOR@CharacterHuman@@QEAAXXZ endp
 
 ; CharacterHuman::~CharacterHuman();
 ??1CharacterHuman@@UEAA@XZ proc
@@ -134,10 +140,16 @@ jmp function_pointers[23*8]
 jmp function_pointers[24*8]
 ?reCalculateNaturalWeapon@CharacterHuman@@UEAAXXZ endp
 
+?_CONSTRUCTOR@SysMessage@GameWorld@@QEAAXAEBV01@@Z proc
+?_CONSTRUCTOR@SysMessage@GameWorld@@QEAAXAEBV01@@Z endp
+
 ; GameWorld::SysMessage::SysMessage(const class GameWorld::SysMessage &);
 ??0SysMessage@GameWorld@@QEAA@AEBV01@@Z proc
 jmp function_pointers[25*8]
 ??0SysMessage@GameWorld@@QEAA@AEBV01@@Z endp
+
+?_CONSTRUCTOR@SysMessage@GameWorld@@QEAAXW4SysMessageEnum@1@AEBVhand@@1_NMPEAX@Z proc
+?_CONSTRUCTOR@SysMessage@GameWorld@@QEAAXW4SysMessageEnum@1@AEBVhand@@1_NMPEAX@Z endp
 
 ; GameWorld::SysMessage::SysMessage(enum GameWorld::SysMessageEnum, const class hand &, const class hand &, bool, float, void *);
 ??0SysMessage@GameWorld@@QEAA@W4SysMessageEnum@1@AEBVhand@@1_NMPEAX@Z proc
@@ -159,10 +171,16 @@ jmp function_pointers[28*8]
 jmp function_pointers[29*8]
 ?startUpThreads@GameWorld@@QEAA_NXZ endp
 
+?_CONSTRUCTOR@GameWorld@@QEAAXXZ proc
+?_CONSTRUCTOR@GameWorld@@QEAAXXZ endp
+
 ; GameWorld::GameWorld();
 ??0GameWorld@@QEAA@XZ proc
 jmp function_pointers[30*8]
 ??0GameWorld@@QEAA@XZ endp
+
+?_DESTRUCTOR@GameWorld@@QEAAXXZ proc
+?_DESTRUCTOR@GameWorld@@QEAAXXZ endp
 
 ; GameWorld::~GameWorld();
 ??1GameWorld@@QEAA@XZ proc
@@ -724,10 +742,16 @@ jmp function_pointers[141*8]
 jmp function_pointers[142*8]
 ?initialisePaths@SaveManager@@QEAAXXZ endp
 
+?_CONSTRUCTOR@SaveManager@@QEAAXXZ proc
+?_CONSTRUCTOR@SaveManager@@QEAAXXZ endp
+
 ; SaveManager::SaveManager();
 ??0SaveManager@@QEAA@XZ proc
 jmp function_pointers[143*8]
 ??0SaveManager@@QEAA@XZ endp
+
+?_DESTRUCTOR@SaveManager@@QEAAXXZ proc
+?_DESTRUCTOR@SaveManager@@QEAAXXZ endp
 
 ; SaveManager::~SaveManager();
 ??1SaveManager@@QEAA@XZ proc

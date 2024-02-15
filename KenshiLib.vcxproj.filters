@@ -2204,6 +2204,9 @@
     <ClInclude Include="Include\kenshi\Globals.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
+    <ClInclude Include="Include\kenshi\FitnessSelector.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Libraries\mygui\MyGUIEngine_x64.lib">
@@ -2306,7 +2309,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="Include\kenshi\util\functions.asm">
+    <MASM Include="Source\kenshi\functions.asm">
       <Filter>Source Files\kenshi</Filter>
     </MASM>
   </ItemGroup>

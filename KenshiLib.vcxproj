@@ -133,6 +133,7 @@
     <ClInclude Include="Include\kenshi\CharStats.h" />
     <ClInclude Include="Include\kenshi\Enums.h" />
     <ClInclude Include="Include\kenshi\Faction.h" />
+    <ClInclude Include="Include\kenshi\FitnessSelector.h" />
     <ClInclude Include="Include\kenshi\GameData.h" />
     <ClInclude Include="Include\kenshi\GameDataManager.h" />
     <ClInclude Include="Include\kenshi\GameWorld.h" />
@@ -843,7 +844,7 @@
     <Library Include="Libraries\ogre\OgreMain_x64.lib" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="Include\kenshi\util\functions.asm" />
+    <MASM Include="Source\kenshi\functions.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
