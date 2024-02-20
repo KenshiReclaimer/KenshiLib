@@ -26,7 +26,8 @@ public:
     // no_addr unsigned int numCols();// public
     unsigned int nRows; // 0x0 Member
     unsigned int nCols; // 0x4 Member
-    std::vector<T*, Ogre::STLAllocator<T*, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > data; // 0x8 Member
+    // Ogre::vector<T*>::type is throwing mad errors
+    std::vector<T*, Ogre::STLAllocator<T*, Ogre::GeneralAllocPolicy > > data; // 0x8 Member
     ~Array2d<T>();// public RVA = 0x5DCBA0
     // no_addr class Array2d<Item> & operator=(const class Array2d<Item> &);// public
     // no_addr void * __vecDelDtor();// public

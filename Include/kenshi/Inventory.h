@@ -3,6 +3,7 @@
 #include "Enums.h"
 #include "util/lektor.h"
 #include "util/Array2d.h"
+#include "Item.h"
 
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
@@ -27,63 +28,70 @@ public:
         unsigned short w; // 0xC Member
         unsigned short h; // 0xE Member
     };
-    // no_addr public void InventorySection(const class InventorySection &);
-    InventorySection(const std::string&, int, int, AttachSlot, Inventory*, bool, bool, bool);// RVA = 0x5D0000
-    virtual ~InventorySection();// RVA = 0x5CE090// vtable offset = 0x0
-    virtual bool hasRoomForItem(GameData*, int);// RVA = 0x5D1BC0// vtable offset = 0x8
-    void notifyModified();// RVA = 0x5CE220
-    virtual bool addItem(Item*, int);// RVA = 0x5D3310// vtable offset = 0x10
-    virtual void _addItem(Item*, int, int);// RVA = 0x5D0180// vtable offset = 0x18
-    Item* getItemAt(int, int);// RVA = 0x5CD760
-    // no_addr public float getTotalWeight();
-    bool hasItem(GameData*);// RVA = 0x5CD810
-    bool hasItem(Item*);// RVA = 0x5CD7B0
-    bool hasItemType(itemType);// RVA = 0x5CD210
-    virtual void autoArrange();// RVA = 0x5D0790// vtable offset = 0x20
-    void getAllItemsOfType(lektor<Item*>&, Item*);// RVA = 0x5CD980
-    void getAllItemsOfType(lektor<Item*>&, itemType);// RVA = 0x5CD8C0
-    void getAllItemsOfName(lektor<Item*>&, const std::string&);// RVA = 0x5CDC80
-    unsigned int getNumItems();// RVA = 0x5CD2A0
-    bool isEmpty();// RVA = 0x5CD2E0
-    bool removeItem(Item*);// RVA = 0x5D0480
-    void clearAllItems(bool, bool);// RVA = 0x5D0680
-    bool canItemGoHere(Item*, int, int);// RVA = 0x5D28A0
-    bool getValidInventoryPosition(Item*, int&, int&);// RVA = 0x5D2920
-    bool findNearestPlaceForItem(Item*, int&, int&);// RVA = 0x5D2A50
-    int getItemsInFootprint(lektor<Item*>&, int, int, int, int);// RVA = 0x5CD670
-    int getItemsInFootprint(lektor<Item*>&, Item*, int, int);// RVA = 0x5CDB40
-    bool existsItemInFootprint(Item*, int, int);// RVA = 0x5CD150
-    AttachSlot getLimitedSlot();// RVA = 0x497670
-    void setupContainerData(GameData*);// RVA = 0x5D2580
-    int applyStackingBonuses(int);// RVA = 0x5CD110
-    void recalculateTotalWeight();// RVA = 0x5CFBC0
-    void setWeightMultiplier(float);// RVA = 0x5CC8F0
-    void setStackingBonus(int, float);// RVA = 0x1FFB70
-    int getMaxStack();// RVA = 0x2233E0
-    // no_addr public class RootObject * getCallbackObject();
-    void addVeryLimitedSlot(GameData*);// RVA = 0x5D1EA0
-    void clearVeryLimitedSlot();// RVA = 0x5CE5E0
-    const lektor<GameData*>& getVeryLimitedSlot();// RVA = 0xF4490
-    bool isLimitedSlotCompatible(GameData*);// RVA = 0x5D17E0
-    bool isLimitedSlotCompatible(Item*);// RVA = 0x5D2690
-    // no_addr public bool getIsAnEquippedItemSection();
-    bool getEnabled();// RVA = 0xF44A0
-    void setEnabled(bool);// RVA = 0x5CC900
-    void setItemsLimitCount(int);// RVA = 0x5CC610
-    // no_addr public int getItemsLimitCount();
-    bool getItemsLimitReached();// RVA = 0x5A92D0
-    Inventory* getInventory();// RVA = 0x5CC620
-    float getFillPercentage();// RVA = 0x5CDA40
-    const std::vector<InventorySection::SectionItem, Ogre::STLAllocator<InventorySection::SectionItem, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > >& getItems();// RVA = 0x1FFB80
-    Item* getItem();// RVA = 0x211230
+    // no_addr void InventorySection(const class InventorySection &);// public
+    InventorySection(const std::string& _name, int _w, int _h, AttachSlot slot, Inventory* inv, bool _containerSlot, bool _equipSlot, bool enabled);// public RVA = 0x5D0000
+    virtual ~InventorySection();// public RVA = 0x5CE090 vtable offset = 0x0
+    virtual bool hasRoomForItem(GameData* _itemData, int quantity);// public RVA = 0x5D1BC0 vtable offset = 0x8
+    void notifyModified();// public RVA = 0x5CE220
+    virtual bool addItem(Item* itemToAdd, int quantity);// public RVA = 0x5D3310 vtable offset = 0x10
+    virtual void _addItem(Item* item, int x, int y);// public RVA = 0x5D0180 vtable offset = 0x18
+    Item* getItemAt(int x, int y);// public RVA = 0x5CD760
+    // no_addr float getTotalWeight();// public
+    bool hasItem(GameData* itemData) const;// public RVA = 0x5CD810
+    bool hasItem(Item* item) const;// public RVA = 0x5CD7B0
+    bool hasItemType(itemType type);// public RVA = 0x5CD210
+    // for some reason, this is tagged as InventorySection::autoArrange::__l5::InventorySectionSortComparer
+    struct InventorySectionSortComparer
+    {
+        // no_addr void InventorySectionSortComparer(int);// public
+        // no_addr bool operator()(const class InventorySection::SectionItem &, const class InventorySection::SectionItem &);// public
+        int sortType; // 0x0 Member
+    };
+    virtual void autoArrange(InventorySectionSortComparer);// public RVA = 0x5D0790 vtable offset = 0x20
+    void getAllItemsOfType(lektor<Item*>& list, Item* item);// public RVA = 0x5CD980
+    void getAllItemsOfType(lektor<Item*>& list, itemType type);// public RVA = 0x5CD8C0
+    void getAllItemsOfName(lektor<Item*>& list, const std::string& itemName);// public RVA = 0x5CDC80
+    unsigned int getNumItems() const;// public RVA = 0x5CD2A0
+    bool isEmpty() const;// public RVA = 0x5CD2E0
+    bool removeItem(Item* item);// public RVA = 0x5D0480
+    void clearAllItems(bool destroy, bool skipUnique);// public RVA = 0x5D0680
+    bool canItemGoHere(Item* item, int x, int y);// public RVA = 0x5D28A0
+    bool getValidInventoryPosition(Item* item, int& x, int& y);// public RVA = 0x5D2920
+    bool findNearestPlaceForItem(Item* item, int& x, int& y);// public RVA = 0x5D2A50
+    int getItemsInFootprint(lektor<Item*>& itemList, int itemWidth, int itemHeight, int x, int y);// protected RVA = 0x5CD670
+    int getItemsInFootprint(lektor<Item*>& out, Item* item, int x, int y);// public RVA = 0x5CDB40
+    bool existsItemInFootprint(Item* item, int x, int y);// public RVA = 0x5CD150
+    AttachSlot getLimitedSlot() const;// public RVA = 0x497670
+    void setupContainerData(GameData* data);// public RVA = 0x5D2580
+    int applyStackingBonuses(int normalStackableAmount) const;// public RVA = 0x5CD110
+    void recalculateTotalWeight();// public RVA = 0x5CFBC0
+    void setWeightMultiplier(float mult);// public RVA = 0x5CC8F0
+    void setStackingBonus(int minn, float mult);// public RVA = 0x1FFB70
+    int getMaxStack() const;// public RVA = 0x2233E0
+    // no_addr class RootObject * getCallbackObject();// public
+    void addVeryLimitedSlot(GameData* item);// public RVA = 0x5D1EA0
+    void clearVeryLimitedSlot();// public RVA = 0x5CE5E0
+    const lektor<GameData*>& getVeryLimitedSlot() const;// public RVA = 0xF4490
+    bool isLimitedSlotCompatible(GameData* itemData);// public RVA = 0x5D17E0
+    bool isLimitedSlotCompatible(Item* item);// public RVA = 0x5D2690
+    // no_addr bool getIsAnEquippedItemSection();// public
+    bool getEnabled() const;// public RVA = 0xF44A0
+    void setEnabled(bool value);// public RVA = 0x5CC900
+    void setItemsLimitCount(int value);// public RVA = 0x5CC610
+    // no_addr int getItemsLimitCount();// public
+    bool getItemsLimitReached() const;// public RVA = 0x5A92D0
+    Inventory* getInventory() const;// public RVA = 0x5CC620
+    float getFillPercentage() const;// public RVA = 0x5CDA40
+    const Ogre::vector<InventorySection::SectionItem>::type& getItems() const;// public RVA = 0x1FFB80
+    Item* getItem() const;// public RVA = 0x211230
     std::string name; // 0x8 Member
     int width; // 0x30 Member
     int height; // 0x34 Member
     bool armourOnly; // 0x38 Member
-    void setupEquipCallbacks(RootObject*);// RVA = 0x5CC630
-    int numItemsInFootprint(Item*, int, int);// RVA = 0x5CDBB0
-    void resize(int, int, bool);// RVA = 0x5D1E60
-    std::vector<InventorySection::SectionItem, Ogre::STLAllocator<InventorySection::SectionItem, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > items; // 0x40 Member
+    void setupEquipCallbacks(RootObject* owner);// protected RVA = 0x5CC630
+    int numItemsInFootprint(Item* item, int x, int y);// protected RVA = 0x5CDBB0
+    void resize(int w, int h, bool clearContent);// protected RVA = 0x5D1E60
+    Ogre::vector<InventorySection::SectionItem>::type items; // 0x40 Member
     Array2d<Item> content; // 0x60 Member
     int stackingBonusMin; // 0x88 Member
     float stackingBonusMult; // 0x8C Member
@@ -97,13 +105,12 @@ public:
     RootObject* callbackObject; // 0xC0 Member
     Inventory* parentInventory; // 0xC8 Member
     bool enabled; // 0xD0 Member
-    // no_addr public class InventorySection & operator=(const class InventorySection &);
-    // no_addr public virtual void * __vecDelDtor(unsigned int);// vtable offset = 0x0
+    // no_addr class InventorySection & operator=(const class InventorySection &);// public
+    //virtual void * __vecDelDtor(unsigned int) = 0;// public vtable offset = 0x0
 };
 
 class GameDataContainer;
 class GameSaveState;
-class Item;
 class Character;
 class Weapon;
 class InventoryGUI;

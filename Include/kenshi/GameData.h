@@ -9,20 +9,8 @@
 #include <map>
 #include "util/lektor.h"
 #include "util/hand.h"
+#include "util/OgreUnordered.h"
 
-// TODO pretty sure Ogre had typedefs for these somewhere?
-template <typename T1, typename T2>
-struct unordered_map_ogre
-{
-    // size = 0x20 which is correct!
-    typedef boost::unordered::unordered_map<T1, T2, boost::hash<T1>, std::equal_to<T2>, Ogre::STLAllocator<std::pair<T1 const, T2>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > type;
-};
-
-template <typename T1, typename T2>
-struct  map_ogre
-{
-    typedef std::map<T1, T2, std::less<T1>, Ogre::STLAllocator<std::pair<T1 const, T2>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > type;
-};
 
 class GameDataContainer;
 class GameDataReference;

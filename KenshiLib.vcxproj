@@ -156,6 +156,7 @@
     <ClInclude Include="Include\kenshi\util\functions.h" />
     <ClInclude Include="Include\kenshi\util\hand.h" />
     <ClInclude Include="Include\kenshi\util\lektor.h" />
+    <ClInclude Include="Include\kenshi\util\OgreUnordered.h" />
     <ClInclude Include="Include\kenshi\util\StringPair.h" />
     <ClInclude Include="Include\kenshi\util\YesNoMaybe.h" />
     <ClInclude Include="Include\kenshi\View.h" />

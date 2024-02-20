@@ -5,9 +5,7 @@
 #include "util/hand.h"
 #include "FitnessSelector.h"
 
-#include <ogre/OgreMemoryAllocatedObject.h>
-#include <boost/unordered_set.hpp>
-#include <boost/unordered_map.hpp>
+#include "util/OgreUnordered.h"
 
 class GameData;
 class GameDataContainer;
@@ -103,9 +101,9 @@ class FactionLeader
 public:
     // no_addr void FactionLeader(const class FactionLeader &);// public
     FactionLeader(Faction* f);// public RVA = 0x66A2F0
-    void setNewLeader(Character* __formal);// public RVA = 0x7BD7D0
+    void setNewLeader(Character*);// public RVA = 0x7BD7D0
     void getEnemyMissionTargetList(lektor<RootObject*>& out, GameData* mission);// public RVA = 0x7BA9C0
-    void getGUIData(DatapanelGUI* __formal, int cat);// public RVA = 0x238FD0
+    void getGUIData(DatapanelGUI*, int cat);// public RVA = 0x238FD0
     Faction* faction; // 0x0 Member
     lektor<GameData*> biomeTerritory; // 0x8 Member
     Faction* worstEnemy; // 0x20 Member
@@ -124,7 +122,7 @@ public:
     void setup(GameData* faction);// public RVA = 0x23BAE0
     void load(GameData* state);// public RVA = 0x23B960
     void save(GameData* state);// public RVA = 0x23BB90
-    float getProsperityMultiplier();// public RVA = 0x238F70
+    float getProsperityMultiplier() const;// public RVA = 0x238F70
     void getGUIData(DatapanelGUI* panel, int cat);// public RVA = 0x23A5E0
     void update(float time);// public RVA = 0x238F80
     void notifySquadDefeated(GameData* squadTemplate);// public RVA = 0x55B290
@@ -159,7 +157,7 @@ public:
         GameData* squadTemplate; // 0x0 Member
         int desiredNumberToHave; // 0x8 Member
         float respawnTimer; // 0xC Member
-        int currentNumber();// public RVA = 0x23B630
+        int currentNumber() const;// public RVA = 0x23B630
         lektor<hand> existingSquadsList; // 0x10 Member
         ~UniqueSpawnData();// public RVA = 0x23B680
         // no_addr class FactionUniqueSquadManager::UniqueSpawnData & operator=(const class FactionUniqueSquadManager::UniqueSpawnData &);// public
@@ -170,7 +168,7 @@ public:
     UniquePlatoon* spawnNewUniqueSquad(GameData* squadtemplate);// private RVA = 0x2390F0
     // no_addr class FactionUniqueSquadManager & operator=(const class FactionUniqueSquadManager &);// public
     // no_addr void __local_vftable_ctor_closure();// public
-    // virtual void* __vecDelDtor(unsigned int) = 0;// private vtable offset = 0x0
+    //virtual void * __vecDelDtor(unsigned int) = 0;// private vtable offset = 0x0
 };
 
 // TODO move?
@@ -183,7 +181,7 @@ public:
     FactionRelations();// public RVA = 0x672BA0
     void setupPhase1(Faction* f);// public RVA = 0x556F50
     void setupPhase2();// public RVA = 0x5570A0
-    bool isEnemyByDefault();// public RVA = 0x358D70
+    bool isEnemyByDefault() const;// public RVA = 0x358D70
     void reset();// public RVA = 0x672AA0
     virtual void save(GameData* factionsList);// public RVA = 0x556780 vtable offset = 0x0
     virtual void load(GameData* gamestate_faction, bool playerOnly);// public RVA = 0x557D90 vtable offset = 0x8
@@ -241,7 +239,7 @@ public:
         float percievedStrength; // 0x10 Member
         // no_addr void setStateVar(const class std::basic_string<char,std::char_traits<char>,std::allocator<char> > &, int);// public
         // no_addr int getStateVar(const class std::basic_string<char,std::char_traits<char>,std::allocator<char> > &);// public
-        std::map<std::string, int, std::less<std::string >, Ogre::STLAllocator<std::pair<std::string const, int>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > stateVariables; // 0x18 Member
+        std::map<std::string, int, std::less<std::string >, Ogre::STLAllocator<std::pair<std::string const, int>, Ogre::GeneralAllocPolicy > > stateVariables; // 0x18 Member
         ~RelationData();// public RVA = 0x55A5D0
         FactionRelations::RelationData& operator=(const FactionRelations::RelationData& __that);// public RVA = 0x55A9D0
         // no_addr void * __vecDelDtor(unsigned int);// public
@@ -250,11 +248,11 @@ public:
     float globalReputationForBadassery; // 0x18 Member
     virtual FactionRelations::RelationData* getRelationData(Faction* p);// public RVA = 0x557C30 vtable offset = 0x50
     void getGUIData(DatapanelGUI* panel, int category);// public RVA = 0x65A620
-    void getRelationsData(boost::unordered::unordered_map<Faction*, float, boost::hash<Faction*>, std::equal_to<Faction*>, Ogre::STLAllocator<std::pair<Faction* const, float>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > >& data);// public RVA = 0x555800
+    void getRelationsData(ogre_unordered_map<Faction*, float>::type& data);// public RVA = 0x555800
     // no_addr void setStateVar(class Faction *, const class std::basic_string<char,std::char_traits<char>,std::allocator<char> > &, int);// public
     // no_addr int getStateVar(class Faction *, const class std::basic_string<char,std::char_traits<char>,std::allocator<char> > &);// public
     bool checkStateCondition(DialogConditionEnum conditionName, ComparisonEnum compareBy, int val, Faction* yourFaction);// public RVA = 0x520FF0
-    boost::unordered::unordered_map<Faction*, FactionRelations::RelationData, boost::hash<Faction*>, std::equal_to<Faction*>, Ogre::STLAllocator<std::pair<Faction* const, FactionRelations::RelationData>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > _factionRelations; // 0x20 Member
+    ogre_unordered_map<Faction*, FactionRelations::RelationData>::type _factionRelations; // 0x20 Member
     float defaultFactionRelation; // 0x60 Member
     ~FactionRelations();// public RVA = 0x672C00
     // no_addr class FactionRelations & operator=(const class FactionRelations &);// public
@@ -307,10 +305,10 @@ public:
 };
 
 // TODO move?
-class FactionWarMgr : public Ogre::AllocatedObject<Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> >
+class FactionWarMgr : public Ogre::GeneralAllocatedObject
 {
 public:
-    // Ogre::AllocatedObject<Ogre::CategorisedAllocPolicy<0> > offset = 0x0, length = 0x1
+    // Ogre::GeneralAllocatedObject offset = 0x0, length = 0x1
     // no_addr void FactionWarMgr(const class FactionWarMgr &);// public
     FactionWarMgr(Faction* f);// public RVA = 0x670740
     ~FactionWarMgr();// public RVA = 0x671C10
@@ -337,7 +335,7 @@ public:
     hand getAITarget(Platoon* who);// public RVA = 0x1EFDD0
     UnloadedPlatoonJob getMyUnloadedAI(Platoon* who);// public RVA = 0x7D2D00
     lektor<TownBase*> myTowns; // 0x10 Member
-    std::map<Platoon*, CampaignInstance*, std::less<Platoon*>, Ogre::STLAllocator<std::pair<Platoon* const, CampaignInstance*>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > forces; // 0x28 Member
+    std::map<Platoon*, CampaignInstance*, std::less<Platoon*>, Ogre::STLAllocator<std::pair<Platoon* const, CampaignInstance*>, Ogre::GeneralAllocPolicy > > forces; // 0x28 Member
     lektor<hand> hiredForces; // 0x50 Member
     lektor<CampaignInstance*> activeCampaigns; // 0x68 Member
     lektor<AreaBiomeGroup*> biomeTerritories; // 0x80 Member

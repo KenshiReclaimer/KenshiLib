@@ -19,10 +19,10 @@ class Weapon;
 class Building;
 class Damages;
 
-class CharStats : public Ogre::AllocatedObject<Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> >
+class CharStats : public Ogre::GeneralAllocatedObject
 {
 public:
-    // Ogre::AllocatedObject<Ogre::CategorisedAllocPolicy<0> > offset = 0x8, length = 0x1
+    // Ogre::GeneralAllocatedObject offset = 0x8, length = 0x1
     // VTable         : (none)
     MedicalSystem* medical; // 0x8 Member
     Character* me; // 0x10 Member
@@ -41,15 +41,15 @@ public:
     float skillMultDamage; // 0x48 Member
     float fistInjuryEquipmentMult; // 0x4C Member
     float skillMultRanged; // 0x50 Member
-    std::map<WeatherAffecting, float, std::less<WeatherAffecting>, Ogre::STLAllocator<std::pair<WeatherAffecting const, float>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > _weatherProtections; // 0x58 Member
-    float getWeatherProtection(WeatherAffecting w);// public RVA = 0x6D0EB0
-    // no_addr void CharStats(const CharStats &);// public
+    std::map<WeatherAffecting, float, std::less<WeatherAffecting>, Ogre::STLAllocator<std::pair<WeatherAffecting const, float>, Ogre::GeneralAllocPolicy > > _weatherProtections; // 0x58 Member
+    float getWeatherProtection(WeatherAffecting w) const;// public RVA = 0x6D0EB0
+    // no_addr void CharStats(const class CharStats &);// public
     CharStats();// public RVA = 0x6D0FC0
-    int unarmedEncumbrancePenalty();// public RVA = 0x6CE7E0
-    int skillBonusUnarmed_forGUI(bool factorEnvironment);// public RVA = 0x6CE820
-    int skillBonusAttack_melee(bool factorEnvironment);// public RVA = 0x6CE660
-    int skillBonusAttack_unarmed(bool factorEnvironment);// public RVA = 0x6CE720
-    int skillBonusDefence(bool factorEnvironment);// public RVA = 0x6CE8B0
+    int unarmedEncumbrancePenalty() const;// public RVA = 0x6CE7E0
+    int skillBonusUnarmed_forGUI(bool factorEnvironment) const;// public RVA = 0x6CE820
+    int skillBonusAttack_melee(bool factorEnvironment) const;// public RVA = 0x6CE660
+    int skillBonusAttack_unarmed(bool factorEnvironment) const;// public RVA = 0x6CE720
+    int skillBonusDefence(bool factorEnvironment) const;// public RVA = 0x6CE8B0
     void serialise(GameData* data);// public RVA = 0x5030D0
     void updateStats(GameData* statData);// public RVA = 0x503E80
     virtual void init(GameData* data, MedicalSystem* _med, Character* charact);// public RVA = 0x505310 vtable offset = 0x0
@@ -60,8 +60,8 @@ public:
     void printRunSpeedStatMax(std::string& out);// public RVA = 0x6D3150
     void getAthleticsTooltip(lektor<StringPair>* dats);// public RVA = 0x6D8920
     void getGUIDataForMainInfo(DatapanelGUI* datapanel, int category, bool combatMode);// public RVA = 0x6DC2C0
-    std::string formatWholeStatStringWithBonuses(int base, int current);// public RVA = 0x6D38B0
-    std::string formatWholeStatStringWithBonuses(StatsEnumerated stat);// public RVA = 0x6ECAD0
+    std::string formatWholeStatStringWithBonuses(int base, int current) const;// public RVA = 0x6D38B0
+    std::string formatWholeStatStringWithBonuses(StatsEnumerated stat) const;// public RVA = 0x6ECAD0
     enum GUIStatsDisplayMode
     {
         GUI_STATS_NORMAL,
@@ -73,27 +73,27 @@ public:
     virtual void periodicUpdate();// public RVA = 0x6CDD10 vtable offset = 0x8
     float calculateStumbleThresholdDamageAmount();// public RVA = 0x6CE1C0
     void setEquipmentStatBonuses(float athlet, float combatSpd, int attack, int def, float _stealth, int _unarmed, float _dodge, float fistdamage, int perception, float ranged, float dexmult, float assmult, float damagemult);// public RVA = 0x6CE510
-    float getOverallSkillLevel_0_100();// public RVA = 0x6CF1F0
+    float getOverallSkillLevel_0_100() const;// public RVA = 0x6CF1F0
     float& getStatRef(StatsEnumerated what);// public RVA = 0x6CE330
-    float getStat(StatsEnumerated what, bool unmodified);// public RVA = 0x6CEC60
+    float getStat(StatsEnumerated what, bool unmodified) const;// public RVA = 0x6CEC60
     static std::string getStatName(StatsEnumerated what);// public RVA = 0x6D25E0
-    float getStatMultiplier(StatsEnumerated st);// public RVA = 0x6CF440
+    float getStatMultiplier(StatsEnumerated st) const;// public RVA = 0x6CF440
     std::string getStatMultiplierForGUI(StatsEnumerated st);// public RVA = 0x6D3B30
     bool getStatPenaltiesForGUI(const std::string& statName, StatsEnumerated stat, lektor<StringPair>& dats);// public RVA = 0x6DACA0
     int getStatPenaltiesTotalForGUI(const std::string& statName, StatsEnumerated stat);// public RVA = 0x6CE200
     void xpStat_timeBased(StatsEnumerated st);// public RVA = 0x704800
     void xpStat_eventBased(StatsEnumerated st, float amount);// public RVA = 0x7048C0
     void xpDodgeEvent(float enemySkill, bool successful);// public RVA = 0x703910
-    float strengthActual();// public RVA = 0x2825B0
+    float strengthActual() const;// public RVA = 0x2825B0
     float _strength; // 0x80 Member
-    virtual float strengthBase();// public RVA = 0x4FA3A0 vtable offset = 0x10
+    virtual float strengthBase() const;// public RVA = 0x4FA3A0 vtable offset = 0x10
     float fitness; // 0x84 Member
     float _dexterity; // 0x88 Member
-    float dexterityBase();// public RVA = 0x4285E0
-    float dexterityActual();// public RVA = 0x6CD8A0
+    float dexterityBase() const;// public RVA = 0x4285E0
+    float dexterityActual() const;// public RVA = 0x6CD8A0
     float perception; // 0x8C Member
     float _toughness; // 0x90 Member
-    float toughness();// public RVA = 0x46F8B0
+    float toughness() const;// public RVA = 0x46F8B0
     float getToughnessMult();// public RVA = 0x4FC190
     float _athletics; // 0x94 Member
     float medic; // 0x98 Member
@@ -137,23 +137,23 @@ public:
     float __meleeAttack; // 0x120 Member
     float _meleeDefence; // 0x124 Member
     float& getMeleeAttackRef();// protected RVA = 0x703380
-    void _chooseAttacks(FitnessSelector<CombatTechniqueData*>& possibleAttacks, float range, float weaponReach, CombatTechniqueData* lastAttack, bool opponentIsStationary, bool skipMedicals, enum WeaponCategory _weaponType, float _weaponSkill);// protected RVA = 0x6D1870
-    float getMeleeDefence(bool includeDefensiveMode);// public RVA = 0x6D0430
-    float getDodge(bool bonuses);// public RVA = 0x6CF330
-    float getDodgePenalty_encumbrance();// public RVA = 0x6CF260
-    float getDodgePenalty_injuries();// public RVA = 0x6CF2C0
-    float getDodgePenalty_gear();// public RVA = 0x6CE890
-    float getMeleeDefence_melee(bool includeDefensiveMode);// public RVA = 0x6CF0F0
-    float getMeleeAttack();// public RVA = 0x6CF080
-    float getMeleeAttack_unarmed(bool bonuses);// public RVA = 0x6CEFA0
-    float getMeleeAttack_melee();// public RVA = 0x6CF020
-    float _getMeleeAttackBase();// public RVA = 0x520C80
+    void _chooseAttacks(FitnessSelector<CombatTechniqueData*>& possibleAttacks, float range, float weaponReach, CombatTechniqueData* lastAttack, bool opponentIsStationary, bool skipMedicals, WeaponCategory _weaponType, float _weaponSkill);// protected RVA = 0x6D1870
+    float getMeleeDefence(bool includeDefensiveMode) const;// public RVA = 0x6D0430
+    float getDodge(bool bonuses) const;// public RVA = 0x6CF330
+    float getDodgePenalty_encumbrance() const;// public RVA = 0x6CF260
+    float getDodgePenalty_injuries() const;// public RVA = 0x6CF2C0
+    float getDodgePenalty_gear() const;// public RVA = 0x6CE890
+    float getMeleeDefence_melee(bool includeDefensiveMode) const;// public RVA = 0x6CF0F0
+    float getMeleeAttack() const;// public RVA = 0x6CF080
+    float getMeleeAttack_unarmed(bool bonuses) const;// public RVA = 0x6CEFA0
+    float getMeleeAttack_melee() const;// public RVA = 0x6CF020
+    float _getMeleeAttackBase() const;// public RVA = 0x520C80
     float getMaxHealAmount(Item* equipment, Building* bed, bool isRobot);// public RVA = 0x4FCAF0
-    bool isDefensiveMode();// public RVA = 0x216510
+    bool isDefensiveMode() const;// public RVA = 0x216510
     bool _defensiveMode; // 0x128 Member
     bool rangedMode; // 0x129 Member
     bool tauntMode; // 0x12A Member
-    bool holdPositionMode();// public RVA = 0x216550
+    bool holdPositionMode() const;// public RVA = 0x216550
     bool _holdPositionMode; // 0x12B Member
     bool passiveCombatMode; // 0x12C Member
     Ogre::Vector3 holdLocation; // 0x130 Member
@@ -170,7 +170,7 @@ public:
     float longestReachingAttack; // 0x150 Member
     CombatTechniqueData* chooseBlock(CutDirection dir, float opponentAttackSkill, CutOrigination from, Character* opponent);// public RVA = 0x6D1B10
     float calculateStumbleBlockTimer(float stumbleForce);// public RVA = 0x6D0450
-    const std::string& getPainAnim(GameData* anatomyHit);// public RVA = 0x4FF390
+    const std::string& getPainAnim(GameData* anatomyHit) const;// public RVA = 0x4FF390
     float calculateTechniqueInegrityCheckTimer();// public RVA = 0x6D0460
     float calculateToughnessDamageResistanceMult();// public RVA = 0x4FCF50
     float calculateToughnessWoundDegenerationRate();// public RVA = 0x4FC450
@@ -180,7 +180,7 @@ public:
     float getAttackBleedDamageMult();// public RVA = 0x6CDDF0
     float getAttackPierceDamage();// public RVA = 0x6CDEB0
     Damages getTotalAttackDamageFor(Character* target);// public RVA = 0x6D0A50
-    virtual float getEquippedWeaponSkill();// public RVA = 0x6EBA90 vtable offset = 0x18
+    virtual float getEquippedWeaponSkill() const;// public RVA = 0x6EBA90 vtable offset = 0x18
     float getSkillDifferenceRatio(float mine, float his);// public RVA = 0x703550
     enum DeadTimeState
     {
@@ -220,23 +220,23 @@ public:
     float calculateAthleticsXPMult(float speed);// public RVA = 0x703470
     float calculateStrengthXPMultFromWalking();// public RVA = 0x703670
     void setWeapon(Weapon* _weapon);// public RVA = 0x6E20D0
-    bool isUnarmed();// public RVA = 0x27F170
+    bool isUnarmed() const;// public RVA = 0x27F170
     // no_addr float getWeaponWeightBonus();// public
     float getWeaponWeightXPBonus();// public RVA = 0x6CD8F0
     float getAttackSpeed();// public RVA = 0x212700
     float getBlockSpeed();// public RVA = 0x4CBDD0
     float getMaxRunSpeed();// public RVA = 0x212710
-    float getCurrentWeaponLength();// public RVA = 0x4CBDE0
-    float getStealthSkill01(bool modded);// public RVA = 0x6CE9F0
+    float getCurrentWeaponLength() const;// public RVA = 0x4CBDE0
+    float getStealthSkill01(bool modded) const;// public RVA = 0x6CE9F0
     float getAttackSuccessChanceSkill();// public RVA = 0x4CBDF0
     static float _convertWeaponWeightToBluntMultiplier(float weaponWeight);// public RVA = 0x6CDA40
     static float _convertBluntMultiplierToWeaponWeight(float blunt);// public RVA = 0x6CDA50
-    float getEncumbranceMult();// public RVA = 0x212720
+    float getEncumbranceMult() const;// public RVA = 0x212720
     float calculateHungerMult();// public RVA = 0x6CD940
     void printExertionHungerMultTooltip(lektor<StringPair>* dats);// public RVA = 0x6D4450
     float calculateTheoreticalIdealMaxRunSpeed();// public RVA = 0x6CDF50
     float calculateWeaponWeightXPMult(float weaponWeight);// public RVA = 0x6CDA80
-    bool hasWeapon();// public RVA = 0x46F8C0
+    bool hasWeapon() const;// public RVA = 0x46F8C0
     // no_addr enum WeaponCategory getCurrentWeaponType();// public
     float calculateMaxStealthSpeed();// public RVA = 0x6CEAC0
     float _calculateMaxSwimSpeed();// public RVA = 0x6CDFD0
@@ -271,7 +271,8 @@ public:
     float bonusHumans; // 0x1B8 Member
     float bonusAnimals; // 0x1BC Member
     float bonusArmourPenetration; // 0x1C0 Member
-    std::map<GameData*, float, std::less<GameData*>, Ogre::STLAllocator<std::pair<GameData* const, float>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > bonusRaces; // 0x1C8 Member
+    // this is weird - I think the template might actually take a policy as an arg?
+    std::map<GameData*, float, std::less<GameData*>, Ogre::STLAllocator<std::pair<GameData* const, float>, Ogre::GeneralAllocPolicy > > bonusRaces; // 0x1C8 Member
     WeaponCategory currentWeaponType; // 0x1F0 Member
     float* pCurrentWeaponSkill; // 0x1F8 Member
     float currentWeaponLength; // 0x200 Member

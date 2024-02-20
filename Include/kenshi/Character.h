@@ -8,6 +8,8 @@
 
 #include <ogre/OgreVector3.h>
 
+#include "util/OgreUnordered.h"
+
 enum ProneState
 {
     PS_NORMAL,
@@ -67,7 +69,7 @@ class Character;
 class BountyManager
 {
 public:
-    boost::unordered::unordered_map<Faction*, Bounty, boost::hash<Faction*>, std::equal_to<Faction*>, Ogre::STLAllocator<std::pair<Faction* const, Bounty>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > bounties; // 0x0 Member
+    ogre_unordered_map<Faction*, Bounty>::type bounties; // 0x0 Member
     Character* me; // 0x40 Member
     Faction* _getBountyFaction(Faction* f);// private RVA = 0x6A5A10
     Faction* _getHighestBountyFaction();// private RVA = 0x6A70E0
@@ -83,7 +85,7 @@ public:
     void unfairAddToBounty(Faction* enforcer, int amount);// public RVA = 0x6A7820
     int getBountyRecognitionThreshold();// public RVA = 0x6A5AC0
     void clearBounty(Faction* enforcer);// public RVA = 0x6A73F0
-    int getTotalBounty();// public RVA = 0x6A7140
+    int getTotalBounty() const;// public RVA = 0x6A7140
     void update(float frameTime);// public RVA = 0x49B900
     StringPair getGUIData(lektor<StringPair>& outs);// public RVA = 0x4A2B20
     void getGUIDataForAppend(lektor<StringPair>& outs);// public RVA = 0x4A1180
@@ -101,9 +103,9 @@ public:
     TimeOfDay prisonSentenceBeganTime; // 0x98 Member
     float prisonSentenceToServe; // 0xA0 Member
     bool _hadABountyAssignedForCurrentCrime; // 0xA4 Member
-    bool isCommittingCrime();// public RVA = 0x6A54F0
+    bool isCommittingCrime() const;// public RVA = 0x6A54F0
     void notifyStartPrisonSentence(Faction* law);// public RVA = 0x6A8350
-    bool hasAccessPass(Faction* forFac);// public RVA = 0x6A5500
+    bool hasAccessPass(Faction* forFac) const;// public RVA = 0x6A5500
     void giveAccessPass(Faction* who, float minutes);// public RVA = 0x282220
     static std::string crimeToStr(CrimeEnum c);// public RVA = 0x6A9F30
     static int getBountyForCrime(CrimeEnum c);// public RVA = 0x6A5840
@@ -254,11 +256,11 @@ class CharacterAnimal;
 class CharacterHuman;
 class Weapon;
 
-class Character : public RootObject, public Ogre::AllocatedObject<Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> >
+class Character : public RootObject, public Ogre::GeneralAllocatedObject
 {
 public:
     // RootObject offset = 0x0, length = 0xC0
-    // Ogre::AllocatedObject<Ogre::CategorisedAllocPolicy<0> > offset = 0xC0, length = 0x1
+    // Ogre::GeneralAllocatedObject offset = 0xC0, length = 0x1
     // no_addr void Character(class Character &);// public
     Character(GameData* dat, Faction* own, const hand& _handle);// protected RVA = 0x4E1440
     bool isImmuneToOffscreenMode();// protected RVA = 0x497740
@@ -280,17 +282,17 @@ public:
     virtual bool isOnARoof();// public RVA = 0x4AC7C0 vtable offset = 0x0
     virtual bool isOnAWall();// public RVA = 0x498840 vtable offset = 0x230
     float getLightLevel();// public RVA = 0x4FC1B0
-    virtual float getHPMultiplier();// public RVA = 0x4AFAF0 vtable offset = 0x238
+    virtual float getHPMultiplier() const;// public RVA = 0x4AFAF0 vtable offset = 0x238
     void healCompletely();// public RVA = 0x4FECA0
     void resetRagdollNavmeshSafePos();// public RVA = 0x63D610
     void setRagdollNavmeshSafePos();// public RVA = 0x511EB0
-    float getFrameTime();// public RVA = 0x27A190
+    float getFrameTime() const;// public RVA = 0x27A190
     void frameSkip();// public RVA = 0x6036F0
     float getCurrentNoiseRange();// public RVA = 0x6A5710
-    virtual bool isDestroyed();// public RVA = 0x4AC800 vtable offset = 0x240
+    virtual bool isDestroyed() const;// public RVA = 0x4AC800 vtable offset = 0x240
     bool isLawEnforcement();// public RVA = 0x4729F0
     bool canAssignBounties();// public RVA = 0x47D860
-    virtual itemType getDataType();// public RVA = 0x4AC810 vtable offset = 0x0
+    virtual itemType getDataType() const;// public RVA = 0x4AC810 vtable offset = 0x0
     bool isDiplomaticStatus(bool factorInBiome);// public RVA = 0x60E840
     bool isLeadingAWarCampaign();// public RVA = 0x7D2D50
     CampaignInstance* isInAWarCampaign();// public RVA = 0x7D2DD0
@@ -301,9 +303,9 @@ public:
     virtual CharacterAnimal* isAnimal();// public RVA = 0x4AFB00 vtable offset = 0x248
     virtual CharacterHuman* isHuman();// public RVA = 0x4AC820 vtable offset = 0x250
     virtual bool takeMoney(int n);// public RVA = 0x60EBF0 vtable offset = 0x0
-    virtual int getMoney();// public RVA = 0x609C60 vtable offset = 0x0
+    virtual int getMoney() const;// public RVA = 0x609C60 vtable offset = 0x0
     void setSquadMemberType(SquadMemberType memType);// public RVA = 0x4E0610
-    TownBase* isResident();// public RVA = 0x49E370
+    TownBase* isResident() const;// public RVA = 0x49E370
     BountyManager crimes; // 0xF0 Member
     StatsEnumerated currentSkillUsing; // 0x198 Member
     void dailyUpdate();// public RVA = 0x4A2510
@@ -315,8 +317,8 @@ public:
     void updateTimes();// public RVA = 0x497860
     virtual SensoryData* getSensoryData();// public RVA = 0x498480 vtable offset = 0x0
     virtual StateBroadcastData* getStateBroadcast();// public RVA = 0x4AC830 vtable offset = 0x0
-    virtual Formation* getFormation();// public RVA = 0x499660 vtable offset = 0x258
-    virtual Formation* getEnemyFormation();// public RVA = 0x499680 vtable offset = 0x260
+    virtual Formation* getFormation() const;// public RVA = 0x499660 vtable offset = 0x258
+    virtual Formation* getEnemyFormation() const;// public RVA = 0x499680 vtable offset = 0x260
     void formationUpdateCallback(const Ogre::Vector3& pos, const hand& target, const Ogre::Vector3& heading, Formation* from);// public RVA = 0x4996A0
     bool AIDestinationIndoorOutdoorCheck(RootObject* who);// public RVA = 0x3FFA00
     virtual void setHandle(const hand& h);// public RVA = 0x4E2970 vtable offset = 0x0
@@ -331,7 +333,7 @@ public:
     virtual void threadedUpdate4();// public RVA = 0x497AC0 vtable offset = 0x278
     virtual void threadedUpdatePeriodic();// public RVA = 0x49FE30 vtable offset = 0x280
     bool pathExists(const Ogre::Vector3& v);// public RVA = 0x511350
-    virtual void weatherUpdate(float __formal);// public RVA = 0x497CE0 vtable offset = 0x288
+    virtual void weatherUpdate(float);// public RVA = 0x497CE0 vtable offset = 0x288
     void stealthUpdate(float _time);// public RVA = 0x6AC0D0
     float lineOfSightCheck(Character* who);// public RVA = 0x6A7020
     float getPerceptionMult();// public RVA = 0x6A63C0
@@ -347,8 +349,8 @@ public:
     virtual bool sellingUniformDetectionCheck(Item* item, Character* thief);// public RVA = 0x60BCC0 vtable offset = 0x2A0
     virtual YesNoMaybe smugglingTradeCheck(Item* item, Character* who);// public RVA = 0x60D480 vtable offset = 0x2A8
     float getStealingSuccessChance(RootObject* stealFrom, Item* item, Character** victimOut);// public RVA = 0x60CAD0
-    WeatherAffecting getCurrentWeatherAffectStatus();// public RVA = 0x498440
-    float getCurrentWeatherAffectStrength();// public RVA = 0x498460
+    WeatherAffecting getCurrentWeatherAffectStatus() const;// public RVA = 0x498440
+    float getCurrentWeatherAffectStrength() const;// public RVA = 0x498460
     WaterState::Enum getWaterLevel();// public RVA = 0x497D50
     void setTerrainHeightPosition(float height);// public RVA = 0x497580
     float getTerrainHeightPosition();// public RVA = 0x485260
@@ -360,9 +362,10 @@ public:
     };
 
     void setDisguiseMessage(Character::DisguiseGUIFeedback msg);// public RVA = 0x6B3A70
-    boost::unordered::unordered_map<enum Character::DisguiseGUIFeedback, float, boost::hash<enum Character::DisguiseGUIFeedback>, std::equal_to<enum Character::DisguiseGUIFeedback>, Ogre::STLAllocator<std::pair<enum Character::DisguiseGUIFeedback const, float>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > disguiseGUIFeedbacks; // 0x1B0 Member
+    ogre_unordered_map<Character::DisguiseGUIFeedback, float>::type disguiseGUIFeedbacks; // 0x1B0 Member
     class WhoSeesMe
     {
+    public:
         // no_addr void WhoSeesMe(class Character::WhoSeesMe &);// public
         WhoSeesMe(double timestamp, YesNoMaybe* what, float prog);// public RVA = 0x6AF060
         WhoSeesMe();// public RVA = 0x6AF050
@@ -370,9 +373,10 @@ public:
         YesNoMaybe seeState; // 0x8 Member
         float progressOfMaybe; // 0xC Member
     };
-    boost::unordered::unordered_map<hand, Character::WhoSeesMe, boost::hash<hand>, std::equal_to<hand>, Ogre::STLAllocator<std::pair<hand const, Character::WhoSeesMe>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > whoSeesMeSneaking; // 0x1F0 Member
+    ogre_unordered_map<hand, Character::WhoSeesMe>::type whoSeesMeSneaking; // 0x1F0 Member
     class AttachedArrowManager
     {
+    public:
         ~AttachedArrowManager();// public RVA = 0x49ADD0
         void clearAll();// public RVA = 0x49A330
         void updateStart();// public RVA = 0x4980A0
@@ -394,15 +398,15 @@ public:
     virtual void loadFromSerialisePostCreationStage(GameSaveState* gd);// public RVA = 0x4E6B80 vtable offset = 0x2B8
     virtual bool setupInventorySections(GameSaveState* state);// public RVA = 0x4E1ED0 vtable offset = 0x2C0
     virtual Ogre::Vector3 getPosition();// public RVA = 0x49E400 vtable offset = 0x0
-    Ogre::Vector3 _getRawPosition();// public RVA = 0x5166D0
+    Ogre::Vector3 _getRawPosition() const;// public RVA = 0x5166D0
     Ogre::Vector3 getRawEntityPosition();// public RVA = 0x497E50
-    virtual float getMovementSpeed();// public RVA = 0x498150 vtable offset = 0x0
-    virtual MoveSpeed getMovementSpeedOrders();// public RVA = 0x498190 vtable offset = 0x2C8
-    virtual Ogre::Vector3 getMovementDirection();// public RVA = 0x4981B0 vtable offset = 0x0
+    virtual float getMovementSpeed() const;// public RVA = 0x498150 vtable offset = 0x0
+    virtual MoveSpeed getMovementSpeedOrders() const;// public RVA = 0x498190 vtable offset = 0x2C8
+    virtual Ogre::Vector3 getMovementDirection() const;// public RVA = 0x4981B0 vtable offset = 0x0
     // no_addr int getSquadMemberID();// public
-    virtual bool isPhysical();// public RVA = 0x498540 vtable offset = 0x0
+    virtual bool isPhysical() const;// public RVA = 0x498540 vtable offset = 0x0
     virtual void setVisible(bool on);// public RVA = 0x498570 vtable offset = 0x0
-    virtual bool getVisible();// public RVA = 0x498600 vtable offset = 0x0
+    virtual bool getVisible() const;// public RVA = 0x498600 vtable offset = 0x0
     void switchLights(bool on);// public RVA = 0x41A380
     virtual bool isDisabled();// public RVA = 0x498630 vtable offset = 0x0
     virtual void setInsideTownWalls(int s);// public RVA = 0x60A5E0 vtable offset = 0x0
@@ -413,7 +417,7 @@ public:
     virtual TownBase* getCurrentTownLocation();// public RVA = 0x498730 vtable offset = 0x0
     virtual void say_WithARepeatLimiter(const std::string& s);// public RVA = 0x49AC90 vtable offset = 0x2D8
     virtual void say(const std::string& s);// public RVA = 0x4996D0 vtable offset = 0x0
-    virtual bool isInventoryVisible();// public RVA = 0x4992D0 vtable offset = 0x2E0
+    virtual bool isInventoryVisible() const;// public RVA = 0x4992D0 vtable offset = 0x2E0
     virtual bool giveItem(Item* item, bool dropOnFail, bool destroyOnFail);// public RVA = 0x49B180 vtable offset = 0x0
     virtual bool hasRoomForItem(GameData* item);// public RVA = 0x49B2A0 vtable offset = 0x0
     virtual bool hasItem(GameData* item);// public RVA = 0x49B330 vtable offset = 0x0
@@ -421,10 +425,10 @@ public:
     virtual int getNumFoodItems();// public RVA = 0x4706C0 vtable offset = 0x2F0
     virtual bool hasSimilarItem(itemType ty);// public RVA = 0x49C2E0 vtable offset = 0x2F8
     bool ifImASmithShouldIDitchMyBackWeapon();// public RVA = 0x49C230
-    virtual bool hasItemsFrom(StorageBuilding* from, boost::unordered::unordered_set<GameData*, boost::hash<GameData*>, std::equal_to<GameData*>, Ogre::STLAllocator<GameData*, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > >& allTheOnesWeHave);// public RVA = 0x47D900 vtable offset = 0x300
-    virtual Inventory* getInventory();// public RVA = 0x4AC840 vtable offset = 0x0
-    ContainerItem* hasABackpackOn();// public RVA = 0x49B0A0
-    bool isATrader();// public RVA = 0x49FCF0
+    virtual bool hasItemsFrom(StorageBuilding* from, ogre_unordered_set<GameData*>::type& allTheOnesWeHave);// public RVA = 0x47D900 vtable offset = 0x300
+    virtual Inventory* getInventory() const;// public RVA = 0x4AC840 vtable offset = 0x0
+    ContainerItem* hasABackpackOn() const;// public RVA = 0x49B0A0
+    bool isATrader() const;// public RVA = 0x49FCF0
     bool isFemale();// public RVA = 0x1FEDA0
     bool isFleeing();// public RVA = 0x499910
     virtual InventoryLayout* createInventoryLayout();// public RVA = 0x49B6F0 vtable offset = 0x0
@@ -441,12 +445,12 @@ public:
     bool IHateThisGuyBecauseOfStuffThatHappened(Character* who);// public RVA = 0x4729C0
     int getRoughLevel();// public RVA = 0x473D10
     virtual void setStandingOrder(MessageForB::StandingOrder orderID, bool on);// public RVA = 0x49A7D0 vtable offset = 0x308
-    bool getStandingOrder(MessageForB::StandingOrder orderID);// public RVA = 0x499440
+    bool getStandingOrder(MessageForB::StandingOrder orderID) const;// public RVA = 0x499440
     void setStealthMode(bool on);// public RVA = 0x49A720
-    bool isStealthMode();// public RVA = 0x4994D0
-    bool isStealthModeOrCrawling();// public RVA = 0x5166F0
+    bool isStealthMode() const;// public RVA = 0x4994D0
+    bool isStealthModeOrCrawling() const;// public RVA = 0x5166F0
     void declareDead();// public RVA = 0x61E800
-    void updateGUIStatsDetails(DatapanelGUI* datapanel, const std::string& name, int statId);// public RVA = 0x6F3D00
+    void updateGUIStatsDetails(DatapanelGUI* datapanel, const std::string& name, int statId, StatsEnumerated);// public RVA = 0x6F3D00
     void _printRaceXPBonusLine(DatapanelGUI* panel, StatsEnumerated s);// public RVA = 0x6EDA30
     void addGoal(TaskType t, RootObjectBase* subject);// public RVA = 0x498DA0
     // no_addr void removeGoal(enum TaskType);// public
@@ -455,22 +459,22 @@ public:
     void removePermajob(int t);// public RVA = 0x498D80
     void clearPermajobs();// public RVA = 0x498D60
     void movePermajob(int taskIdx, int targetIdx);// public RVA = 0x498D40
-    const std::string& getPermajobName(int slot);// public RVA = 0x498C50
-    TaskType getPermajob(int slot);// public RVA = 0x498C70
-    const Tasker* getPermajobData(int slot);// public RVA = 0x498C90
-    int getPermajobCount();// public RVA = 0x498CB0
-    virtual const Ogre::Aabb& getAABB();// public RVA = 0x498CD0 vtable offset = 0x0
+    const std::string& getPermajobName(int slot) const;// public RVA = 0x498C50
+    TaskType getPermajob(int slot) const;// public RVA = 0x498C70
+    const Tasker* getPermajobData(int slot) const;// public RVA = 0x498C90
+    int getPermajobCount() const;// public RVA = 0x498CB0
+    virtual const Ogre::Aabb& getAABB() const;// public RVA = 0x498CD0 vtable offset = 0x0
     void addOrder(Building* dest, TaskType t, RootObject* subject, bool shift, bool clear, const Ogre::Vector3& location);// public RVA = 0x4A1E50
     virtual void updateLastTask(Building* dest, TaskType t, RootObject* subject, const Ogre::Vector3& location);// public RVA = 0x498EB0 vtable offset = 0x310
     virtual void playerMoveOrderDefault(Building* dest, RootObject* subject, const Ogre::Vector3& location);// public RVA = 0x4A2030 vtable offset = 0x318
     void endCombatMode();// public RVA = 0x498F40
     virtual float getTotalRelativeStrengthOfAttackers();// public RVA = 0x498FB0 vtable offset = 0x320
-    virtual bool canGoIndoors(Building* b);// public RVA = 0x4AFB10 vtable offset = 0x328
-    virtual const hand& isIndoors();// public RVA = 0x49DDA0 vtable offset = 0x0
-    virtual const hand& isStandingOnBuilding();// public RVA = 0x4984A0 vtable offset = 0x330
-    virtual bool isIndoorsRagdoll();// public RVA = 0x4984C0 vtable offset = 0x338
+    virtual bool canGoIndoors(Building* b) const;// public RVA = 0x4AFB10 vtable offset = 0x328
+    virtual const hand& isIndoors() const;// public RVA = 0x49DDA0 vtable offset = 0x0
+    virtual const hand& isStandingOnBuilding() const;// public RVA = 0x4984A0 vtable offset = 0x330
+    virtual bool isIndoorsRagdoll() const;// public RVA = 0x4984C0 vtable offset = 0x338
     virtual void notifyIndoors(const hand& in);// public RVA = 0x60A910 vtable offset = 0x0
-    hand destinationIndoors(RootObject* r);// public RVA = 0x60B830
+    hand destinationIndoors(RootObject* r) const;// public RVA = 0x60B830
     int destinationInsideWalls(RootObject* r);// public RVA = 0x60A5F0
     void setDestinationIndoors(const hand& h);// public RVA = 0x62F500
     // no_addr void setDestinationInsideWalls(int);// public
@@ -480,17 +484,17 @@ public:
     virtual void setName(const std::string& name);// public RVA = 0x49C050 vtable offset = 0x0
     void setNameTagVisible(bool value);// public RVA = 0x498930
     void ragdollMode(bool on, RagdollPart::Enum part);// public RVA = 0x49BAE0
-    bool isRagdoll();// public RVA = 0x63D740
+    bool isRagdoll() const;// public RVA = 0x63D740
     bool isDown();// public RVA = 0x1F8800
     Ogre::Vector3 getRagdollPhysicsRootPos();// public RVA = 0x63D9F0
     virtual bool amSomeoneWhoNeedsToEatToLive();// public RVA = 0x499B10 vtable offset = 0x340
     virtual float getMagicHungerSetting();// public RVA = 0x499A20 vtable offset = 0x348
     bool wantsToEatNow();// public RVA = 0x497CF0
     virtual bool isKidnapped();// public RVA = 0x60A350 vtable offset = 0x350
-    virtual bool isLiterallyUnconciousNotPretending();// public RVA = 0x499B70 vtable offset = 0x358
-    virtual bool isUnconcious();// public RVA = 0x499B90 vtable offset = 0x0
-    virtual bool isCrippled();// public RVA = 0x4AC850 vtable offset = 0x360
-    virtual ProneState getProneState();// public RVA = 0x497B90 vtable offset = 0x368
+    virtual bool isLiterallyUnconciousNotPretending() const;// public RVA = 0x499B70 vtable offset = 0x358
+    virtual bool isUnconcious() const;// public RVA = 0x499B90 vtable offset = 0x0
+    virtual bool isCrippled() const;// public RVA = 0x4AC850 vtable offset = 0x360
+    virtual ProneState getProneState() const;// public RVA = 0x497B90 vtable offset = 0x368
     virtual void setProneState(ProneState p);// public RVA = 0x497BA0 vtable offset = 0x370
     void _killRagdoll(bool doItNow);// public RVA = 0x4A2AA0
     bool isCurrentlyGettingUp; // 0x278 Member
@@ -506,7 +510,7 @@ public:
     bool sendDialogEvent(Character* target, EventTriggerEnum what);// public RVA = 0x534AF0
     void sayALine(const std::string& line, bool force);// public RVA = 0x530000
     Dialogue* dialogue; // 0x280 Member
-    bool hasDialogue();// public RVA = 0x52A6C0
+    bool hasDialogue() const;// public RVA = 0x52A6C0
     bool willTalkToEnemies();// public RVA = 0x52A6E0
     void relocationTeleport(const Ogre::Vector3& moveBy);// public RVA = 0x4981E0
     void teleport(const Ogre::Vector3& moveBy, const Ogre::Quaternion& rot);// public RVA = 0x498260
@@ -530,22 +534,22 @@ public:
     virtual void setAge(float f);// public RVA = 0x4AFB20 vtable offset = 0x388
     std::string currentStumblePainAnimation; // 0x288 Member
     virtual void setFaction(Faction* p, ActivePlatoon* a);// public RVA = 0x49B840 vtable offset = 0x0
-    virtual float getAge();// public RVA = 0x4AFB30 vtable offset = 0x390
-    virtual float getAge0to1();// public RVA = 0x4AFB40 vtable offset = 0x398
-    virtual std::string getAgeString();// public RVA = 0x6D2450 vtable offset = 0x3A0
-    virtual float getAgeInverse();// public RVA = 0x4AFB50 vtable offset = 0x3A8
+    virtual float getAge() const;// public RVA = 0x4AFB30 vtable offset = 0x390
+    virtual float getAge0to1() const;// public RVA = 0x4AFB40 vtable offset = 0x398
+    virtual std::string getAgeString() const;// public RVA = 0x6D2450 vtable offset = 0x3A0
+    virtual float getAgeInverse() const;// public RVA = 0x4AFB50 vtable offset = 0x3A8
     void reThinkCurrentAIAction();// public RVA = 0x4980B0
     CharBody* getBody();// public RVA = 0x1F25B0
-    CombatClass* getCombatClass();// public RVA = 0x499030
+    CombatClass* getCombatClass() const;// public RVA = 0x499030
     CharStats* getStats();// public RVA = 0x9BB10
     MedicalSystem* getMedical();// public RVA = 0x8D500
-    Ownerships* getOwnerships();// public RVA = 0x60DCA0
+    Ownerships* getOwnerships() const;// public RVA = 0x60DCA0
     AI* getAI();// public RVA = 0x1D9AD0
     void getSquadMissionTarget(hand& h);// public RVA = 0x60B400
-    hand getAttackTarget();// public RVA = 0x3506D0
-    bool isInCombatMode(bool melee, bool ranged);// public RVA = 0x351540
-    bool isInRangedCombatMode();// public RVA = 0x3515E0
-    bool isLiterallyUnderMeleeAttackRightNowForSure();// public RVA = 0x27ED20
+    hand getAttackTarget() const;// public RVA = 0x3506D0
+    bool isInCombatMode(bool melee, bool ranged) const;// public RVA = 0x351540
+    bool isInRangedCombatMode() const;// public RVA = 0x3515E0
+    bool isLiterallyUnderMeleeAttackRightNowForSure() const;// public RVA = 0x27ED20
     bool _isLiterallyUnderMeleeAttackRightNowForSure; // 0x2B0 Member
     void _isLiterallyUnderMeleeAttackRightNowForSure_update();// private RVA = 0x352820
     CharacterMemory* _myMemory; // 0x2B8 Member
@@ -566,22 +570,22 @@ public:
     bool areYouGonnaGetMe(Character* who);// public RVA = 0x49A470
     lektor<hand>& getAllAttackers(lektor<hand>& out);// public RVA = 0x49AED0
     int getAllAttackersCount();// public RVA = 0x49A490
-    virtual RaceData* getRace();// public RVA = 0x4AC860 vtable offset = 0x0
+    virtual RaceData* getRace() const;// public RVA = 0x4AC860 vtable offset = 0x0
     virtual void setRace(GameData* r);// public RVA = 0x499150 vtable offset = 0x3B8
     RaceData* myRace; // 0x2E0 Member
     float getRadius();// public RVA = 0x498130
-    bool isPlayerCharacter();// public RVA = 0x609CD0
+    bool isPlayerCharacter() const;// public RVA = 0x609CD0
     bool checkPlayerOrderForProblems(TaskType t, RootObject* subject);// public RVA = 0x4A16C0
     bool breakFollowOrderLoop(const hand& start);// public RVA = 0x498990
     Inventory* inventory; // 0x2E8 Member
     float getTotalCarryWeight();// public RVA = 0x498750
-    virtual Weapon* getCurrentWeapon();// public vtable offset = 0x3C0
-    virtual Weapon* getThePreferredWeapon();// public vtable offset = 0x3C8
+    virtual Weapon* getCurrentWeapon() = 0;// public vtable offset = 0x3C0
+    virtual Weapon* getThePreferredWeapon() = 0;// public vtable offset = 0x3C8
     virtual Crossbow* getRangedWeapon();// public RVA = 0x4AC870 vtable offset = 0x3D0
-    virtual bool drawWeapon();// public vtable offset = 0x3D8
+    virtual bool drawWeapon(Item*, std::string) = 0;// public vtable offset = 0x3D8
     Item* getUpperBodyArmour();// public RVA = 0x49C6C0
     Item* getLowerBodyArmour();// public RVA = 0x49C7F0
-    bool isInjured(bool robot);// public RVA = 0x62F530
+    bool isInjured(bool robot) const;// public RVA = 0x62F530
     bool shouldUseRangedWeapons();// public RVA = 0x658940
     RangedCombatClass* rangedCombat; // 0x2F0 Member
     Ogre::Vector3 getBoneWorldPosition(const std::string& name);// public RVA = 0x358C90
@@ -589,13 +593,13 @@ public:
     // no_addr void getCopyOfStatsForModifying(class GameData *);// public
     // no_addr void updateModifiedStats(class GameData *);// public
     void _setPlatoon(ActivePlatoon* p, int idnum);// public RVA = 0x4E0440
-    ActivePlatoon* getPlatoon();// public RVA = 0x60A110
-    bool hasPlatoon();// public RVA = 0x4966D0
-    bool isInAPersistentPlatoon();// public RVA = 0x4E0490
+    ActivePlatoon* getPlatoon() const;// public RVA = 0x60A110
+    bool hasPlatoon() const;// public RVA = 0x4966D0
+    bool isInAPersistentPlatoon() const;// public RVA = 0x4E0490
     Blackboard* getBlackboard();// public RVA = 0x60A1A0
     Character* getSquadLeader();// public RVA = 0x60B810
-    OrdersReceiver* getOrdersReciever();// public RVA = 0x4E05E0
-    bool preventRagdollMode();// public RVA = 0x4975A0
+    OrdersReceiver* getOrdersReciever() const;// public RVA = 0x4E05E0
+    bool preventRagdollMode() const;// public RVA = 0x4975A0
     UseStuffState inSomething; // 0x2F8 Member
     hand inWhat; // 0x300 Member
     void setPrisonMode(bool on, UseableStuff* h);// public RVA = 0x27C830
@@ -604,14 +608,14 @@ public:
     hand slaveOwner; // 0x328 Member
     void setSlaveAIJob(bool on);// public RVA = 0x27A300
     void setChainedMode(bool on, const hand& owner);// public RVA = 0x27A7C0
-    bool isChainedMode();// public RVA = 0x27A1A0
+    bool isChainedMode() const;// public RVA = 0x27A1A0
     LockedArmour* getChainedModeShackles();// public RVA = 0x498790
-    hand getMySlaveOwner();// public RVA = 0x284330
+    hand getMySlaveOwner() const;// public RVA = 0x284330
     SlaveStateEnum isSlave();// public RVA = 0x498820
     void changeSlaveOwner(const hand& newOwner);// public RVA = 0x27A660
     bool isMySlave(Character* slave);// public RVA = 0x27A410
     bool isMyFactionsSlave(Character* slave);// public RVA = 0x27A4D0
-    virtual bool isHeadShaven();// public RVA = 0x4AC880 vtable offset = 0x3E0
+    virtual bool isHeadShaven() const;// public RVA = 0x4AC880 vtable offset = 0x3E0
     // no_addr void playSlaveAnim(const class std::basic_string<char,std::char_traits<char>,std::allocator<char> > &, float, float);// public
     void runSlaveAnim(const std::string& anim, float speed, float sync);// public RVA = 0x485270
     void endSlaveAnim(const std::string& anim);// public RVA = 0x27FB10
@@ -619,10 +623,10 @@ public:
     void pickupObject(Character* who);// public RVA = 0x49FD10
     void getPickedUp(Character* byWhom);// public RVA = 0x49EB10
     void slaveAttachToBoneMode(const std::string& bone);// public RVA = 0x4B1860
-    bool isDead();// public RVA = 0x4E0600
+    bool isDead() const;// public RVA = 0x4E0600
     bool isCarryingSomething; // 0x348 Member
-    bool isBeingCarried();// public RVA = 0xF1DF0
-    hand getCarryingObject();// public RVA = 0x284370
+    bool isBeingCarried() const;// public RVA = 0xF1DF0
+    hand getCarryingObject() const;// public RVA = 0x284370
     std::string carringObjectLeftOrRight; // 0x350 Member
     bool isCarryingLeftSide; // 0x378 Member
     void chooseCarryObjectLeftOrRight();// public RVA = 0x4E1120
@@ -631,7 +635,7 @@ public:
     float getDiplomacyMultiplier();// public RVA = 0x60E620
     virtual bool isEnemy(Character* who, bool factorInDisguises);// public RVA = 0x614F50 vtable offset = 0x3E8
     virtual bool isAlly(Character* who, bool factorInDisguises);// public RVA = 0x60A9D0 vtable offset = 0x3F0
-    virtual unsigned int getDefaultTaskRepertoireEnum();// public RVA = 0x4AFB60 vtable offset = 0x3F8
+    virtual unsigned int getDefaultTaskRepertoireEnum() const;// public RVA = 0x4AFB60 vtable offset = 0x3F8
     AnimationClass* getAnimationClass();// public RVA = 0x3BE70
     Ogre::Vector3 getPredictedPosition(float secondsInFuture);// public RVA = 0x350400
     hand carryingObject; // 0x380 Member
@@ -639,14 +643,14 @@ public:
     void _carryMode(bool on, bool makeRagdoll, bool makeHull);// public RVA = 0x49E740
     void recalculateTotalEquipmentSkillBonus();// public RVA = 0x6D11D0
     virtual void setupAudio();// public RVA = 0x4E8990 vtable offset = 0x400
-    unsigned __int64 getAudioObject();// public RVA = 0x358D30
+    unsigned __int64 getAudioObject() const;// public RVA = 0x358D30
     bool audioEvent(const char* name, SoundRange range);// public RVA = 0x4997F0
-    void audioValue(const char* name, float value);// public RVA = 0x499720
-    void audioValue(const char* name, const char* value);// public RVA = 0x499700
+    void audioValue(const char* name, float value) const;// public RVA = 0x499720
+    void audioValue(const char* name, const char* value) const;// public RVA = 0x499700
     void setGroundType(GroundType t);// public RVA = 0x49AD40
     GroundType getGroundType();// public RVA = 0x4996F0
     void calculateMainArmourType();// public RVA = 0x4A2630
-    ArmourType getMainArmourType();// public RVA = 0x3BE80
+    ArmourType getMainArmourType() const;// public RVA = 0x3BE80
     virtual bool wearingUniformOf(Faction* f);// public RVA = 0x4AC890 vtable offset = 0x408
     GameData* getUniformColorScheme();// public RVA = 0x41ACD0
     bool canTakePlayerOrdersAtThisTime();// public RVA = 0x658A40
@@ -669,13 +673,13 @@ public:
     void processCharacterLoadTimeMessages();// protected RVA = 0x6104C0
     Ogre::Vector3 ragdollNavmeshPosition; // 0x3C8 Member
     bool wantsPathfinderActive();// protected RVA = 0x4E01A0
-    virtual void createAnimationClass();// protected vtable offset = 0x418
+    virtual void createAnimationClass() = 0;// protected vtable offset = 0x418
     bool _isBeingCarried; // 0x3D4 Member
     WeaponCategory lastUsedWeaponCategory; // 0x3D8 Member
     struct RagdollMsg
     {
         RagdollMsg(bool on, RagdollPart::Enum part);// public RVA = 0x4975B0
-        bool operator==(const Character::RagdollMsg& m);// public RVA = 0x4975C0
+        bool operator==(const Character::RagdollMsg& m) const;// public RVA = 0x4975C0
         bool on; // 0x0 Member
         RagdollPart::Enum part; // 0x4 Member
     };
@@ -718,16 +722,15 @@ public:
     SoundEmitter* audioEmitter; // 0x690 Member
     float terrainHeightPosition; // 0x698 Member
     char inDoorsSetCooldown; // 0x69C Member
-    lektor<std::pair<enum WeatherAffecting, float> > activeEffects; // 0x6A0 Member
+    lektor<std::pair<WeatherAffecting, float> > activeEffects; // 0x6A0 Member
     lektor<Effect*> particleEffects; // 0x6B8 Member
     void setEffectBT(GameData* effect, bool active);// protected RVA = 0x49D620
     virtual void postRagdollCallback(bool on, RagdollPart::Enum part);// protected RVA = 0x49BD10 vtable offset = 0x420
     Sword* naturalWeapon; // 0x6D0 Member
     virtual void reCalculateNaturalWeapon();// protected RVA = 0x4E9AB0 vtable offset = 0x428
     // no_addr class Character & operator=(const class Character &);// public
-    // virtual void* __vecDelDtor(unsigned int) = 0;// public vtable offset = 0x0
+    //virtual void * __vecDelDtor(unsigned int) = 0;// public vtable offset = 0x0
 };
-
 
 class Weapon;
 
@@ -753,7 +756,7 @@ public:
     virtual void validateInventorySections();// public RVA = 0x4E0940 vtable offset = 0x0
     virtual void setupAudio();// public RVA = 0x4E8EA0 vtable offset = 0x0
     void shaveHead(bool on);// public RVA = 0x486630
-    virtual bool isHeadShaven();// public RVA = 0x486650 vtable offset = 0x0
+    virtual bool isHeadShaven() const;// public RVA = 0x486650 vtable offset = 0x0
     virtual void createAnimationClass();// protected RVA = 0x4993F0 vtable offset = 0x0
     virtual void dropItem(RootObject* itembase);// protected RVA = 0x49A4C0 vtable offset = 0x0
     void dropWeaponInHands();// protected RVA = 0x49C4E0
@@ -766,16 +769,17 @@ public:
     virtual void postRagdollCallback(bool on, RagdollPart::Enum part);// protected RVA = 0x49BFB0 vtable offset = 0x0
     virtual void reCalculateNaturalWeapon();// protected RVA = 0x4E9D40 vtable offset = 0x0
     // no_addr class CharacterHuman & operator=(const class CharacterHuman &);// public
-    //virtual void* __vecDelDtor(unsigned int) = 0;// protected vtable offset = 0x0
+    //virtual void * __vecDelDtor(unsigned int) = 0;// protected vtable offset = 0x0
 };
 
 class CharacterAnimal : public Character
 {
+public:
     // Character offset = 0x0, length = 0x6D8
     virtual CharacterAnimal* isAnimal();// public RVA = 0x4AC8B0 vtable offset = 0x0
     virtual void createAnimationClass();// public RVA = 0x4B2450 vtable offset = 0x0
     // no_addr bool preventRagdollMode();// public
-    virtual bool drawWeapon(Item* __formal, std::string* lastSlot);// public RVA = 0x4AFA90 vtable offset = 0x0
+    virtual bool drawWeapon(Item*, std::string* lastSlot);// public RVA = 0x4AFA90 vtable offset = 0x0
     virtual void sheatheWeapon();// public RVA = 0x4AC8C0 vtable offset = 0x0
     virtual Weapon* getCurrentWeapon();// public RVA = 0x4AC8D0 vtable offset = 0x0
     virtual Weapon* getThePreferredWeapon();// public RVA = 0x4AC8E0 vtable offset = 0x0
@@ -785,15 +789,15 @@ class CharacterAnimal : public Character
     virtual void setupAudio();// public RVA = 0x4E9040 vtable offset = 0x0
     virtual void periodicUpdate();// public RVA = 0x49DC80 vtable offset = 0x0
     virtual void setAge(float zeroToOne);// public RVA = 0x4AC8F0 vtable offset = 0x0
-    virtual float getAge();// public RVA = 0x4AC900 vtable offset = 0x0
-    virtual float getAgeInverse();// public RVA = 0x4AC930 vtable offset = 0x0
-    virtual float getAge0to1();// public RVA = 0x4AC970 vtable offset = 0x0
-    virtual unsigned int getDefaultTaskRepertoireEnum();// public RVA = 0x4AC980 vtable offset = 0x0
-    virtual bool canGoIndoors(Building* b);// public RVA = 0x497F50 vtable offset = 0x0
-    virtual float getSmellHuntingThresholdBlood();// public RVA = 0x4AC990 vtable offset = 0x430
-    virtual float getSmellHuntingThresholdEggs();// public RVA = 0x4AC9A0 vtable offset = 0x438
+    virtual float getAge() const;// public RVA = 0x4AC900 vtable offset = 0x0
+    virtual float getAgeInverse() const;// public RVA = 0x4AC930 vtable offset = 0x0
+    virtual float getAge0to1() const;// public RVA = 0x4AC970 vtable offset = 0x0
+    virtual unsigned int getDefaultTaskRepertoireEnum() const;// public RVA = 0x4AC980 vtable offset = 0x0
+    virtual bool canGoIndoors(Building* b) const;// public RVA = 0x497F50 vtable offset = 0x0
+    virtual float getSmellHuntingThresholdBlood() const;// public RVA = 0x4AC990 vtable offset = 0x430
+    virtual float getSmellHuntingThresholdEggs() const;// public RVA = 0x4AC9A0 vtable offset = 0x438
     bool weaponIsTechnicallyEquipped; // 0x6D8 Member
-    virtual float getHPMultiplier();// public RVA = 0x4AC9B0 vtable offset = 0x0
+    virtual float getHPMultiplier() const;// public RVA = 0x4AC9B0 vtable offset = 0x0
     float HPMultiplier; // 0x6DC Member
     TimeOfDay itemInMouthTimeStamp; // 0x6E0 Member
     virtual void foodUpdate();// public RVA = 0x4AC3D0 vtable offset = 0x0
@@ -816,5 +820,5 @@ class CharacterAnimal : public Character
     Weapon* weaponInHands; // 0x708 Member
     float audioTimeStamp; // 0x710 Member
     // no_addr class CharacterAnimal & operator=(const class CharacterAnimal &);// public
-    // virtual void* __vecDelDtor(unsigned int) = 0;// protected vtable offset = 0x0
+    //virtual void * __vecDelDtor(unsigned int) = 0;// protected vtable offset = 0x0
 };
