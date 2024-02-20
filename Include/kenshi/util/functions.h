@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <Release_Assert.h>
 
 /* Here's how all this black magic fuckery works
 * functions.asm declares an array of pointers to the game's functions
@@ -23,11 +24,13 @@
 extern "C" intptr_t function_pointers[1];
 // address of first function definition
 extern "C" void FUNC_BEGIN(void);
+extern "C" void FUNC_END(void);
 extern "C" const uint32_t FUNCTION_SIZE;
 extern "C" const uint32_t FUNCTION_BUFF_LENGTH;
 // amount of "error" in the compiled function table, this MUST be 0
 extern "C" const uint32_t FUNCTION_ERROR;
 
+// NOTE: doesn't work with virtual functions
 inline intptr_t GetFunctionSlot(void* ptr)
 {
 	intptr_t functionsStart = (intptr_t)&FUNC_BEGIN;
@@ -35,13 +38,32 @@ inline intptr_t GetFunctionSlot(void* ptr)
 	return (functionAddr - functionsStart) / FUNCTION_SIZE;
 }
 
+template<typename T>
+// NOTE: doesn't work with virtual functions
+intptr_t GetFunctionSlotDebug(T fun)
+{
+	return GetFunctionSlot((void*&)fun); // the cast has to be to a ref to work with member functions in VC++
+}
+
+// usage: GetShimAddress(&Class::function)
+// returns the address of the JMP instruction corresponding to that function
+template<typename T>
+// NOTE: doesn't work with virtual functions
+intptr_t GetShimAddress(T fun)
+{
+	return (intptr_t&)fun; // the cast has to be to a ref to work with member functions in VC++
+}
+
 // usage: GetRealAddress(&Class::function)
+// NOTE: doesn't work with virtual functions
 template<typename T>
 intptr_t GetRealAddress(T fun)
 {
+	assert_release((intptr_t&)fun >= (intptr_t)&FUNC_BEGIN && (intptr_t&)fun <= (intptr_t)&FUNC_END);
 	return function_pointers[GetFunctionSlot((void*&)fun)]; // the cast has to be to a ref to work with member functions in VC++
 }
 
+// NOTE: doesn't work with virtual functions
 template<typename T>
 T GetRealFunction(T fun)
 {
