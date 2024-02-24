@@ -55,7 +55,8 @@ StaticMap<std::string, Kenshi::BinaryVersion> HashToVersionMap = StaticMap<std::
     .Add("83ea507cf9667bfe8de2d8a64e9ea57a", Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"))
     .Add("631763f867f8a674fc54a78cd5767235", Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"))
     .Add("df4a5a7ef8a29deb24b70e7b7f4a222a", Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.65"))
-    .Add("1d67d862b4ce17c5b54279790fbe8f8a", Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"));
+    .Add("1d67d862b4ce17c5b54279790fbe8f8a", Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"))
+    .Add("213349bf76a0a758067f9ed0aef2ab01", Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.65"));
 
 // Game world address Steam 1.51.1 0x001AAE060
 // Game world address GOG 1.51.1 0x001AADFB0
@@ -64,22 +65,25 @@ StaticMap<Kenshi::BinaryVersion, offset_t> GameWorldOffset = StaticMap<Kenshi::B
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC9510)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01ACA520)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.65"), 0x021330B0)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC9470);
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC9470)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.65"), 0x02131020);
 
-// Search for 2000.000f in non-writable and one of th ose will be the correct value
+// Search for 2000.000f in non-writable and one of those will be the correct value
 // CAMERA_FAR
 StaticMap<Kenshi::BinaryVersion, offset_t> MaxCameraDistanceOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x011F4E18)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x011F5D88)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.65"), 0x016FF770)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x011F5AD8);
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x011F5AD8)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.65"), 0x016FE300);
 
 // CAMERA_CLOSE
 StaticMap<Kenshi::BinaryVersion, offset_t> MinCameraDistanceOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01188734)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01189734)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.65"), 0x0167EAD4)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01189704);
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01189704)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.65"), 0x0167DAD4);
 
 // easiest way to track this down is to find the vtable for: 
 // Ogre::STLAllocator<std::pair<std::basic_string<char,std::char_traits<char>,std::allocator<char> > const ,InputHandler::Command>,Ogre::CategorisedAllocPolicy<0> >
@@ -88,15 +92,17 @@ StaticMap<Kenshi::BinaryVersion, offset_t> InputHandlerOffset = StaticMap<Kenshi
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC8950)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01AC9960)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.65"), 0x02132320)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC88B0);
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC88B0)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.65"), 0x02130290);
 
 // SaveManager**
 // No vmt, find this by breakpointing SaveManager::saveGame() and backtrack from RCX
 StaticMap<Kenshi::BinaryVersion, offset_t> SaveManagerOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC4D98)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01AC5D88)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.65"), 0x0212DC08)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC4CD8);
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.65"), 0x0212DBC8)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC4CD8)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.65"), 0x0212BB08);
 
 // SaveFileSystem**
 // easiest way to track this down is to find the vtable and backtrack
@@ -104,25 +110,29 @@ StaticMap<Kenshi::BinaryVersion, offset_t> SaveFileSystemOffset = StaticMap<Kens
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC4DD8)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01AC5DC8)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.65"), 0x0212DC08)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC4D18);
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC4D18)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.65"), 0x0212BB48);
 
 StaticMap<Kenshi::BinaryVersion, offset_t> SaveManagerSaveGameFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x002B5D30)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x002B5D90)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.65"), 0x00375220)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x02B5890);
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x02B5890)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.65"), 0x0374E40);
 
 StaticMap<Kenshi::BinaryVersion, offset_t> ModLoadFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x006BEF60)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x006BFFA0)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.65"), 0x0086FC10)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x06BF910);
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x06BF910)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.65"), 0x086F3F0);
 
 StaticMap<Kenshi::BinaryVersion, offset_t> CrashReportFunction = StaticMap<Kenshi::BinaryVersion, offset_t>()
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x005CB0D0)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x005CC110)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.65"), 0x00744750)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x05CBC10);
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x05CBC10)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.65"), 0x07440B0);
 
 // TODO remove after dropping support for old versions
 StaticMap<Kenshi::BinaryVersion, offset_t> CurrentFontSizeOffset = StaticMap<Kenshi::BinaryVersion, offset_t>()
@@ -139,7 +149,8 @@ StaticMap<Kenshi::BinaryVersion, offset_t> GlobalConOffset = StaticMap<Kenshi::B
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.55"), 0x01AC91D0)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.64"), 0x01ACA1E0)
     .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::STEAM, "1.0.65"), 0x02132D70)
-    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC8120);
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.64"), 0x01AC8120)
+    .Add(Kenshi::BinaryVersion(Kenshi::BinaryVersion::GOG, "1.0.65"), 0x02130CE0);
 
 std::string kenshiHash = GetEXEHash();
 Kenshi::BinaryVersion kenshiVersion = HashToVersionMap.count(kenshiHash) > 0 ? HashToVersionMap.at(kenshiHash) : Kenshi::BinaryVersion(Kenshi::BinaryVersion::UNKNOWN, "UNKNOWN");
