@@ -1,40 +1,36 @@
 #pragma once
 
-#include "util/lektor.h"
-#include "util/hand.h"
-#include "util/PerfTimer.h"
-#include "RootObject.h"
-#include "TimeOfDay.h"
-#include "GameDataManager.h"
-#include "ModInfo.h"
+#include <ogre/OgreMemoryAllocatorConfig.h>
+#include <string>
+#include <ogre/OgreVector3.h>
+#include <ogre/OgreQuaternion.h>
+#include <kenshi/GameDataManager.h>
+#include <kenshi/util/OgreUnordered.h>
+#include <kenshi/util/PerfTimer.h>
+#include <kenshi/util/TimeOfDay.h>
+#include <kenshi/util/hand.h>
 
-#include <ogre/OgreMemoryAllocatedObject.h>
-#include <boost/unordered_set.hpp>
-
-#include <list>
-
-class Renderer;
-class PhysicsActual;
-class Character;
-class Building;
-class ZoneManager;
-class AudioSystemGlobal;
-class Alarm;
-class PlayerInterface;
-class RenderTimeBackthread;
+class GameDataManager;
 class RendererT;
+class AttachedEntity;
+class TownBuildingsManager;
+class NestBatcher;
 class PhysicsInterface;
 class RootObjectFactory;
 class FactionManager;
 class NavMesh;
 class NodeList;
 class MessageRoller;
-class AttachedEntity;
-class TownBuildingsManager;
-class NestBatcher;
-class RendererT;
+class ZoneMap;
+class RenderTimeBackthread;
 class ThreadWannabe;
+class RootObject;
+class ModInfo;
+class PlayerInterface;
+class ZoneManager;
+class AudioSystemGlobal;
 
+// TODO move?
 enum NxShapesType
 {
     NX_STATIC_SHAPES = 0x1,
@@ -47,110 +43,114 @@ class SimpleTimeStamper
 {
 public:
     CPerfTimer timer; // 0x0 Member
-    // no_addr public void SimpleTimeStamper(const class SimpleTimeStamper &);
-    SimpleTimeStamper();// RVA = 0x685F10
-    double getTime(double);// RVA = 0x2BD4A0
-    double stampTime();// RVA = 0x1CEFE0
-    ~SimpleTimeStamper();// RVA = 0x685EA0
-    // no_addr public class SimpleTimeStamper & operator=(const class SimpleTimeStamper &);
-    // no_addr public void * __vecDelDtor(unsigned int);
+    // no_addr void SimpleTimeStamper(const class SimpleTimeStamper & _a1);// public missing arg names
+    SimpleTimeStamper();// public RVA = 0x685F10
+    void _CONSTRUCTOR();// public RVA = 0x685F10
+    double getTime(double _lastStamp);// public RVA = 0x2BD4A0
+    double stampTime();// public RVA = 0x1CEFE0
+    ~SimpleTimeStamper();// public RVA = 0x685EA0
+    void _DESTRUCTOR();// public RVA = 0x685EA0
+    // no_addr class SimpleTimeStamper & operator=(const class SimpleTimeStamper & _a1);// public missing arg names
+    // no_addr void * __vecDelDtor(unsigned int _a1);// public missing arg names
 };
 
-class GameWorld : Ogre::AllocatedObject<Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> >
+class GameWorld : public Ogre::GeneralAllocatedObject
 {
 public:
     // Ogre::AllocatedObject<Ogre::CategorisedAllocPolicy<0> > offset = 0x8, length = 0x1
     // VTable         : (none)
     // Typedef        : HandCharacterMap
     float tempSpawnsDisableTimer; // 0x8 Member
-    void justLoadFactionRelations(GameDataManager*);// RVA = 0x7F5620
-    bool startUpThreads();// RVA = 0x6BC970
-    // no_addr public void GameWorld(const class GameWorld &);
-    GameWorld();// RVA = 0x6C4330
-    ~GameWorld();// RVA = 0x6BCB10
-    bool start(RendererT*);// RVA = 0x6B9E20
-    void resetGame();// RVA = 0x2AD5B0
-    void _clearAndDestroyGameWorldStuff();// RVA = 0x2AC4B0
-    bool initialisation();// RVA = 0x6BD040
-    bool initialisationGameData();// RVA = 0x6BFFA0
-    void dailyUpdates();// RVA = 0x600FB0
-    void initialiseNewGameWorld(GameDataManager*);// RVA = 0x7F5370
-    void errorToLogReleaseMode(const std::string&);// RVA = 0x600580
-    void errorD(const std::string&);// RVA = 0x6005A0
-    void logToSave(const std::string&);// RVA = 0x6005B0
-    void log(const std::string&);// RVA = 0x6005C0
-    void logDebug(const std::string&, const std::string&);// RVA = 0x6005F0
-    void logDebug(const std::string&);// RVA = 0x6005E0
-    void destroy(Ogre::MovableObject*);// RVA = 0x612D80
-    void destroy(AttachedEntity*);// RVA = 0x612D40
-    void destroy(TownBuildingsManager*);// RVA = 0x612E50
-    void destroy(NestBatcher*);// RVA = 0x60DAF0
-    bool destroy(RootObject*, bool, const char*);// RVA = 0x6120F0
-    void destroy(GameData*);// RVA = 0x6530D0
-    bool getIsInKillList(RootObject*);// RVA = 0x60D740
-    void flushKillList();// RVA = 0x621460
-    void dynamicDestroyBuilding(const hand&);// RVA = 0x2111B0
-    bool allThreadQueuesAreClear();// RVA = 0x626710
+    void justLoadFactionRelations(GameDataManager * datasrc);// private RVA = 0x9EDD30
+    bool startUpThreads();// private RVA = 0x86BF20
+    // no_addr void GameWorld(const class GameWorld & _a1);// public missing arg names
+    GameWorld();// public RVA = 0x873780
+    void _CONSTRUCTOR();// public RVA = 0x873780
+    ~GameWorld();// public RVA = 0x86C0C0
+    void _DESTRUCTOR();// public RVA = 0x86C0C0
+    bool start(RendererT * _rend);// public RVA = 0x8693D0
+    void resetGame();// public RVA = 0x36C660
+    void _clearAndDestroyGameWorldStuff();// public RVA = 0x36B560
+    bool initialisation();// public RVA = 0x86C5F0
+    bool initialisationGameData();// public RVA = 0x86F3F0
+    void dailyUpdates();// public RVA = 0x7856F0
+    void initialiseNewGameWorld(GameDataManager * datasrc);// public RVA = 0x9EDA80
+    void errorToLogReleaseMode(const std::string & msg);// public RVA = 0x784CC0
+    void errorD(const std::string & msg);// public RVA = 0x784CE0
+    void logToSave(const std::string & msg);// public RVA = 0x784CF0
+    void log(const std::string & line);// public RVA = 0x784D00
+    void logDebug(const std::string & msg, const std::string & logname);// public RVA = 0x784D30
+    void logDebug(const std::string & line);// public RVA = 0x784D20
+    void destroy(Ogre::MovableObject * e);// public RVA = 0x799520
+    void destroy(AttachedEntity * e);// public RVA = 0x7994E0
+    void destroy(TownBuildingsManager * b);// public RVA = 0x7995F0
+    void destroy(NestBatcher * n);// public RVA = 0x794290
+    bool destroy(RootObject * obj, bool justUnloaded, const char * debugInfo);// public RVA = 0x798890
+    void destroy(GameData * d);// public RVA = 0x7EA990
+    bool getIsInKillList(RootObject * obj);// public RVA = 0x793EE0
+    void flushKillList();// public RVA = 0x7A7C00
+    void dynamicDestroyBuilding(const hand & h);// public RVA = 0x2AC0D0
+    bool allThreadQueuesAreClear();// public RVA = 0x7ACEB0
     bool initialized; // 0xC Member
-    RendererT* render; // 0x10 Member
-    PhysicsInterface* physics; // 0x18 Member
+    RendererT * render; // 0x10 Member
+    PhysicsInterface * physics; // 0x18 Member
     GameDataManager gamedata; // 0x20 Member
     GameDataManager leveldata; // 0x1A0 Member
     GameDataManager savedata; // 0x320 Member
-    RootObjectFactory* theFactory; // 0x4A0 Member
-    FactionManager* factionMgr; // 0x4A8 Member
-    NavMesh* navmesh; // 0x4B0 Member
-    NodeList* nodeList; // 0x4B8 Member
+    RootObjectFactory * theFactory; // 0x4A0 Member
+    FactionManager * factionMgr; // 0x4A8 Member
+    NavMesh * navmesh; // 0x4B0 Member
+    NodeList * nodeList; // 0x4B8 Member
     hand guiDisplayObject; // 0x4C0 Member
-    MessageRoller* messageRoller; // 0x4E0 Member
-    Ogre::Log* ogreLogger; // 0x4E8 Member
+    MessageRoller * messageRoller; // 0x4E0 Member
+    Ogre::Log * ogreLogger; // 0x4E8 Member
     bool steamEnabled; // 0x4F0 Member
     lektor<ModInfo> baseMods; // 0x4F8 Member
     lektor<std::string > baseModsNames; // 0x510 Member
-    lektor<ModInfo*> activeMods; // 0x528 Member
-    std::map<std::string, ModInfo, std::less<std::string >, Ogre::STLAllocator<std::pair<std::string const, ModInfo>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > availableModsByName; // 0x540 Member
-    lektor<ModInfo*> availabelModsOrderedList; // 0x568 Member
-    void initBaseMods();// RVA = 0x6B9FE0
-    void initModsList();// RVA = 0x6BEC60
-    lektor<ModInfo*> getModsListFromConfig();// RVA = 0x6B8860
-    const lektor<ModInfo*>& getAllModsList();// RVA = 0x6B7DE0
-    int getModIndex(const std::string&);// RVA = 0x6B7E60
-    const std::string& getModLeveldataFolder(const std::string&);// RVA = 0x6B7F30
-    void getObjectsWithinSphere(lektor<RootObject*>&, const Ogre::Vector3&, float, itemType, int, RootObject*);// RVA = 0x600850
-    void getCharactersWithinSphere(lektor<RootObject*>&, const Ogre::Vector3&, float, float, float, int, int, RootObject*);// RVA = 0x600D80
-    void getObjectsWithinBox(lektor<RootObject*>&, const Ogre::Vector3&, const Ogre::Vector3&, const Ogre::Quaternion&, itemType, int, RootObject*);// RVA = 0x600990
-    bool buildingIntersectionTestCapsule(const Ogre::Vector3&, float, float, RootObject*);// RVA = 0x600920
-    float getLightLevel(const Ogre::Vector3&, int, bool);// RVA = 0x80BFB0
-    void populateMapArea_nonPermanent(ZoneMap*, int, bool);// RVA = 0x7F49C0
-    bool findValidSpawnPos(Ogre::Vector3&, const Ogre::Vector3&);// RVA = 0x7F4CC0
-    void togglePause(bool);// RVA = 0x6023F0
-    float getFrameSpeedMultiplier();// RVA = 0x51D0C0
-    void setFrameSpeedMultiplier(float);// RVA = 0x602360
-    void setGameSpeed(float, bool);// RVA = 0x6024F0
-    void userPause(bool);// RVA = 0x602660
-    bool isPaused();// RVA = 0x9BA90
-    const Ogre::Vector3 getCameraCenter();// RVA = 0x600640
-    const Ogre::Vector3 getCameraPos();// RVA = 0x600670
-    bool fixNaNPosition(Ogre::Vector3&);// RVA = 0x6006E0
-    float getWindSpeed(const Ogre::Vector3&);// RVA = 0x600600
-    bool isLoadingFromASaveGame();// RVA = 0x600500
-    PlayerInterface* player; // 0x580 Member
-    void addToUpdateListMain(Character*);// RVA = 0x602320
-    void removeFromUpdateListMain(Character*);// RVA = 0x601B90
-    const boost::unordered::unordered_set<Character*, boost::hash<Character*>, std::equal_to<Character*>, Ogre::STLAllocator<Character*, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > >& getCharacterUpdateList();// RVA = 0x516680
-    void addToDeathParade(Character*);// RVA = 0x60F240
-    bool removeFromDeathParade(Character*);// RVA = 0x60F2A0
-    void removeFromDeathParadeByPlatoon(Platoon*);// RVA = 0x60F410
-    Character* getFromDeathParade(const hand&);// RVA = 0x63A330
-    void hideContextMenu();// RVA = 0x6204F0
-    // no_addr public void lockBackgroundThreadsForSave();
-    // no_addr public void unlockBackgroundThreads();
-    void showPlayerAMessage_withLog(const std::string&, bool);// RVA = 0x5B23F0
-    void showPlayerAMessage(const std::string&, bool);// RVA = 0x5B23D0
-    void showPlayerAMessageD(const std::string&, bool);// RVA = 0x5AEC90
-    void playNotification(const char*);// RVA = 0x1CC290
-    // no_addr public int getNumCharactersLoaded();
-    boost::unordered::unordered_set<Character*, boost::hash<Character*>, std::equal_to<Character*>, Ogre::STLAllocator<Character*, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > charactersWithLights; // 0x588 Member
+    lektor<ModInfo *> activeMods; // 0x528 Member
+    std::map<std::string,ModInfo,std::less<std::string >,Ogre::STLAllocator<std::pair<std::string const ,ModInfo>,Ogre::GeneralAllocPolicy > > availableModsByName; // 0x540 Member
+    lektor<ModInfo *> availabelModsOrderedList; // 0x568 Member
+    void initBaseMods();// public RVA = 0x869590
+    void initModsList();// public RVA = 0x86E210
+    lektor<ModInfo *> getModsListFromConfig();// public RVA = 0x867E10
+    const lektor<ModInfo *> & getAllModsList() const;// public RVA = 0x867390
+    int getModIndex(const std::string & modName) const;// public RVA = 0x867410
+    const std::string & getModLeveldataFolder(const std::string & modName);// public RVA = 0x8674E0
+    void getObjectsWithinSphere(lektor<RootObject *> & results, const Ogre::Vector3 & spherePos, float radius, itemType type, int maxNumber, RootObject * skip);// public RVA = 0x784F90
+    void getCharactersWithinSphere(lektor<RootObject *> & results, const Ogre::Vector3 & spherePos, float farRadius, float nearRadius, float always, int maxFar, int maxNear, RootObject * skip);// public RVA = 0x7854C0
+    void getObjectsWithinBox(lektor<RootObject *> & results, const Ogre::Vector3 & pos, const Ogre::Vector3 & size, const Ogre::Quaternion & rot, itemType type, int maxNumber, RootObject * skip);// public RVA = 0x7850D0
+    bool buildingIntersectionTestCapsule(const Ogre::Vector3 & pos, float radius, float length, RootObject * skip);// public RVA = 0x785060
+    float getLightLevel(const Ogre::Vector3 & position, int floor, bool inside) const;// public RVA = 0xA09760
+    void populateMapArea_nonPermanent(ZoneMap * map, int howMany, bool rePopulationMode);// public RVA = 0x9ED0D0
+    bool findValidSpawnPos(Ogre::Vector3 & pos, const Ogre::Vector3 & centerArea);// public RVA = 0x9ED3D0
+    void togglePause(bool on);// public RVA = 0x786B30
+    float getFrameSpeedMultiplier() const;// public RVA = 0x66BFE0
+    void setFrameSpeedMultiplier(float m);// public RVA = 0x786AA0
+    void setGameSpeed(float speed, bool click);// public RVA = 0x786C30
+    void userPause(bool p);// public RVA = 0x786DA0
+    bool isPaused() const;// public RVA = 0xDEDC0
+    const Ogre::Vector3 getCameraCenter() const;// public RVA = 0x784D80
+    const Ogre::Vector3 getCameraPos() const;// public RVA = 0x784DB0
+    bool fixNaNPosition(Ogre::Vector3 & pos) const;// public RVA = 0x784E20
+    float getWindSpeed(const Ogre::Vector3 & pos) const;// public RVA = 0x784D40
+    bool isLoadingFromASaveGame();// public RVA = 0x784C40
+    PlayerInterface * player; // 0x580 Member
+    void addToUpdateListMain(Character * character);// public RVA = 0x786A60
+    void removeFromUpdateListMain(Character * character);// public RVA = 0x7862D0
+    const ogre_unordered_set<Character *>::type & getCharacterUpdateList() const;// public RVA = 0x663BE0
+    void addToDeathParade(Character * who);// public RVA = 0x7959E0
+    bool removeFromDeathParade(Character * who);// public RVA = 0x795A40
+    void removeFromDeathParadeByPlatoon(Platoon * p);// public RVA = 0x795BB0
+    Character * getFromDeathParade(const hand & h);// public RVA = 0x7CC1E0
+    void hideContextMenu();// public RVA = 0x7A6C90
+    // no_addr void lockBackgroundThreadsForSave();// public
+    // no_addr void unlockBackgroundThreads();// public
+    void showPlayerAMessage_withLog(const std::string & message, bool queued);// public RVA = 0x723850
+    void showPlayerAMessage(const std::string & message, bool queued);// public RVA = 0x723830
+    void showPlayerAMessageD(const std::string & message, bool queued);// public RVA = 0x7200F0
+    void playNotification(const char * sound) const;// public RVA = 0x257850
+    // no_addr int getNumCharactersLoaded();// public
+    ogre_unordered_set<Character *>::type charactersWithLights; // 0x588 Member
     enum SysMessageEnum
     {
         SYS_NONE,
@@ -169,75 +169,79 @@ public:
         SYS_CHARACTER_PARTICLES,
         SYS_RESTORE_SQUAD,
         SYS_DESTROY_PLATOON,
-        SYS_BREAK_BUILDING
+        SYS_BREAK_BUILDING    
     };
 
     class SysMessage
     {
+    public:
         GameWorld::SysMessageEnum msg; // 0x0 Member
         hand target; // 0x8 Member
         hand from; // 0x28 Member
         bool on; // 0x48 Member
         float number; // 0x4C Member
-        void* data; // 0x50 Member
-        SysMessage(const GameWorld::SysMessage&);// RVA = 0x210230
-        SysMessage(GameWorld::SysMessageEnum, const hand&, const hand&, bool, float, void*);// RVA = 0x20F700
-        // no_addr public void SysMessage();
-        bool operator==(const GameWorld::SysMessage&);// RVA = 0x282970
-        // no_addr public class GameWorld::SysMessage & operator=(const class GameWorld::SysMessage &);
+        void * data; // 0x50 Member
+        SysMessage(const GameWorld::SysMessage & __that);// public RVA = 0x2AADF0
+        void _CONSTRUCTOR(const GameWorld::SysMessage & __that);// public RVA = 0x2AADF0
+        SysMessage(GameWorld::SysMessageEnum _msg, const hand & _target, const hand & _from, bool _on, float _number, void * _data);// public RVA = 0x2AA040
+        void _CONSTRUCTOR(GameWorld::SysMessageEnum _msg, const hand & _target, const hand & _from, bool _on, float _number, void * _data);// public RVA = 0x2AA040
+        // no_addr void SysMessage();// public
+        bool operator==(const GameWorld::SysMessage & m) const;// public RVA = 0x338050
+        // no_addr class GameWorld::SysMessage & operator=(const class GameWorld::SysMessage & _a1);// public missing arg names
     };
-    void sysMessage(const GameWorld::SysMessage&);// RVA = 0x2119A0
-    void sysMessageUrgent(const GameWorld::SysMessage&);// RVA = 0x510990
-    void sysMessage_noDuplicates(const GameWorld::SysMessage&);// RVA = 0x290D60
-    virtual void mainLoop_GPUSensitiveStuff(float);// RVA = 0x603060// vtable offset = 0x0
-    void clearPortaitsUpdate();// RVA = 0x601960
-    void addPortraitUpdate(const hand&);// RVA = 0x601C00
-    void removePortaitUpdate(const hand&);// RVA = 0x601C50
-    std::list<GameWorld::SysMessage, Ogre::STLAllocator<GameWorld::SysMessage, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > sysMessageList; // 0x5C8 Member
-    void processSysMessages();// RVA = 0x62EBB0
-    void getCollisionGroupType(itemType, NxShapesType&, unsigned int&);// RVA = 0x600740
-    boost::unordered::unordered_map<hand, float, boost::hash<hand>, std::equal_to<hand>, Ogre::STLAllocator<std::pair<hand const, float>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > updatePortraitsMap; // 0x5E8 Member
+    void sysMessage(const GameWorld::SysMessage & m);// public RVA = 0x2ACA90
+    void sysMessageUrgent(const GameWorld::SysMessage & m);// public RVA = 0x65C810
+    void sysMessage_noDuplicates(const GameWorld::SysMessage & m);// public RVA = 0x349730
+    virtual void mainLoop_GPUSensitiveStuff(float time);// public RVA = 0x7877A0 vtable offset = 0x0
+    void _NV_mainLoop_GPUSensitiveStuff(float time);// public RVA = 0x7877A0 vtable offset = 0x0
+    void clearPortaitsUpdate();// public RVA = 0x7860A0
+    void addPortraitUpdate(const hand & characterHandle);// public RVA = 0x786340
+    void removePortaitUpdate(const hand & characterHandle);// public RVA = 0x786390
+    std::list<GameWorld::SysMessage,Ogre::STLAllocator<GameWorld::SysMessage,Ogre::GeneralAllocPolicy > > sysMessageList; // 0x5C8 Member
+    void processSysMessages();// protected RVA = 0x7B5350
+    void getCollisionGroupType(itemType type, NxShapesType & shapeType, unsigned int & group);// protected RVA = 0x784E80
+    ogre_unordered_map<hand,float>::type updatePortraitsMap; // 0x5E8 Member
     lektor<hand> dynamicDestroyBuildingsList; // 0x628 Member
-    boost::unordered::unordered_set<AttachedEntity*, boost::hash<AttachedEntity*>, std::equal_to<AttachedEntity*>, Ogre::STLAllocator<AttachedEntity*, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > destroyListAE; // 0x640 Member
-    boost::unordered::unordered_set<Ogre::MovableObject*, boost::hash<Ogre::MovableObject*>, std::equal_to<Ogre::MovableObject*>, Ogre::STLAllocator<Ogre::MovableObject*, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > destroyListOE; // 0x680 Member
-    boost::unordered::unordered_set<TownBuildingsManager*, boost::hash<TownBuildingsManager*>, std::equal_to<TownBuildingsManager*>, Ogre::STLAllocator<TownBuildingsManager*, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > destroyListTBM; // 0x6C0 Member
+    ogre_unordered_set<AttachedEntity *>::type destroyListAE; // 0x640 Member
+    ogre_unordered_set<Ogre::MovableObject *>::type destroyListOE; // 0x680 Member
+    ogre_unordered_set<TownBuildingsManager *>::type destroyListTBM; // 0x6C0 Member
     float frameSpeedMult; // 0x700 Member
-    void destroyDeathParade();// RVA = 0x601980
-    boost::unordered::unordered_map<hand, Character*, boost::hash<hand>, std::equal_to<hand>, Ogre::STLAllocator<std::pair<hand const, Character*>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > deathParade; // 0x708 Member
+    void destroyDeathParade();// private RVA = 0x7860C0
+    ogre_unordered_map<hand,Character *>::type deathParade; // 0x708 Member
     bool deathParadeWasMeddledWith; // 0x748 Member
-    void processKeys();// RVA = 0x6027B0
-    void processThreadMessages();// RVA = 0x600450
+    void processKeys();// private RVA = 0x786EF0
+    void processThreadMessages();// private RVA = 0x784B90
     bool charUpdateListMain_inUse; // 0x749 Member
-    boost::unordered::unordered_set<Character*, boost::hash<Character*>, std::equal_to<Character*>, Ogre::STLAllocator<Character*, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > charUpdateListMain; // 0x750 Member
-    void charsUpdate();// RVA = 0x6014E0
-    void charsUpdateUT();// RVA = 0x601090
-    void charsUpdatePaused();// RVA = 0x6018E0
-    void charsUpdateDeathParade();// RVA = 0x6010F0
-    void threadSafeRagdollUpdates();// RVA = 0x63E680
-    RenderTimeBackthread* _AINonRenderThread; // 0x790 Member
-    ThreadWannabe* AINonRenderThread();// RVA = 0x1FF8F0
-    void processAttachmentsKillList();// RVA = 0x60DBA0
-    void processKillList(bool);// RVA = 0x615EA0
-    void processUpdateRemovalList();// RVA = 0x60DB20
-    std::deque<NestBatcher*, Ogre::STLAllocator<NestBatcher*, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > nestBatcherKillList; // 0x798 Member
-    boost::unordered::unordered_set<RootObject*, boost::hash<RootObject*>, std::equal_to<RootObject*>, Ogre::STLAllocator<RootObject*, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > killListPhase0; // 0x7D0 Member
-    boost::unordered::unordered_map<RootObject*, float, boost::hash<RootObject*>, std::equal_to<RootObject*>, Ogre::STLAllocator<std::pair<RootObject* const, float>, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > killListPhase1; // 0x810 Member
-    std::deque<RootObject*, Ogre::STLAllocator<RootObject*, Ogre::CategorisedAllocPolicy<Ogre::MEMCATEGORY_GENERAL> > > killListPhase2; // 0x850 Member
-    lektor<Character*> mainUpdateListRemovalQueue; // 0x888 Member
-    void loadAllPlatoons();// RVA = 0x7F4FB0
-    void reCalculateFortificationInsideOutsideStateForAllCharacters();// RVA = 0x600FC0
+    ogre_unordered_set<Character *>::type charUpdateListMain; // 0x750 Member
+    void charsUpdate();// private RVA = 0x785C20
+    void charsUpdateUT();// private RVA = 0x7857D0
+    void charsUpdatePaused();// private RVA = 0x786020
+    void charsUpdateDeathParade();// private RVA = 0x785830
+    void threadSafeRagdollUpdates();// private RVA = 0x7D1120
+    RenderTimeBackthread * _AINonRenderThread; // 0x790 Member
+    ThreadWannabe * AINonRenderThread();// public RVA = 0x2963B0
+    void processAttachmentsKillList();// public RVA = 0x794340
+    void processKillList(bool forceImmediate);// protected RVA = 0x79C640
+    void processUpdateRemovalList();// protected RVA = 0x7942C0
+    std::deque<NestBatcher *,Ogre::STLAllocator<NestBatcher *,Ogre::GeneralAllocPolicy > > nestBatcherKillList; // 0x798 Member
+    ogre_unordered_set<RootObject *>::type killListPhase0; // 0x7D0 Member
+    ogre_unordered_map<RootObject *,float>::type killListPhase1; // 0x810 Member
+    std::deque<RootObject *,Ogre::STLAllocator<RootObject *,Ogre::GeneralAllocPolicy > > killListPhase2; // 0x850 Member
+    lektor<Character *> mainUpdateListRemovalQueue; // 0x888 Member
+    void loadAllPlatoons();// protected RVA = 0x9ED6C0
+    void reCalculateFortificationInsideOutsideStateForAllCharacters();// public RVA = 0x785700
     SimpleTimeStamper timeStamper; // 0x8A0 Member
-    double getTimeStamp();// RVA = 0x1CF000
-    TimeOfDay getTimeFromStamp(const TimeOfDay&);// RVA = 0x51D510
-    float getTimeFromStamp(double);// RVA = 0x406B60
-    float getTimeFromStamp_inGameHours(double);// RVA = 0x51B7E0
-    TimeOfDay getTimeStamp_inGameHours();// RVA = 0x51D4F0
-    float getLengthOfHourInRealSeconds();// RVA = 0x51DCD0
-    ZoneManager* zoneMgr; // 0x8B0 Member
+    double getTimeStamp();// public RVA = 0x25B040
+    TimeOfDay getTimeFromStamp(const TimeOfDay & stamp);// public RVA = 0x66C4B0
+    float getTimeFromStamp(double stamp);// public RVA = 0x514C10
+    float getTimeFromStamp_inGameHours(double stamp);// public RVA = 0x66A070
+    TimeOfDay getTimeStamp_inGameHours();// public RVA = 0x66C490
+    float getLengthOfHourInRealSeconds();// public RVA = 0x66CC70
+    ZoneManager * zoneMgr; // 0x8B0 Member
     bool debugFlag; // 0x8B8 Member
     bool paused; // 0x8B9 Member
     bool gameResetting; // 0x8BA Member
-    AudioSystemGlobal* audioThread; // 0x8C0 Member
-    // no_addr public class GameWorld & operator=(const class GameWorld &);
-    // no_addr public void * __vecDelDtor(unsigned int);
+    AudioSystemGlobal * audioThread; // 0x8C0 Member
+    // no_addr class GameWorld & operator=(const class GameWorld & _a1);// public missing arg names
+    // no_addr void * __vecDelDtor(unsigned int _a1);// public missing arg names
 };

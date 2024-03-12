@@ -2,7 +2,7 @@
 
 #include <map>
  
-#include <ogre/OgreMemoryAllocatedObject.h>
+#include <ogre/OgreMemoryAllocatorConfig.h>
 
 // RVAs from FitnessSelector<CombatTechniqueData*>
 template<typename T>

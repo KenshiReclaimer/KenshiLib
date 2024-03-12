@@ -1,4 +1,5 @@
 #pragma once
+
 class Item;
 
 void  showErrorMessage();// RVA = 0x5CC110

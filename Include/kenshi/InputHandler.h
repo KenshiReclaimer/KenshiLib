@@ -3,7 +3,7 @@
 #include "util/lektor.h"
 
 #include <map>
-#include <ogre/OgreMemoryAllocatedObject.h>
+#include <ogre/OgreMemoryAllocatorConfig.h>
 #include <ogre/OgreVector2.h>
 #include <ogre/OgreVector3.h>
 #include <ois/OISKeyboard.h>

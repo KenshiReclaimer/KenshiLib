@@ -1,8 +1,8 @@
 #pragma once
 
-#include "util/lektor.h"
 #include "Enums.h"
-#include "TimeOfDay.h"
+#include "util/lektor.h"
+#include "util/TimeOfDay.h"
 #include "util/StringPair.h"
 
 #include <ogre/OgreVector3.h>

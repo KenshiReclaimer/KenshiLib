@@ -37,6 +37,9 @@
     <Filter Include="Source Files\kenshi">
       <UniqueIdentifier>{38cf539a-2379-436a-976c-12ad88c29a23}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\kenshi\util">
+      <UniqueIdentifier>{06f5bdcb-92ea-409e-90f6-4a41bd849db2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\core\RVA.cpp">
@@ -2048,19 +2051,10 @@
     <ClInclude Include="Include\kenshi\GameWorld.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
-    <ClInclude Include="Include\kenshi\util\hand.h">
-      <Filter>Header Files\kenshi</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\kenshi\util\lektor.h">
-      <Filter>Header Files\kenshi</Filter>
-    </ClInclude>
     <ClInclude Include="Include\kenshi\MedicalSystem.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
     <ClInclude Include="Include\kenshi\ModInfo.h">
-      <Filter>Header Files\kenshi</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\kenshi\Platoon.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
     <ClInclude Include="Include\kenshi\PlayerInterface.h">
@@ -2174,22 +2168,10 @@
     <ClInclude Include="Include\kenshi\RootObject.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
-    <ClInclude Include="Include\kenshi\TimeOfDay.h">
-      <Filter>Header Files\kenshi</Filter>
-    </ClInclude>
     <ClInclude Include="Include\kenshi\Enums.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
-    <ClInclude Include="Include\kenshi\util\StringPair.h">
-      <Filter>Header Files\kenshi</Filter>
-    </ClInclude>
     <ClInclude Include="Include\kenshi\Logger.h">
-      <Filter>Header Files\kenshi</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\kenshi\util\Array2d.h">
-      <Filter>Header Files\kenshi</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\kenshi\util\YesNoMaybe.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
     <ClInclude Include="Include\kenshi\CharStats.h">
@@ -2198,16 +2180,73 @@
     <ClInclude Include="Include\kenshi\GlobalConstants.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
-    <ClInclude Include="Include\kenshi\util\functions.h">
+    <ClInclude Include="Include\kenshi\Globals.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
-    <ClInclude Include="Include\kenshi\Globals.h">
+    <ClInclude Include="Include\kenshi\Dialogue.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
     <ClInclude Include="Include\kenshi\FitnessSelector.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
+    <ClInclude Include="Include\kenshi\Platoon.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\util\Array2d.h">
+      <Filter>Header Files\kenshi\util</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\util\functions.h">
+      <Filter>Header Files\kenshi\util</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\util\hand.h">
+      <Filter>Header Files\kenshi\util</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\util\lektor.h">
+      <Filter>Header Files\kenshi\util</Filter>
+    </ClInclude>
     <ClInclude Include="Include\kenshi\util\OgreUnordered.h">
+      <Filter>Header Files\kenshi\util</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\util\StringPair.h">
+      <Filter>Header Files\kenshi\util</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\util\TimeOfDay.h">
+      <Filter>Header Files\kenshi\util</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\util\PerfTimer.h">
+      <Filter>Header Files\kenshi\util</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\util\YesNoMaybe.h">
+      <Filter>Header Files\kenshi\util</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\GameSaveState.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\Bounty.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\BountyManager.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\CharacterAnimal.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\CharacterHuman.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\InstanceID.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\RootObjectBase.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\SaveFileSystem.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\FactionLeader.h">
+      <Filter>Header Files\kenshi</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kenshi\TradeCulture.h">
       <Filter>Header Files\kenshi</Filter>
     </ClInclude>
   </ItemGroup>

@@ -35,6 +35,7 @@ inline intptr_t GetFunctionSlot(void* ptr)
 {
 	intptr_t functionsStart = (intptr_t)&FUNC_BEGIN;
 	intptr_t functionAddr = (intptr_t)ptr;
+	intptr_t slot = (functionAddr - functionsStart) / FUNCTION_SIZE;
 	return (functionAddr - functionsStart) / FUNCTION_SIZE;
 }
 

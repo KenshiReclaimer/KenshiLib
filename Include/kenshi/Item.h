@@ -2,7 +2,8 @@
 
 #include "RootObject.h"
 #include "util/YesNoMaybe.h"
-#include "TimeOfDay.h"
+#include "util/TimeOfDay.h"
+#include "util/OgreUnordered.h"
 
 // TODO RobotLimbItem SeveredLimbItem NestItem BlueprintItem MapItem MoneyItem
 
@@ -387,6 +388,8 @@ public:
 	// no_addr public class RaceLimiter & operator=(const class RaceLimiter &);
 	// no_addr public void * __vecDelDtor(unsigned int);
 };
+
+class GameData;
 
 class ContainerItem : Item, RaceLimiter
 {

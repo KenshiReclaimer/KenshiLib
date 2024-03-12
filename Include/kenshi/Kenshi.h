@@ -1,6 +1,6 @@
 #pragma once
-#include "mygui/MyGUI_Gui.h"
 
+#include "mygui/MyGUI_Gui.h"
 
 class GameWorld;
 class PlayerInterface;

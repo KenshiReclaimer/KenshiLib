@@ -5,6 +5,7 @@
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 
+// TODO can this be done with typedefs?
 template<typename T1, typename T2>
 struct ogre_unordered_map
 {
